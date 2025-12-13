@@ -4,8 +4,8 @@
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-header">
       <div class="logo">
-        <i class="bi bi-building"></i>
-        <span class="logo-text">School MS</span>
+        <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="" class="user-avatar-img rounded-0" />
+        <span class="logo-text">Attendance</span>
       </div>
       <button class="sidebar-toggle" (click)="toggleSidebar()">
         <i class="bi" [class.bi-chevron-left]="!sidebarCollapsed" [class.bi-chevron-right]="sidebarCollapsed"></i>
@@ -105,10 +105,6 @@
 
           @if (userMenuOpen) {
           <div class="user-dropdown">
-            <a class="dropdown-item" href="#">
-              <i class="bi bi-person"></i>
-              <span>Profile</span>
-            </a>
             <a class="dropdown-item" href="#">
               <i class="bi bi-gear"></i>
               <span>Settings</span>

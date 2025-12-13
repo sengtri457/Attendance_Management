@@ -1,19 +1,19 @@
-import { Component, OnInit, Pipe } from "@angular/core";
+import { Component, OnInit, Pipe } from '@angular/core';
 import {
   Attendance,
   AttendanceFilters,
   PaginationResponse,
-} from "../../../models/user.model";
-import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { RouterModule } from "@angular/router";
+} from '../../../models/user.model';
+import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: "app-attendance-list.component",
+  selector: 'app-attendance-list.component',
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: "./attendance-list.component.html",
-  styleUrl: "./attendance-list.component.css",
+  templateUrl: './attendance-list.component.html',
+  styleUrl: './attendance-list.component.css',
 })
 export class AttendanceListComponent implements OnInit {
   attendanceRecords: Attendance[] = [];
@@ -21,7 +21,7 @@ export class AttendanceListComponent implements OnInit {
   currentPage = 1;
   totalPages = 1;
   totalRecords = 0;
-
+  public Math = Math;
   filters: AttendanceFilters = {
     page: 1,
     limit: 20,
@@ -45,7 +45,7 @@ export class AttendanceListComponent implements OnInit {
         this.loading = false;
       },
       error: (error) => {
-        console.error("Error loading attendance:", error);
+        console.error('Error loading attendance:', error);
         this.loading = false;
       },
     });
@@ -64,7 +64,7 @@ export class AttendanceListComponent implements OnInit {
   exportData(): void {
     this.attendanceService.exportToCSV(
       this.attendanceRecords,
-      "attendance-records.csv",
+      'attendance-records.csv'
     );
   }
 

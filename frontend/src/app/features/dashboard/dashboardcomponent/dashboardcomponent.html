@@ -310,7 +310,59 @@
       </div>
     </div>
   </div>
-
+  <div class="row mt-4">
+    <div class="col-">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-pie-chart-fill me-2"></i>
+            Attendance Overview
+          </h5>
+          <!-- Line Chart -->
+          <div class="chart-container chart-wide">
+            <canvas #lineCanvas></canvas>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-text">Summary of attendance statistics</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            User Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas #barCanvas></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-doughnut-chart-fill me-2"></i>
+            Attendance Status
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas #doughnutCanvas></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="row mt-4">
     <div class="col-12">
       <div class="card">
