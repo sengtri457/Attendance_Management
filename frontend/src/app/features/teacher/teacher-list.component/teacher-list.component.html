@@ -30,7 +30,6 @@
               <th><i class="bi bi-person me-1"></i> Name</th>
               <th><i class="bi bi-envelope me-1"></i> Email</th>
               <th><i class="bi bi-telephone me-1"></i> Phone</th>
-              <th><i class="bi bi-person-badge me-1"></i> Username</th>
               <th><i class="bi bi-book me-1"></i> Subjects</th>
               <th class="text-center">Actions</th>
             </tr>
@@ -57,9 +56,7 @@
                 <span class="text-muted">-</span>
                 }
               </td>
-              <td class="align-middle">
-                <span class="badge bg-secondary">{{ teacher.user.username }}</span>
-              </td>
+
               <td class="align-middle">
                 <span class="badge bg-info">{{ teacher?.subject?.subjectName || "No teach"}}</span>
               </td>

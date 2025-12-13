@@ -1,29 +1,29 @@
-import { Component, inject } from "@angular/core";
-import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
-import { LateReportItem } from "../../../models/user.model";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
+import { Component, inject } from '@angular/core';
+import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
+import { LateReportItem } from '../../../models/user.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: "app-late-report.component",
+  selector: 'app-late-report.component',
   imports: [CommonModule, FormsModule],
-  templateUrl: "./late-report.component.html",
-  styleUrl: "./late-report.component.css",
+  templateUrl: './late-report.component.html',
+  styleUrl: './late-report.component.css',
 })
 export class LateReportComponent {
   attendanceService = inject(AttendanceService);
 
   lateReport: any[] = [];
-  dateFrom: string = "";
-  dateTo: string = "";
+  dateFrom: string = '';
+  dateTo: string = '';
   minLateCount: number | undefined;
 
   loading = false;
-  errorMessage = "";
+  errorMessage = '';
   totalCount = 0;
 
-  sortColumn: string = "lateCount";
-  sortDirection: "asc" | "desc" = "desc";
+  sortColumn: string = 'lateCount';
+  sortDirection: 'asc' | 'desc' = 'desc';
 
   ngOnInit() {
     this.setDefaultDates();
@@ -35,13 +35,13 @@ export class LateReportComponent {
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    this.dateFrom = thirtyDaysAgo.toISOString().split("T")[0];
-    this.dateTo = today.toISOString().split("T")[0];
+    this.dateFrom = thirtyDaysAgo.toISOString().split('T')[0];
+    this.dateTo = today.toISOString().split('T')[0];
   }
 
   loadLateReport() {
     this.loading = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
 
     this.attendanceService
       .getLateReport(this.dateFrom, this.dateTo, this.minLateCount)
@@ -55,7 +55,7 @@ export class LateReportComponent {
         },
         error: (error) => {
           this.errorMessage =
-            error.error?.message || "Failed to load late report";
+            error.error?.message || 'Failed to load late report';
           this.loading = false;
         },
       });
@@ -69,10 +69,10 @@ export class LateReportComponent {
 
   sortBy(column: string) {
     if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortColumn = column;
-      this.sortDirection = "desc";
+      this.sortDirection = 'desc';
     }
     this.sortData();
   }
@@ -82,20 +82,20 @@ export class LateReportComponent {
       let aVal: any = a[this.sortColumn as keyof LateReportItem];
       let bVal: any = b[this.sortColumn as keyof LateReportItem];
 
-      if (this.sortColumn === "name") {
+      if (this.sortColumn === 'name') {
         aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
         bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
       }
 
-      if (aVal < bVal) return this.sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return this.sortDirection === "asc" ? 1 : -1;
+      if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }
 
   getSortIcon(column: string): string {
-    if (this.sortColumn !== column) return "↕";
-    return this.sortDirection === "asc" ? "↑" : "↓";
+    if (this.sortColumn !== column) return '↕';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   get totalLateInstances(): number {
@@ -103,15 +103,15 @@ export class LateReportComponent {
   }
 
   get averageLateCount(): string {
-    if (this.lateReport.length === 0) return "0";
+    if (this.lateReport.length === 0) return '0';
     return (this.totalLateInstances / this.lateReport.length).toFixed(1);
   }
 
   get averageLateMinutes(): string {
-    if (this.lateReport.length === 0) return "0";
+    if (this.lateReport.length === 0) return '0';
     const totalMinutes = this.lateReport.reduce(
       (sum, item) => sum + item.totalLateMinutes,
-      0,
+      0
     );
     return (totalMinutes / this.totalLateInstances).toFixed(1);
   }
@@ -122,41 +122,39 @@ export class LateReportComponent {
 
   exportToCSV() {
     const headers = [
-      "Student ID",
-      "First Name",
-      "Last Name",
-      "Email",
-      "Late Count",
-      "Average Late By (min)",
-      "Total Late Minutes",
-      "Last Late Date",
+      'Student ID',
+      'First Name',
+      'Last Name',
+      'Late Count',
+      'Average Late By (min)',
+      'Total Late Minutes',
+      'Last Late Date',
     ];
 
     const rows = this.lateReport.map((item) => [
       item.studentId,
-      item?.firstName,
-      item?.lastName,
-      item?.email,
+      item?.student.firstName,
+      item?.student.lastName,
       item.lateCount.toString(),
-      item.averageLateBy,
+      item.avgLateMinutes.toString(),
       item.totalLateMinutes.toString(),
-      this.formatDate(item.lastLateDate),
+      this.formatDate(item.latestLateDate),
     ]);
 
     const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n');
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
     const filename = `late-report-${this.dateFrom}-to-${this.dateTo}.csv`;
 
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

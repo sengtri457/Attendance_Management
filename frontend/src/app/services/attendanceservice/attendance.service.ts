@@ -1,8 +1,9 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
-import { Injectable } from "@angular/core";
-import { inject } from "@angular/core/primitives/di";
-import { environment } from "../../../environments/environment";
-import { Observable } from "rxjs";
+import { Student } from './../../models/user.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { inject } from '@angular/core/primitives/di';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
 import {
   Attendance,
   AttendanceStats,
@@ -13,14 +14,13 @@ import {
   PaginationResponse,
   MarkAbsentRequest,
   MarkAbsentResponse,
-  Student,
   LeaveRequest,
   MarkAttendanceRequest,
-} from "../../models/user.model";
-import { LeaveStatusCheck } from "../../models/leave.model";
+} from '../../models/user.model';
+import { LeaveStatusCheck } from '../../models/leave.model';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AttendanceService {
   private http = inject(HttpClient);
@@ -34,30 +34,30 @@ export class AttendanceService {
    */
 
   getAll(
-    filters?: AttendanceFilters,
+    filters?: AttendanceFilters
   ): Observable<PaginationResponse<Attendance>> {
     let params = new HttpParams();
 
     if (filters?.studentId) {
-      params = params.set("studentId", filters.studentId);
+      params = params.set('studentId', filters.studentId);
     }
     if (filters?.dateFrom) {
-      params = params.set("dateFrom", filters.dateFrom);
+      params = params.set('dateFrom', filters.dateFrom);
     }
     if (filters?.dateTo) {
-      params = params.set("dateTo", filters.dateTo);
+      params = params.set('dateTo', filters.dateTo);
     }
     if (filters?.status) {
-      params = params.set("status", filters.status);
+      params = params.set('status', filters.status);
     }
     if (filters?.isLate !== undefined) {
-      params = params.set("isLate", filters.isLate.toString());
+      params = params.set('isLate', filters.isLate.toString());
     }
     if (filters?.page) {
-      params = params.set("page", filters.page.toString());
+      params = params.set('page', filters.page.toString());
     }
     if (filters?.limit) {
-      params = params.set("limit", filters.limit.toString());
+      params = params.set('limit', filters.limit.toString());
     }
 
     return this.http.get<PaginationResponse<Attendance>>(this.apiUrl, {
@@ -93,7 +93,7 @@ export class AttendanceService {
       checkOutTime?: string;
       note?: string;
       status?: string;
-    },
+    }
   ): Observable<{ success: boolean; message: string; data: Attendance }> {
     return this.http.put<{
       success: boolean;
@@ -107,7 +107,7 @@ export class AttendanceService {
    */
   delete(id: string): Observable<{ success: boolean; message: string }> {
     return this.http.delete<{ success: boolean; message: string }>(
-      `${this.apiUrl}/${id}`,
+      `${this.apiUrl}/${id}`
     );
   }
 
@@ -117,11 +117,11 @@ export class AttendanceService {
   getStudentStats(
     studentId: string,
     dateFrom?: string,
-    dateTo?: string,
+    dateTo?: string
   ): Observable<any> {
     let params = new HttpParams();
-    if (dateFrom) params = params.set("dateFrom", dateFrom);
-    if (dateTo) params = params.set("dateTo", dateTo);
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
 
     return this.http.get(`${this.apiUrl}/stats/${studentId}`, { params });
   }
@@ -132,13 +132,13 @@ export class AttendanceService {
   getLateReport(
     dateFrom?: string,
     dateTo?: string,
-    minLateCount?: number,
+    minLateCount?: number
   ): Observable<{ success: boolean; count: number; data: LateReportItem[] }> {
     let params = new HttpParams();
-    if (dateFrom) params = params.set("dateFrom", dateFrom);
-    if (dateTo) params = params.set("dateTo", dateTo);
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
     if (minLateCount)
-      params = params.set("minLateCount", minLateCount.toString());
+      params = params.set('minLateCount', minLateCount.toString());
 
     return this.http.get<{
       success: boolean;
@@ -152,11 +152,11 @@ export class AttendanceService {
    */
   getAbsentReport(
     dateFrom?: string,
-    dateTo?: string,
+    dateTo?: string
   ): Observable<{ success: boolean; count: number; data: AbsentReportItem[] }> {
     let params = new HttpParams();
-    if (dateFrom) params = params.set("dateFrom", dateFrom);
-    if (dateTo) params = params.set("dateTo", dateTo);
+    if (dateFrom) params = params.set('dateFrom', dateFrom);
+    if (dateTo) params = params.set('dateTo', dateTo);
 
     return this.http.get<{
       success: boolean;
@@ -184,7 +184,7 @@ export class AttendanceService {
     studentIds: string[],
     date: string,
     markedByTeacherId: string,
-    note?: string,
+    note?: string
   ): Observable<any> {
     return this.http.post(`${this.apiUrl}/mark-absent`, {
       studentIds,
@@ -201,7 +201,7 @@ export class AttendanceService {
     dateFrom?: string,
     dateTo?: string,
     page?: number,
-    limit?: number,
+    limit?: number
   ): Observable<PaginationResponse<Attendance>> {
     return this.getAll({ studentId, dateFrom, dateTo, page, limit });
   }
@@ -213,7 +213,7 @@ export class AttendanceService {
     dateFrom: string,
     dateTo: string,
     page?: number,
-    limit?: number,
+    limit?: number
   ): Observable<PaginationResponse<Attendance>> {
     return this.getAll({ dateFrom, dateTo, page, limit });
   }
@@ -225,7 +225,7 @@ export class AttendanceService {
     dateFrom?: string,
     dateTo?: string,
     page?: number,
-    limit?: number,
+    limit?: number
   ): Observable<PaginationResponse<Attendance>> {
     return this.getAll({ isLate: true, dateFrom, dateTo, page, limit });
   }
@@ -237,21 +237,21 @@ export class AttendanceService {
     dateFrom?: string,
     dateTo?: string,
     page?: number,
-    limit?: number,
+    limit?: number
   ): Observable<PaginationResponse<Attendance>> {
-    return this.getAll({ status: "absent", dateFrom, dateTo, page, limit });
+    return this.getAll({ status: 'absent', dateFrom, dateTo, page, limit });
   }
 
   /**
    * Check if student is present today
    */
   isStudentPresentToday(studentId: string): Observable<boolean> {
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split('T')[0];
     return new Observable((observer) => {
       this.getAll({ studentId, dateFrom: today, dateTo: today }).subscribe({
         next: (response) => {
           const hasPresent = response.data.some(
-            (att) => att.status === "present" || att.status === "late",
+            (att) => att.status === 'present' || att.status === 'late'
           );
           observer.next(hasPresent);
           observer.complete();
@@ -267,7 +267,7 @@ export class AttendanceService {
   calculateAttendancePercentage(
     studentId: string,
     dateFrom?: string,
-    dateTo?: string,
+    dateTo?: string
   ): Observable<number> {
     return new Observable((observer) => {
       this.getStudentStats(studentId, dateFrom, dateTo).subscribe({
@@ -284,11 +284,11 @@ export class AttendanceService {
    * Format time for display (HH:MM AM/PM)
    */
   formatTime(date: Date | string | null): string {
-    if (!date) return "N/A";
+    if (!date) return 'No Times';
     const d = new Date(date);
-    return d.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
+    return d.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
     });
   }
 
@@ -296,10 +296,10 @@ export class AttendanceService {
    * Format date for display
    */
   formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
+    return new Date(date).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
     });
   }
 
@@ -308,13 +308,13 @@ export class AttendanceService {
    */
   getStatusColor(status: string): string {
     const colors: { [key: string]: string } = {
-      present: "success",
-      late: "warning",
-      absent: "danger",
-      "half-day": "info",
-      "on-leave": "secondary",
+      present: 'success',
+      late: 'warning',
+      absent: 'danger',
+      'half-day': 'info',
+      'on-leave': 'secondary',
     };
-    return colors[status] || "secondary";
+    return colors[status] || 'secondary';
   }
 
   /**
@@ -322,13 +322,13 @@ export class AttendanceService {
    */
   getStatusIcon(status: string): string {
     const icons: { [key: string]: string } = {
-      present: "check-circle",
-      late: "clock",
-      absent: "x-circle",
-      "half-day": "minus-circle",
-      "on-leave": "calendar",
+      present: 'check-circle',
+      late: 'clock',
+      absent: 'x-circle',
+      'half-day': 'minus-circle',
+      'on-leave': 'calendar',
     };
-    return icons[status] || "circle";
+    return icons[status] || 'circle';
   }
 
   /**
@@ -336,61 +336,63 @@ export class AttendanceService {
    */
   exportToCSV(
     data: Attendance[],
-    filename: string = "attendance-report.csv",
+    filename: string = 'attendance-report.csv'
   ): void {
     const headers = [
-      "Date",
-      "Student Name",
-      "Student ID",
-      "Check In",
-      "Check Out",
-      "Status",
-      "Late By (min)",
-      "Work Hours",
-      "Note",
+      'Date',
+      'Student Name',
+      'Student ID',
+      'Check In',
+      'Check Out',
+      'Status',
+      'Late By (min)',
+      'Work Hours',
+      'Note',
     ];
 
     const rows = data.map((att) => {
-      const student = typeof att.student === "object" ? att.student : null;
+      const student = typeof att.student === 'object' ? att.student : null;
       return [
         this.formatDate(att.date),
-        student ? `${student.firstName} ${student.lastName}` : "N/A",
-        student?.studentId || "N/A",
-        this.formatTime(att.checkInTime),
-        this.formatTime(att.checkOutTime),
+        student
+          ? `${student.firstName} ${student.lastName}`
+          : 'Unavailable Name',
+        student?._id || 'N/A',
+        this.formatTime(att.checkInTime || null),
+        this.formatTime(att.checkOutTime || null),
         att.status,
         att.lateBy.toString(),
         att.workHours.toFixed(2),
-        att.note || "",
+        att.note || '',
       ];
     });
 
     const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n');
 
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   }
   checkLeaveStatus(
     studentId: string,
-    date: string,
+    date: string
   ): Observable<LeaveStatusCheck> {
     const params = new HttpParams()
-      .set("studentId", studentId)
-      .set("date", date);
+      .set('studentId', studentId)
+      .set('date', date);
 
     return this.http.get<LeaveStatusCheck>(
       `${this.apiUrl}/check-leave-status`,
-      { params },
+      { params }
     );
   }
 }

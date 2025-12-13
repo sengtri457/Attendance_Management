@@ -27,20 +27,10 @@
             <span class="input-group-text bg-white">
               <i class="bi bi-search text-muted"></i>
             </span>
-            <input
-              type="text"
-              class="form-control"
-              [(ngModel)]="searchTerm"
-              (input)="onSearchChange()"
-              placeholder="Type to search by name or email..."
-              [disabled]="loadingStudents"
-            />
-            <button
-              *ngIf="searchTerm"
-              class="btn btn-outline-secondary"
-              type="button"
-              (click)="searchTerm=''; onSearchChange()"
-            >
+            <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+              placeholder="Type to search by name or email..." [disabled]="loadingStudents" />
+            <button *ngIf="searchTerm" class="btn btn-outline-secondary" type="button"
+              (click)="searchTerm=''; onSearchChange()">
               <i class="bi bi-x-lg"></i>
             </button>
           </div>
@@ -52,12 +42,8 @@
           <label class="form-label fw-semibold">
             <i class="bi bi-people me-1"></i>Or Select from List
           </label>
-          <select
-            class="form-select form-select-lg"
-            [(ngModel)]="studentId"
-            (change)="onStudentChange($event)"
-            [disabled]="loadingStudents"
-          >
+          <select class="form-select form-select-lg" [(ngModel)]="studentId" (change)="onStudentChange($event)"
+            [disabled]="loadingStudents">
             <option value="">-- Select a Student --</option>
             <option *ngFor="let student of filteredStudents" [value]="student._id">
               {{ student.firstName }} {{ student.lastName }} - {{ student.user.email }}
@@ -81,11 +67,7 @@
 
         <!-- Clear Button -->
         <div class="col-12" *ngIf="selectedStudent || searchTerm">
-          <button
-            type="button"
-            class="btn btn-outline-secondary"
-            (click)="clearStudentSelection()"
-          >
+          <button type="button" class="btn btn-outline-secondary" (click)="clearStudentSelection()">
             <i class="bi bi-x-lg me-2"></i>Clear Selection & Search
           </button>
         </div>
@@ -96,8 +78,9 @@
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
             <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3"
-                 style="width: 50px; height: 50px; flex-shrink: 0;">
-              <strong class="fs-5">{{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}</strong>
+              style="width: 50px; height: 50px; flex-shrink: 0;">
+              <strong
+                class="fs-5">{{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}</strong>
             </div>
             <div>
               <h6 class="mb-0">
@@ -113,26 +96,19 @@
               </div>
             </div>
           </div>
-          <button
-            type="button"
-            class="btn btn-sm btn-outline-danger"
-            (click)="clearStudentSelection()"
-            title="Clear selection"
-          >
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="clearStudentSelection()"
+            title="Clear selection">
             <i class="bi bi-x-lg"></i>
           </button>
         </div>
       </div>
 
       <!-- No Results Message -->
-      <div *ngIf="searchTerm && filteredStudents.length === 0 && !loadingStudents" class="alert alert-warning mt-3 mb-0">
+      <div *ngIf="searchTerm && filteredStudents.length === 0 && !loadingStudents"
+        class="alert alert-warning mt-3 mb-0">
         <i class="bi bi-exclamation-triangle me-2"></i>
         No students found matching "<strong>{{ searchTerm }}</strong>"
-        <button
-          type="button"
-          class="btn btn-sm btn-outline-warning ms-2"
-          (click)="searchTerm=''; onSearchChange()"
-        >
+        <button type="button" class="btn btn-sm btn-outline-warning ms-2" (click)="searchTerm=''; onSearchChange()">
           Clear Search
         </button>
       </div>
@@ -162,14 +138,8 @@
               <i class="bi bi-calendar-event me-1"></i>From Date
               <span class="text-danger">*</span>
             </label>
-            <input
-              type="date"
-              class="form-control form-control-lg"
-              [(ngModel)]="fromDate"
-              name="fromDate"
-              [min]="fromDate"
-              required
-            />
+            <input type="date" class="form-control form-control-lg" [(ngModel)]="fromDate" name="fromDate"
+              [min]="fromDate" required />
           </div>
 
           <!-- To Date -->
@@ -178,14 +148,8 @@
               <i class="bi bi-calendar-check me-1"></i>To Date
               <span class="text-danger">*</span>
             </label>
-            <input
-              type="date"
-              class="form-control form-control-lg"
-              [(ngModel)]="toDate"
-              name="toDate"
-              [min]="fromDate"
-              required
-            />
+            <input type="date" class="form-control form-control-lg" [(ngModel)]="toDate" name="toDate" [min]="fromDate"
+              required />
           </div>
 
           <!-- Duration Display -->
@@ -202,15 +166,9 @@
               <i class="bi bi-chat-left-text me-1"></i>Reason for Leave
               <span class="text-danger">*</span>
             </label>
-            <textarea
-              class="form-control"
-              rows="5"
-              [(ngModel)]="reason"
-              name="reason"
-              placeholder="Please provide a detailed reason for the leave request..."
-              required
-              maxlength="500"
-            ></textarea>
+            <textarea class="form-control" rows="5" [(ngModel)]="reason" name="reason"
+              placeholder="Please provide a detailed reason for the leave request..." required
+              maxlength="500"></textarea>
             <small class="form-text text-muted">
               <i class="bi bi-pencil me-1"></i>
               {{ reason.length }}/500 characters
@@ -221,20 +179,13 @@
           <div class="col-12">
             <hr>
             <div class="d-flex gap-2">
-              <button
-                type="submit"
-                class="btn btn-primary btn-lg px-5"
-                [disabled]="submitting || !fromDate || !toDate || !reason.trim()"
-              >
+              <button type="submit" class="btn btn-primary btn-lg px-5"
+                [disabled]="submitting || !fromDate || !toDate || !reason.trim()">
                 <i class="bi me-2" [ngClass]="submitting ? 'bi-arrow-repeat spin' : 'bi-send'"></i>
                 {{ submitting ? 'Submitting...' : 'Submit Leave Request' }}
               </button>
-              <button
-                type="button"
-                class="btn btn-outline-secondary btn-lg"
-                (click)="reason=''; setMinDate()"
-                [disabled]="submitting"
-              >
+              <button type="button" class="btn btn-outline-secondary btn-lg" (click)="reason=''; setMinDate()"
+                [disabled]="submitting">
                 <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
               </button>
             </div>
@@ -313,11 +264,8 @@
                 </span>
               </td>
               <td>
-                <span
-                  class="text-truncate d-inline-block"
-                  style="max-width: 250px; cursor: help;"
-                  [title]="request.reason"
-                >
+                <span class="text-truncate d-inline-block" style="max-width: 250px; cursor: help;"
+                  [title]="request.reason">
                   {{ request.reason }}
                 </span>
               </td>
@@ -372,8 +320,9 @@
           <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"></button>
         </div>
         <div class="modal-body text-center py-5">
-          <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-4"
-               style="width: 100px; height: 100px;">
+          <div
+            class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-4"
+            style="width: 100px; height: 100px;">
             <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
           </div>
           <h3 class="mb-3">Leave Request Submitted Successfully!</h3>

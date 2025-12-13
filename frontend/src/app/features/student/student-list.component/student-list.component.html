@@ -1,168 +1,157 @@
 <div class="container-fluid py-4">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-          <h1 class="h2 mb-0">
-            <i class="bi bi-people-fill text-primary me-2"></i>
-            Students
-          </h1>
-          <p class="text-muted mb-0">Manage student information</p>
-        </div>
-        <button
-          routerLink="/students/create"
-          class="btn btn-primary"
-        >
-          <i class="bi bi-plus-circle me-2"></i>
-          Add Student
-        </button>
-      </div>
-
-      @if (loading) {
-        <div class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-          <p class="mt-2 text-muted">Loading students...</p>
-        </div>
-      } @else {
-        <div class="card">
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th scope="col">
-                      <i class="bi bi-person me-1"></i>
-                      Name
-                    </th>
-                    <th scope="col">
-                      <i class="bi bi-envelope me-1"></i>
-                      Email
-                    </th>
-                    <th scope="col">
-                      <i class="bi bi-telephone me-1"></i>
-                      Phone
-                    </th>
-                    <th scope="col">
-                      <i class="bi bi-gender-ambiguous me-1"></i>
-                      Gender
-                    </th>
-                    <th scope="col">
-                        <i class="bi bi-calendar2-event"></i>
-                      Date of Birth
-                    </th>
-                    <th scope="col">
-                        <i class="bi bi-card-checklist"></i>
-                        Blacklisted
-                    </th>
-                    <th scope="col" class="text-center">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (student of students; track student._id) {
-                    <tr>
-                      <td class="align-middle">
-                        <div class="d-flex align-items-center">
-                          @if (student.photo) {
-                            <img [src]="student.photo" class="rounded-circle me-2" width="32" height="32" alt="Photo">
-                          } @else {
-                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                                 style="width: 32px; height: 32px;">
-                              {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
-                            </div>
-                          }
-                          <strong>{{ student.firstName }} {{ student.lastName }}</strong>
-                        </div>
-                      </td>
-                      <td class="align-middle">{{ student.user.email }}</td>
-                      <td class="align-middle">
-                        @if (student.phone) {
-                          <i class="bi bi-telephone-fill text-success me-1"></i>
-                          {{ student.phone }}
-                        } @else {
-                          <span class="text-muted">-</span>
-                        }
-                      </td>
-                      <td class="align-middle">
-                        @if (student.gender) {
-                          <span class="badge bg-secondary">{{ student.gender }}</span>
-                        } @else {
-                          <span class="text-muted">-</span>
-                        }
-                      </td>
-                      <td class="align-middle">
-                          {{ student.dob | date:'shortDate' }}
-                      </td>
-                      <td class="align-middle">
-                        @if (student.isBlacklisted) {
-                          <span class="badge bg-danger">Yes</span>
-                        } @else {
-                          <span class=" badge bg-success">No</span>
-                        }
-                      </td>
-
-                      <td class="align-middle text-center">
-                        <div class="btn-group btn-group-sm">
-                          <button
-                            [routerLink]="['/students', student._id]"
-                            class="btn btn-outline-primary"
-                            title="View Details"
-                          >
-                            <i class="bi bi-eye"></i>
-                          </button>
-                          <button
-                            [routerLink]="['/students/edit', student._id]"
-                            class="btn btn-outline-success"
-                            title="Edit"
-                          >
-                            <i class="bi bi-pencil"></i>
-                          </button>
-                          <button
-                            (click)="deleteStudent(student._id, $event)"
-                            class="btn btn-outline-danger"
-                            title="Delete"
-                          >
-                            <i class="bi bi-trash"></i>
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  } @empty {
-                    <tr>
-                      <td colspan="5" class="text-center py-5">
-                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                        <p class="text-muted mt-2">No students found</p>
-                        <button routerLink="/students/create" class="btn btn-primary btn-sm">
-                          <i class="bi bi-plus-circle me-1"></i>
-                          Add First Student
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        @if (students.length > 0) {
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <p class="text-muted mb-0">
-              Showing {{ students.length }} student(s)
-            </p>
-            <nav>
-              <ul class="pagination pagination-sm mb-0">
-                <li class="page-item disabled">
-                  <a class="page-link" href="#">Previous</a>
-                </li>
-                <li class="page-item active">
-                  <a class="page-link" href="#">1</a>
-                </li>
-                <li class="page-item disabled">
-                  <a class="page-link" href="#">Next</a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        }
-      }
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h2 mb-0">
+        <i class="bi bi-people-fill text-primary me-2"></i>
+        Students
+      </h1>
+      <p class="text-muted mb-0">Manage student information</p>
     </div>
+    @if (currentUser?.role === 'Admin') {
+    <button routerLink="/students/create" class="btn btn-primary">
+      <i class="bi bi-plus-circle me-2"></i>
+      Add Student
+    </button>
+    }
+  </div>
+
+  @if (loading) {
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 text-muted">Loading students...</p>
+  </div>
+  } @else {
+  <div class="card">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">
+                <i class="bi bi-person me-1"></i>
+                Name
+              </th>
+              <th scope="col">
+                <i class="bi bi-envelope me-1"></i>
+                Email
+              </th>
+              <th scope="col">
+                <i class="bi bi-telephone me-1"></i>
+                Phone
+              </th>
+              <th scope="col">
+                <i class="bi bi-gender-ambiguous me-1"></i>
+                Gender
+              </th>
+              <th scope="col">
+                <i class="bi bi-calendar2-event"></i>
+                DOB
+              </th>
+              <th scope="col">
+                <i class="bi bi-card-checklist"></i>
+                Blacklist
+              </th>
+              <th scope="col" class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (student of students; track student._id) {
+            <tr>
+              <td class="align-middle">
+                <div class="d-flex align-items-center">
+                  @if (student.photo) {
+                  <img [src]="student.photo" class="rounded-circle me-2" width="32" height="32" alt="Photo">
+                  } @else {
+                  <div
+                    class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                    style="width: 32px; height: 32px;">
+                    {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                  </div>
+                  }
+                  <strong>{{ student.firstName }} {{ student.lastName }}</strong>
+                </div>
+              </td>
+              <td class="align-middle">{{ student.user.email }}</td>
+              <td class="align-middle">
+                @if (student.phone) {
+                <i class="bi bi-telephone-fill text-success me-1"></i>
+                {{ student.phone }}
+                } @else {
+                <span class="text-muted">-</span>
+                }
+              </td>
+              <td class="align-middle">
+                @if (student.gender) {
+                <span class="badge bg-secondary">{{ student.gender }}</span>
+                } @else {
+                <span class="text-muted">-</span>
+                }
+              </td>
+              <td class="align-middle">
+                {{ student.dob | date:'shortDate' }}
+              </td>
+              <td class="align-middle">
+                @if (student.isBlacklisted) {
+                <span class="badge bg-danger">Yes</span>
+                } @else {
+                <span class=" badge bg-success">No</span>
+                }
+              </td>
+
+              <td class="align-middle text-center">
+                <div class="btn-group btn-group-sm">
+                  <button [routerLink]="['/students', student._id]" class="btn btn-outline-primary"
+                    title="View Details">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                  <button [routerLink]="['/students/edit', student._id]" class="btn btn-outline-success" title="Edit">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button (click)="deleteStudent(student._id, $event)" class="btn btn-outline-danger" title="Delete">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="5" class="text-center py-5">
+                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No students found</p>
+                <button routerLink="/students/create" class="btn btn-primary btn-sm">
+                  <i class="bi bi-plus-circle me-1"></i>
+                  Add First Student
+                </button>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  @if (students.length > 0) {
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <p class="text-muted mb-0">
+      Showing {{ students.length }} student(s)
+    </p>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item disabled">
+          <a class="page-link" href="#">Previous</a>
+        </li>
+        <li class="page-item active">
+          <a class="page-link" href="#">1</a>
+        </li>
+        <li class="page-item disabled">
+          <a class="page-link" href="#">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  }
+  }
+</div>

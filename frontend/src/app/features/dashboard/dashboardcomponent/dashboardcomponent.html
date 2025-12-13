@@ -23,10 +23,7 @@
             My Profile
           </h5>
           <p class="card-text">View and manage your student information</p>
-          <button
-            [routerLink]="['/students', studentId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/students', studentId]" class="btn btn-primary">
             <i class="bi bi-eye me-2"></i>
             View Profile
           </button>
@@ -67,19 +64,13 @@
                     <tr>
                       <td class="align-middle">
                         <div class="d-flex align-items-center">
-                          @if (studentSpecificInformation.data.photo) {
-                          <img
-                            [src]="studentSpecificInformation.data?.photo"
-                            class="rounded-circle me-2"
-                            width="32"
-                            height="32"
-                            alt="Photo"
-                          />
+                          @if (studentSpecificInformation?.data.photo) {
+                          <img [src]="studentSpecificInformation?.data?.photo" class="rounded-circle me-2" width="32"
+                            height="32" alt="Photo" />
                           } @else {
                           <div
                             class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                            style="width: 32px; height: 32px"
-                          >
+                            style="width: 32px; height: 32px">
                             {{
                             studentSpecificInformation.data.firstName.charAt(0)
                             }}{{
@@ -87,10 +78,8 @@
                             }}
                           </div>
                           }
-                          <strong
-                            >{{ studentSpecificInformation.data.firstName }} {{
-                            studentSpecificInformation.data.lastName }}</strong
-                          >
+                          <strong>{{ studentSpecificInformation.data.firstName }} {{
+                            studentSpecificInformation.data.lastName }}</strong>
                         </div>
                       </td>
                       <td class="align-middle">
@@ -105,9 +94,7 @@
                       </td>
                       <td class="align-middle">
                         @if (studentSpecificInformation.data.gender) {
-                        <span class="badge bg-secondary"
-                          >{{ studentSpecificInformation.data.gender }}</span
-                        >
+                        <span class="badge bg-secondary">{{ studentSpecificInformation.data.gender }}</span>
                         } @else {
                         <span class="text-muted">-</span>
                         }
@@ -152,7 +139,7 @@
             My Attendance
           </h5>
           <p class="card-text">Check your attendance records</p>
-          <button class="btn btn-primary" disabled>
+          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
@@ -205,10 +192,7 @@
             My Profile
           </h5>
           <p class="card-text">View your teacher profile</p>
-          <button
-            [routerLink]="['/teachers', teacherId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/teachers', teacherId]" class="btn btn-primary">
             <i class="bi bi-arrow-right me-2"></i>
             View Profile
           </button>
@@ -271,10 +255,7 @@
             </div>
             <i class="bi bi-people" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
-          <button
-            routerLink="/students"
-            class="btn btn-light btn-sm mt-3 w-100"
-          >
+          <button routerLink="/students" class="btn btn-light btn-sm mt-3 w-100">
             View All
           </button>
         </div>
@@ -288,15 +269,9 @@
               <h6 class="card-title">Teachers</h6>
               <h2 class="mb-0">{{teacher.length}}</h2>
             </div>
-            <i
-              class="bi bi-person-badge"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-person-badge" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
-          <button
-            routerLink="/teachers"
-            class="btn btn-light btn-sm mt-3 w-100"
-          >
+          <button routerLink="/teachers" class="btn btn-light btn-sm mt-3 w-100">
             View All
           </button>
         </div>
@@ -310,10 +285,7 @@
               <h6 class="card-title">Parents</h6>
               <h2 class="mb-0">{{parents.length}}</h2>
             </div>
-            <i
-              class="bi bi-people-fill"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button class="btn btn-light btn-sm mt-3 w-100" routerLink="/parents">
             View All
@@ -329,15 +301,9 @@
               <h6 class="card-title">Attendance</h6>
               <h2 class="mb-0">{{attendance.length}}</h2>
             </div>
-            <i
-              class="bi bi-calendar-check"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
-          <button
-            routerLink="/attendance"
-            class="btn btn-light btn-sm mt-3 w-100"
-          >
+          <button routerLink="/attendance" class="btn btn-light btn-sm mt-3 w-100">
             View Records
           </button>
         </div>
@@ -360,11 +326,11 @@
               <i class="bi bi-plus-circle me-2"></i>
               Add Student
             </button>
-            <button routerLink="/teachers" class="btn btn-success">
+            <button routerLink="/teachers/create" class="btn btn-success">
               <i class="bi bi-plus-circle me-2"></i>
               Add Teacher
             </button>
-            <button routerLink="/subject" class="btn btn-secondary">
+            <button routerLink="/subjects/create" class="btn btn-secondary">
               <i class="bi bi-plus-circle me-2"></i>
               Add Subjects
             </button>
@@ -372,14 +338,11 @@
               <i class="bi bi-calendar-plus me-2"></i>
               Mark Attendance
             </button>
-            <button (click)="reviewApprove()" class="btn btn-warning">
+            <button class="btn btn-warning" routerLink="/leave/review">
               <i class="bi bi-file-earmark-text me-2"></i>
               Review Leave Requests
             </button>
-            <button
-              [routerLink]="['/students/blacklist']"
-              class="btn btn-danger"
-            >
+            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
               <i class="bi bi-file-earmark-text me-2"></i>
               View Blacklisted Students
             </button>
