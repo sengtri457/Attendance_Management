@@ -1,0 +1,258 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <h2 class="mb-1">
+            <i class="bi bi-calendar-check me-2"></i>
+            Attendance Dashboard
+          </h2>
+          <p class="text-muted mb-0">{{ currentDate | date:'fullDate' }}</p>
+        </div>
+        <div>
+          <button class="btn btn-primary me-2" routerLink="mark">
+            <i class="bi bi-plus-circle me-2"></i>
+            Mark Attendance
+          </button>
+          <button class="btn btn-primary me-2" (click)="leaveRequest()">
+            <i class="bi bi-plus-circle me-2"></i>
+            LeaveRequest
+          </button>
+          @if(auth.isTeacher()){
+          <button class="btn btn-danger me-2" routerLink="mark-absent">
+            <i class="bi bi-plus-circle me-2"></i>
+            Mark Absent
+          </button>
+          }
+          <button class="btn btn-outline-secondary" (click)="loadTodayAttendance()">
+            <i class="bi bi-arrow-clockwise"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div *ngIf="!loading" class="row g-4 mb-4">
+    <!-- Total Present -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1">Present Today</p>
+              <h3 class="mb-0">{{ summary.present }}</h3>
+              <small class="text-success">
+                <i class="bi bi-check-circle-fill"></i>
+                {{ getAttendanceRate() }}% attendance
+              </small>
+            </div>
+            <div class="bg-success bg-opacity-10 p-3 rounded">
+              <i class="bi bi-check-circle text-success fs-2"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Late Arrivals -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1">Late Arrivals</p>
+              <h3 class="mb-0">{{ summary.late }}</h3>
+              <small class="text-warning">
+                <i class="bi bi-clock-fill"></i>
+                {{ getPunctualityRate() }}% on-time
+              </small>
+            </div>
+            <div class="bg-warning bg-opacity-10 p-3 rounded">
+              <i class="bi bi-clock text-warning fs-2"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Absent -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1">Absent</p>
+              <h3 class="mb-0">{{ summary.absent }}</h3>
+              <small class="text-danger">
+                <i class="bi bi-x-circle-fill"></i>
+                Not present
+              </small>
+            </div>
+            <div class="bg-danger bg-opacity-10 p-3 rounded">
+              <i class="bi bi-x-circle text-danger fs-2"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- On Leave -->
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <p class="text-muted mb-1">On Leave</p>
+              <h3 class="mb-0">{{ summary.onLeave }}</h3>
+              <small class="text-info">
+                <i class="bi bi-calendar-x-fill"></i>
+                Approved leave
+              </small>
+            </div>
+            <div class="bg-info bg-opacity-10 p-3 rounded">
+              <i class="bi bi-calendar-x text-info fs-2"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row g-4 mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-list-check text-primary fs-1 mb-3"></i>
+          <h5>View All Records</h5>
+          <p class="text-muted small">Browse complete attendance history</p>
+          <button class="btn btn-primary btn-sm" routerLink="list">
+            View Records
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-graph-up text-success fs-1 mb-3"></i>
+          <h5>Late Report</h5>
+          <p class="text-muted small">View students with late arrivals</p>
+          <button class="btn btn-success btn-sm" routerLink="lateReport">
+            View Report
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center py-4">
+          <i class="bi bi-file-earmark-text text-danger fs-1 mb-3"></i>
+          <h5>Absent Report</h5>
+          <p class="text-muted small">View absence patterns</p>
+          <button class="btn btn-danger btn-sm" routerLink="absenteeReport">
+            View Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Attendance -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white py-3">
+      <h5 class="mb-0">
+        <i class="bi bi-clock-history me-2"></i>
+        Recent Check-ins
+      </h5>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Student</th>
+              <th>Check-in Time</th>
+              <th>Status</th>
+              <th>Late By</th>
+              <th>Study Hours</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let attendance of todayAttendance.slice(0, 10)">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-circle me-2">
+                    {{ (attendance.student.firstName || '').charAt(0) }}
+                  </div>
+                  <div>
+                    <div class="fw-medium">
+                      {{ (attendance.student.firstName || '') }}
+                      {{ (attendance.student.lastName || '') }}
+                    </div>
+                    <small class="text-muted">
+                      {{ (attendance.student.studentId || '') }}
+                    </small>
+                  </div>
+                </div>
+              </td>
+              <td>{{ attendanceService.formatTime(attendance.checkInTime) }}</td>
+              <td>
+                <span [class]="'badge bg-' + attendanceService.getStatusColor(attendance.status)">
+                  <i [class]="'bi bi-' + attendanceService.getStatusIcon(attendance.status) + ' me-1'"></i>
+                  {{ attendance.status | uppercase }}
+                </span>
+              </td>
+              <td>
+                  @if(attendance.isLate)
+                  {
+                  <span class="text-warning">
+                    {{ attendance.lateBy || "No Lated" }} min
+                  </span>
+                  }
+                  @else{
+                <span class="text-muted">No Lated</span>
+                  }
+              </td>
+              <td>
+                  @if(attendance.workHours > 0){
+                <span>
+                  {{ attendance.workHours || 0 }} hrs
+                </span>
+                  }@else
+                  {
+                  <span class="text-muted">
+                    0 hrs
+                  </span>
+                  }
+              </td>
+              <td>
+                <button
+                    [routerLink]="[ 'stats', attendance.student._id]"
+                    class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="todayAttendance.length === 0">
+              <td colspan="5" class="text-center py-4 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                No attendance records yet today
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,238 @@
+<div class="container-fluid py-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+      } @else if (parent) {
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            @if (!isParentUser) {
+              <button routerLink="/parents" class="btn btn-link text-decoration-none p-0 mb-2">
+                <i class="bi bi-arrow-left me-2"></i>Back to Parents
+              </button>
+            }
+            <h1 class="h2 mb-0">Parent Details</h1>
+          </div>
+          @if (canEdit) {
+            <button [routerLink]="['/parents/edit', parent._id]" class="btn btn-primary">
+              <i class="bi bi-pencil me-2"></i>Edit Parent
+            </button>
+          }
+        </div>
+
+        <div class="row">
+          <!-- Parent Information -->
+          <div class="col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-body text-center">
+                <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                     style="width: 120px; height: 120px; font-size: 2.5rem;">
+                  {{ parent.name.charAt(0) }}
+                </div>
+                <h3 class="mb-1">{{ parent.name }}</h3>
+                <p class="text-muted mb-3">{{ parent.user.email }}</p>
+
+                <hr>
+
+                <div class="text-start">
+                  <div class="mb-3">
+                    <small class="text-muted d-block">Username</small>
+                    <strong>{{ parent.user.username }}</strong>
+                  </div>
+
+                  @if (parent.phone) {
+                    <div class="mb-3">
+                      <small class="text-muted d-block">Phone</small>
+                      <strong>
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ parent.phone }}
+                      </strong>
+                    </div>
+                  }
+
+                  <div class="mb-3">
+                    <small class="text-muted d-block">Children</small>
+                    <h4 class="mb-0">
+                      <span class="badge bg-primary">{{ children.length }}</span>
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Children List -->
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="bi bi-people me-2"></i>
+                  Children
+                </div>
+                @if (canEdit) {
+                  <button
+                    class="btn btn-sm btn-primary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addChildModal"
+                  >
+                    <i class="bi bi-plus-circle me-1"></i>
+                    Add Child
+                  </button>
+                }
+              </div>
+              <div class="card-body">
+                @if (loadingChildren) {
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm"></div>
+                  </div>
+                } @else if (children.length > 0) {
+                  <div class="row g-3">
+                    @for (child of children; track child._id) {
+                      <div class="col-md-6">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="d-flex align-items-start">
+                              @if (child.photo) {
+                                <img [src]="child.photo" class="rounded-circle me-3" width="48" height="48" alt="Photo">
+                              } @else {
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-3"
+                                     style="width: 48px; height: 48px;">
+                                  {{ child.firstName.charAt(0) }}{{ child.lastName.charAt(0) }}
+                                </div>
+                              }
+                              <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ child.firstName }} {{ child.lastName }}</h6>
+                                <p class="text-muted small mb-2">
+                                  <i class="bi bi-envelope me-1"></i>
+                                  {{ child.user.email }}
+                                </p>
+                                @if (child.phone) {
+                                  <p class="text-muted small mb-2">
+                                    <i class="bi bi-telephone me-1"></i>
+                                    {{ child.phone }}
+                                  </p>
+                                }
+                                @if (child.relationshipCreated) {
+                                  <p class="text-muted small mb-2">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    Linked: {{ child.relationshipCreated | date:'mediumDate' }}
+                                  </p>
+                                }
+                                <div class="d-flex gap-2 mt-2">
+                                  <button
+                                    [routerLink]="['/students', child._id]"
+                                    class="btn btn-sm btn-outline-primary"
+                                  >
+                                    <i class="bi bi-eye me-1"></i>
+                                    View Profile
+                                  </button>
+                                  @if (canEdit) {
+                                    <button
+                                      (click)="removeChild(child._id)"
+                                      class="btn btn-sm btn-outline-danger"
+                                    >
+                                      <i class="bi bi-trash me-1"></i>
+                                      Remove
+                                    </button>
+                                  }
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-5 text-muted">
+                    <i class="bi bi-people" style="font-size: 3rem;"></i>
+                    <p class="mt-2">No children linked to this parent</p>
+                    @if (canEdit) {
+                      <button
+                        class="btn btn-primary btn-sm"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addChildModal"
+                      >
+                        <i class="bi bi-plus-circle me-1"></i>
+                        Add First Child
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            @if (children.length > 0) {
+              <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                  <div class="card bg-primary text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">Total Children</h6>
+                      <h2 class="mb-0">{{ children.length }}</h2>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-success text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">Active Students</h6>
+                      <h2 class="mb-0">{{ getActiveChildren() }}</h2>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-info text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">Avg. Attendance</h6>
+                      <h2 class="mb-0">-</h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Add Child Modal -->
+      <div class="modal fade" id="addChildModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Add Child to Parent</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p class="text-muted">Select a student to link as a child:</p>
+              <select class="form-select" [(ngModel)]="selectedStudentId">
+                <option value="">Select a student...</option>
+                @for (student of availableStudents; track student._id) {
+                  <option [value]="student._id">
+                    {{ student.firstName }} {{ student.lastName }} ({{ student.user.email }})
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button
+                type="button"
+                class="btn btn-primary"
+                [disabled]="!selectedStudentId || addingChild"
+                (click)="addChild()"
+              >
+                @if (addingChild) {
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Adding...
+                } @else {
+                  <i class="bi bi-plus-circle me-2"></i>
+                  Add Child
+                }
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

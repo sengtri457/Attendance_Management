@@ -1,42 +1,47 @@
 const mongoose = require("mongoose");
 
-const studentSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+const studentSchema = new mongoose.Schema(
+  {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    parentStudent: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parent",
+    },
+    firstName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    dob: {
+      type: Date,
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female", "other"],
+    },
+    phone: {
+      type: String,
+      trim: true,
+    },
+    photo: {
+      type: String,
+    },
+    isBlacklisted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  parentStudent: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Parent",
+  {
+    timestamps: true,
   },
-  firstName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  lastName: {
-    type: String,
-    required: true,
-    trim: true,
-  },
-  dob: {
-    type: Date,
-  },
-  gender: {
-    type: String,
-    enum: ["male", "female", "other"],
-  },
-  phone: {
-    type: String,
-    trim: true,
-  },
-  photo: {
-    type: String,
-  },
-  isBlacklisted: {
-    type: Boolean,
-    default: false,
-  },
-});
+);
 module.exports = mongoose.model("Student", studentSchema);

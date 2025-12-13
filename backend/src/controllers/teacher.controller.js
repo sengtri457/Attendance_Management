@@ -6,10 +6,9 @@ const Subject = require("../models/Subject");
 
 exports.getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find().populate(
-      "user",
-      "username email isActive",
-    );
+    const teachers = await Teacher.find()
+      .populate("user", "username email isActive")
+      .populate("subject", "subjectName teachTime endTime");
 
     res.json({
       success: true,
@@ -28,7 +27,7 @@ exports.getTeacherById = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id).populate(
       "user",
-      "username email isActive",
+      "username email isActive"
     );
 
     if (!teacher) {
@@ -50,7 +49,6 @@ exports.getTeacherById = async (req, res) => {
     });
   }
 };
-
 exports.createTeacher = async (req, res) => {
   try {
     const { subjectId, userId, name, phone } = req.body;
@@ -59,7 +57,7 @@ exports.createTeacher = async (req, res) => {
       user: userId,
       name,
       phone,
-      subject: subjectId,
+      subject: subjectId, // Changed from subjectId to subject
     });
 
     await teacher.save();
@@ -85,7 +83,7 @@ exports.updateTeacher = async (req, res) => {
     const teacher = await Teacher.findByIdAndUpdate(
       req.params.id,
       { name, phone },
-      { new: true },
+      { new: true }
     );
 
     if (!teacher) {
@@ -108,20 +106,29 @@ exports.updateTeacher = async (req, res) => {
     });
   }
 };
-
 exports.getTeacherSubjects = async (req, res) => {
   try {
-    const subjects = await Subject.find({ teacher: req.params.id });
+    const teacher = await Teacher.findById(req.params.id).populate(
+      "subject",
+      "subjectName teachTime endTime"
+    );
+
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
 
     res.json({
       success: true,
-      data: subjects,
+      data: teacher.subject ? [teacher.subject] : [], // Return as array for consistency
     });
   } catch (error) {
-    console.error("Error fetching teacher subjects:", error);
+    console.error("Error fetching teacher subject:", error);
     res.status(500).json({
       success: false,
-      message: "Failed to fetch subjects",
+      message: "Failed to fetch subject",
     });
   }
 };

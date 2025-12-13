@@ -1,0 +1,225 @@
+<div class="container-fluid py-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+        </div>
+      } @else if (student) {
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            <button routerLink="/students" class="btn btn-link text-decoration-none p-0 mb-2">
+              <i class="bi bi-arrow-left me-2"></i>Back to Students
+            </button>
+            <h1 class="h2 mb-0">Student Details</h1>
+          </div>
+          @if (canEdit) {
+            <button [routerLink]="['/students/edit', student._id]" class="btn btn-primary">
+              <i class="bi bi-pencil me-2"></i>Edit Student
+            </button>
+          }
+        </div>
+
+        <div class="row">
+          <!-- Student Information Card -->
+          <div class="col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-body text-center">
+                @if (student.photo) {
+                  <img [src]="student.photo" class="rounded-circle mb-3" width="120" height="120" alt="Photo">
+                } @else {
+                  <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                       style="width: 120px; height: 120px; font-size: 2.5rem;">
+                    {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                  </div>
+                }
+                <h3 class="mb-1">{{ student.firstName }} {{ student.lastName }}</h3>
+                <p class="text-muted mb-3">{{ student.user.email }}</p>
+
+                @if (student.isBlacklisted) {
+                  <span class="badge bg-danger mb-3">
+                    <i class="bi bi-exclamation-triangle me-1"></i>
+                    Blacklisted
+                  </span>
+                }
+
+                <hr>
+
+                <div class="text-start">
+                  <div class="mb-3">
+                    <small class="text-muted d-block">Username</small>
+                    <strong>{{ student.user.username }}</strong>
+                  </div>
+
+                  @if (student.phone) {
+                    <div class="mb-3">
+                      <small class="text-muted d-block">Phone</small>
+                      <strong>
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ student.phone }}
+                      </strong>
+                    </div>
+                  }
+
+                  @if (student.dob) {
+                    <div class="mb-3">
+                      <small class="text-muted d-block">Date of Birth</small>
+                      <strong>{{ student.dob | date:'mediumDate' }}</strong>
+                    </div>
+                  }
+
+                  @if (student.gender) {
+                    <div class="mb-3">
+                      <small class="text-muted d-block">Gender</small>
+                      <span class="badge bg-secondary">{{ student.gender }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- Parents Card -->
+            @if (parents.length > 0) {
+              <div class="card mt-4">
+                <div class="card-header">
+                  <i class="bi bi-people me-2"></i>
+                  Parents/Guardians
+                </div>
+                <ul class="list-group list-group-flush">
+                  @for (parent of parents; track $index) {
+                    <li class="list-group-item">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong>{{ parent?.name }}</strong>
+                          @if (parent?.phone) {
+                            <div class="small text-muted">
+                              <i class="bi bi-telephone me-1"></i>
+                              {{ parent?.phone }}
+                            </div>
+                          }
+                        </div>
+                      </div>
+                    </li>
+                  }
+                </ul>
+              </div>
+            }
+          </div>
+
+          <!-- Attendance & Activities -->
+          <div class="col-lg-8">
+            <!-- Attendance Card -->
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="bi bi-calendar-check me-2"></i>
+                  Recent Attendance
+                </div>
+                <button class="btn btn-sm btn-outline-primary">
+                  View All
+                </button>
+              </div>
+              <div class="card-body">
+                @if (loadingAttendance) {
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm"></div>
+                  </div>
+                } @else if (attendanceRecords.length > 0) {
+                  <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                      <thead>
+                        <tr>
+                          <th>Date</th>
+                          <th>Check In</th>
+                          <th>Check Out</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (record of attendanceRecords; track record._id) {
+                          <tr>
+                            <td>{{ record.date | date:'mediumDate' }}</td>
+                            <td>
+                              @if (record.checkInTime) {
+                                <span class="badge bg-success">
+                                  {{ record.checkInTime | date:'shortTime'  }}
+                                </span>
+                              } @else {
+                                <span class="text-muted">No Check-In</span>
+                              }
+                            </td>
+                            <td>
+                              @if (record.checkOutTime) {
+                                <span class="badge bg-info">
+                                  {{ record.checkOutTime | date:'shortTime' }}
+                                </span>
+                              } @else {
+                                <span class="text-muted">No Check-Out</span>
+                              }
+                            </td>
+                            <td>
+                              @if (record.checkInTime) {
+                                <span class="badge bg-success">Present</span>
+                              } @else {
+                                <span class="badge bg-danger">Absent</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                } @else {
+                  <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">No attendance records found</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="card bg-primary text-white">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <h6 class="mb-0">Total Days</h6>
+                        <h3 class="mb-0">{{ attendanceRecords.length }}</h3>
+                      </div>
+                      <i class="bi bi-calendar-week" style="font-size: 2rem; opacity: 0.3;"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-success text-white">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <h6 class="mb-0">Present</h6>
+                        <h3 class="mb-0">{{ getPresentCount() }}</h3>
+                      </div>
+                      <i class="bi bi-check-circle" style="font-size: 2rem; opacity: 0.3;"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-danger text-white">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                      <div>
+                        <h6 class="mb-0">Absent</h6>
+                        <h3 class="mb-0">{{ getAbsentCount() }}</h3>
+                      </div>
+                      <i class="bi bi-x-circle" style="font-size: 2rem; opacity: 0.3;"></i>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>

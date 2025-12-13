@@ -1,0 +1,114 @@
+<div class="container-fluid py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2 mb-0">
+            <i class="bi bi-people-fill text-primary me-2"></i>
+            Parents
+          </h1>
+          <p class="text-muted mb-0">Manage parent/guardian information</p>
+        </div>
+        @if (canCreate) {
+          <button routerLink="/parents/create" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            Add Parent
+          </button>
+        }
+      </div>
+
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary"></div>
+          <p class="mt-2 text-muted">Loading parents...</p>
+        </div>
+      } @else {
+        <div class="card">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th><i class="bi bi-person me-1"></i> Name</th>
+                    <th><i class="bi bi-envelope me-1"></i> Email</th>
+                    <th><i class="bi bi-telephone me-1"></i> Phone</th>
+                    <th class="text-center">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (parent of parents; track parent._id) {
+                    <tr>
+                      <td class="align-middle">
+                        <div class="d-flex align-items-center">
+                          <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                               style="width: 32px; height: 32px;">
+                            {{ parent.name.charAt(0) }}
+                          </div>
+                          <strong>{{ parent.name }}</strong>
+                        </div>
+                      </td>
+                      <td class="align-middle">{{ parent.user.email }}</td>
+                      <td class="align-middle">
+                        @if (parent.phone) {
+                          <i class="bi bi-telephone-fill text-success me-1"></i>
+                          {{ parent.phone }}
+                        } @else {
+                          <span class="text-muted">-</span>
+                        }
+                      </td>
+
+                      <td class="align-middle text-center">
+                        <div class="btn-group btn-group-sm">
+                          <button
+                            [routerLink]="['/parents', parent._id]"
+                            class="btn btn-outline-primary"
+                            title="View Details"
+                          >
+                            <i class="bi bi-eye"></i>
+                          </button>
+                          @if (canEdit) {
+                            <button
+                              [routerLink]="['/parents/edit', parent._id]"
+                              class="btn btn-outline-success"
+                              title="Edit"
+                            >
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                          }
+                          @if (canDelete) {
+                            <button
+                              (click)="deleteParent(parent._id, $event)"
+                              class="btn btn-outline-danger"
+                              title="Delete"
+                            >
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          }
+                        </div>
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="5" class="text-center py-5">
+                        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-2">No parents found</p>
+                        @if (canCreate) {
+                          <button routerLink="/parents/create" class="btn btn-primary btn-sm">
+                            <i class="bi bi-plus-circle me-1"></i>
+                            Add First Parent
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        @if (parents.length > 0) {
+          <div class="d-flex justify-content-between align-items-center mt-3">
+            <p class="text-muted mb-0">Showing {{ parents.length }} parent(s)</p>
+          </div>
+        }
+      }
+    </div>

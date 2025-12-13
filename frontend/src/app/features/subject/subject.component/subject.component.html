@@ -1,0 +1,130 @@
+<!--
+  FILE: src/app/components/subject-list/subject-list.component.html
+  This is the complete HTML template for displaying the list of subjects
+-->
+
+<div class="container">
+  <!-- Header Section with Title and Create Button -->
+  <div class="header">
+    <h1>Subject Management</h1>
+    <button class="btn btn-primary" (click)="createNewSubject()">
+      <span class="btn-icon">+</span> Create New Subject
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
+    <p>Loading subjects...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error">
+    <strong>⚠️ Error:</strong> {{ error }}
+  </div>
+
+  <!-- Empty State - No Subjects Found -->
+  <div *ngIf="!loading && !error && subjects.length === 0" class="empty-state">
+    <div class="empty-icon">📚</div>
+    <h3>No Subjects Found</h3>
+    <p>Get started by creating your first subject!</p>
+    <button class="btn btn-primary" (click)="createNewSubject()">
+      Create Your First Subject
+    </button>
+  </div>
+
+  <!-- Subject Cards Grid -->
+  <div *ngIf="!loading && subjects.length > 0" class="subjects-grid">
+    <div *ngFor="let subject of subjects; let i = index" class="subject-card" [attr.data-index]="i">
+
+      <!-- Card Header with Subject Name and Code -->
+      <div class="subject-header">
+        <h3 class="subject-name">{{ subject.subjectName }}</h3>
+        <span class="subject-code" *ngIf="subject.subjectCode">
+          {{ subject.subjectCode }}
+        </span>
+      </div>
+
+      <!-- Subject Details Section -->
+      <div class="subject-details">
+
+        <!-- Day of Week -->
+        <div class="detail-row" *ngIf="subject.dayOfWeek">
+          <span class="label">
+            <span class="icon">📅</span> Day:
+          </span>
+          <span class="value">{{ subject.dayOfWeek }}</span>
+        </div>
+
+        <!-- Time Schedule -->
+        <div class="detail-row" *ngIf="subject.teachTime && subject.endTime">
+          <span class="label">
+            <span class="icon">🕐</span> Time:
+          </span>
+          <span class="value">
+            {{ subject.teachTime | date:'shortTime' }} - {{ subject.endTime | date:'shortTime' }}
+          </span>
+        </div>
+
+        <!-- Credits -->
+        <div class="detail-row" *ngIf="subject.credit">
+          <span class="label">
+            <span class="icon">⭐</span> Credits:
+          </span>
+          <span class="value">{{ subject.credit }}</span>
+        </div>
+
+        <!-- Teacher ID -->
+        <div class="detail-row" *ngIf="subject.teacherId">
+          <span class="label">
+            <span class="icon">👨‍🏫</span> Teacher:
+          </span>
+          <span class="value">{{ subject.teacherId }}</span>
+        </div>
+
+        <!-- Description -->
+        <div class="detail-row description-row" *ngIf="subject.description">
+          <span class="label">
+            <span class="icon">📝</span> Description:
+          </span>
+          <span class="value description-text">{{ subject.description }}</span>
+        </div>
+
+        <!-- Created Date -->
+        <div class="detail-row" *ngIf="subject.createdAt">
+          <span class="label">
+            <span class="icon">📆</span> Created:
+          </span>
+          <span class="value">{{ subject.createdAt | date:'short' }}</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="subject-actions">
+        <button
+          class="btn btn-edit"
+          (click)="editSubject(subject._id)"
+          title="Edit this subject"
+        >
+          ✏️ Edit
+        </button>
+        <button
+          class="btn btn-delete"
+          (click)="deleteSubject(subject._id)"
+          title="Delete this subject"
+        >
+          🗑️ Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Footer -->
+  <div *ngIf="!loading && subjects.length > 0" class="summary-footer">
+    <p>
+      <strong>Total Subjects:</strong> {{ subjects.length }}
+      <span *ngIf="subjects.length === 1">subject</span>
+      <span *ngIf="subjects.length !== 1">subjects</span>
+    </p>
+  </div>
+</div>

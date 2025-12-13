@@ -1,0 +1,233 @@
+<div class="container-fluid py-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h2 mb-0">
+            <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>
+            Blacklisted Students
+          </h1>
+          <p class="text-muted mb-0">View and manage blacklisted students</p>
+        </div>
+        <div>
+          <button
+            class="btn btn-outline-primary me-2"
+            (click)="loadBlacklistedStudents()"
+          >
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Refresh
+          </button>
+          <span class="badge bg-danger fs-6">
+            {{ blacklistedStudents.length }} Blacklisted
+          </span>
+        </div>
+      </div>
+
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-danger"></div>
+          <p class="mt-2 text-muted">Loading blacklisted students...</p>
+        </div>
+      } @else {
+        <div class="row">
+          <div class="col-12">
+            <div class="card border-danger">
+              <div class="card-header bg-danger text-white">
+                <i class="bi bi-shield-x me-2"></i>
+                Blacklisted Students
+              </div>
+              <div class="card-body p-0">
+                <div class="table-responsive">
+                  <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th><i class="bi bi-person me-1"></i> Name</th>
+                        <th><i class="bi bi-envelope me-1"></i> Email</th>
+                        <th><i class="bi bi-telephone me-1"></i> Phone</th>
+                        <th><i class="bi bi-calendar me-1"></i> Blacklisted Date</th>
+                        <th><i class="bi bi-file-text me-1"></i> Reason</th>
+                        <th class="text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (student of blacklistedStudents; track student._id) {
+                        <tr>
+                          <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                              @if (student.photo) {
+                                <img [src]="student.photo" class="rounded-circle me-2" width="32" height="32" alt="Photo">
+                              } @else {
+                                <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center me-2"
+                                     style="width: 32px; height: 32px;">
+                                  {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                                </div>
+                              }
+                              <strong>{{ student.firstName }} {{ student.lastName }}</strong>
+                            </div>
+                          </td>
+                          <td class="align-middle">{{ student.user.email }}</td>
+                          <td class="align-middle">
+                            @if (student.phone) {
+                              {{ student.phone }}
+                            } @else {
+                              <span class="text-muted">-</span>
+                            }
+                          </td>
+                          <td class="align-middle">
+                            @if (student.createdAt) {
+                              {{ student.createdAt | date:'medium' }}
+                            } @else {
+                              <span class="text-muted">-</span>
+                            }
+                          </td>
+                          <td class="align-middle">
+                            @if (student.blacklistReason) {
+                              <span class="badge bg-warning text-dark">{{ student.blacklistReason }}</span>
+                            } @else {
+                              <span class="text-muted">No reason provided</span>
+                            }
+                          </td>
+                          <td class="align-middle text-center">
+                            <div class="btn-group btn-group-sm">
+                              <button
+                                [routerLink]="['/students', student._id]"
+                                class="btn btn-outline-primary"
+                                title="View Details"
+                              >
+                                <i class="bi bi-eye"></i>
+                              </button>
+                              <!-- <button
+                                (click)="viewHistory(student)"
+                                class="btn btn-outline-info"
+                                title="View History"
+                                data-bs-toggle="modal"
+                                data-bs-target="#historyModal"
+                              >
+                                <i class="bi bi-clock-history"></i>
+                              </button> -->
+                              @if (canRestore) {
+                                <button
+                                  (click)="restoreStudent(student._id)"
+                                  class="btn btn-outline-success"
+                                  title="Restore Student"
+                                >
+                                  <i class="bi bi-arrow-counterclockwise"></i>
+                                </button>
+                              }
+                            </div>
+                          </td>
+                        </tr>
+                      } @empty {
+                        <tr>
+                          <td colspan="6" class="text-center py-5">
+                            <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-2">No blacklisted students found</p>
+                            <p class="text-success">All students are in good standing!</p>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        @if (blacklistedStudents.length > 0) {
+          <div class="row mt-4 g-3">
+            <div class="col-md-4">
+              <div class="card text-white bg-danger">
+                <div class="card-body">
+                  <h6 class="card-title">Total Blacklisted</h6>
+                  <h2 class="mb-0">{{ blacklistedStudents.length }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card text-white bg-warning">
+                <div class="card-body">
+                  <h6 class="card-title">This Month</h6>
+                  <h2 class="mb-0">{{ getThisMonthCount() }}</h2>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="card text-white bg-info">
+                <div class="card-body">
+                  <h6 class="card-title">With Reason</h6>
+                  <h2 class="mb-0">{{ getWithReasonCount() }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      <!-- History Modal -->
+      <div class="modal fade" id="historyModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">
+                <i class="bi bi-clock-history me-2"></i>
+                Blacklist History
+                @if (selectedStudent) {
+                  - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+                }
+              </h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              @if (loadingHistory) {
+                <div class="text-center py-3">
+                  <div class="spinner-border spinner-border-sm"></div>
+                </div>
+              } @else if (blacklistHistory.length > 0) {
+                <div class="timeline">
+                  @for (record of blacklistHistory; track record._id) {
+                    <div class="card mb-3">
+                      <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                          <div>
+                            <h6 class="mb-1">
+                              @if (record.action === 'blacklisted') {
+                                <span class="badge bg-danger">Blacklisted</span>
+                              } @else {
+                                <span class="badge bg-success">Restored</span>
+                              }
+                            </h6>
+                            <p class="text-muted mb-2">
+                              <i class="bi bi-calendar me-1"></i>
+                              {{ record.date | date:'medium' }}
+                            </p>
+                            @if (record.reason) {
+                              <p class="mb-1">
+                                <strong>Reason:</strong> {{ record.reason }}
+                              </p>
+                            }
+                            @if (record.performedBy) {
+                              <p class="text-muted mb-0">
+                                <i class="bi bi-person me-1"></i>
+                                By: {{ record.performedBy.username }}
+                              </p>
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <div class="text-center py-3 text-muted">
+                  <i class="bi bi-info-circle" style="font-size: 2rem;"></i>
+                  <p class="mt-2">No history records found</p>
+                </div>
+              }
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

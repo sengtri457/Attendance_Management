@@ -1,0 +1,188 @@
+<!-- leave-approval.component.html -->
+<div class="leave-approval-container">
+  <!-- Header -->
+  <div class="header">
+    <h1>Leave Request Management</h1>
+    <p class="subtitle">Review and approve student leave requests</p>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-section">
+    <div class="filter-group">
+      <label for="statusFilter">Status:</label>
+      <select
+        id="statusFilter"
+        [(ngModel)]="statusFilter"
+        (change)="onStatusFilterChange()"
+        class="filter-select">
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="searchTerm">Search:</label>
+      <input
+        type="text"
+        id="searchTerm"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        placeholder="Search by name or student ID..."
+        class="search-input">
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner"></div>
+    <p>Loading leave requests...</p>
+  </div>
+
+  <!-- Leave Requests Table -->
+  <div *ngIf="!isLoading && filteredRequests.length > 0" class="table-container">
+    <table class="leave-table">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Student ID</th>
+          <th>Leave Type</th>
+          <th>From Date</th>
+          <th>To Date</th>
+          <th>Days</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let leave of filteredRequests" class="leave-row">
+          <td>
+            <div class="student-info">
+              <div class="student-avatar">
+                {{ leave.student.firstName.charAt(0) }}{{ leave.student.lastName.charAt(0) }}
+              </div>
+              <div>
+                <div class="student-name">
+                  {{ leave.student.firstName }} {{ leave.student.lastName }}
+                </div>
+                <div class="student-email">{{ leave.student.email }}</div>
+              </div>
+            </div>
+          </td>
+          <td>{{ leave.student.studentId }}</td>
+          <td>
+            <span [class]="'badge ' + getLeaveTypeBadgeClass(leave.leaveType)">
+              {{ leave.leaveType | titlecase }}
+            </span>
+          </td>
+          <td>{{ formatDate(leave.fromDate) }}</td>
+          <td>{{ formatDate(leave.toDate) }}</td>
+          <td class="text-center">
+            {{ getDaysDifference(leave.fromDate, leave.toDate) }} day(s)
+          </td>
+          <td>
+            <div class="reason-cell" [title]="leave.reason">
+              {{ leave.reason }}
+            </div>
+          </td>
+          <td>
+            <span [class]="'badge ' + getStatusBadgeClass(leave.status)">
+              {{ leave.status | titlecase }}
+            </span>
+          </td>
+          <td>
+            <div class="action-buttons" *ngIf="leave.status === 'pending'">
+              <button
+                class="btn btn-approve"
+                (click)="approveLeave(leave)"
+                title="Approve">
+                ✓ Approve
+              </button>
+              <button
+                class="btn btn-reject"
+                (click)="openRejectModal(leave)"
+                title="Reject">
+                ✕ Reject
+              </button>
+            </div>
+            <div *ngIf="leave.status !== 'pending'" class="no-action">
+              —
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- No Results -->
+  <div *ngIf="!isLoading && filteredRequests.length === 0" class="no-results">
+    <div class="no-results-icon">📋</div>
+    <h3>No Leave Requests Found</h3>
+    <p>There are no leave requests matching your filters.</p>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && filteredRequests.length > 0" class="pagination">
+    <button
+      class="btn btn-pagination"
+      [disabled]="currentPage === 1"
+      (click)="changePage(currentPage - 1)">
+      Previous
+    </button>
+
+    <span class="pagination-info">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+
+    <button
+      class="btn btn-pagination"
+      [disabled]="currentPage === totalPages"
+      (click)="changePage(currentPage + 1)">
+      Next
+    </button>
+  </div>
+
+  <!-- Reject Modal -->
+  <div class="modal-overlay" *ngIf="showRejectModal" (click)="closeRejectModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Reject Leave Request</h2>
+        <button class="modal-close" (click)="closeRejectModal()">✕</button>
+      </div>
+
+      <div class="modal-body" *ngIf="selectedLeave">
+        <div class="modal-info">
+          <p><strong>Student:</strong> {{ selectedLeave.student.firstName }} {{ selectedLeave.student.lastName }}</p>
+          <p><strong>Period:</strong> {{ formatDate(selectedLeave.fromDate) }} to {{ formatDate(selectedLeave.toDate) }}</p>
+          <p><strong>Reason:</strong> {{ selectedLeave.reason }}</p>
+        </div>
+
+        <div class="form-group">
+          <label for="rejectionReason">Rejection Reason: *</label>
+          <textarea
+            id="rejectionReason"
+            [(ngModel)]="rejectionReason"
+            rows="4"
+            placeholder="Please provide a reason for rejecting this leave request..."
+            class="form-textarea"
+            required>
+          </textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-cancel" (click)="closeRejectModal()">
+          Cancel
+        </button>
+        <button
+          class="btn btn-reject"
+          (click)="rejectLeave()"
+          [disabled]="!rejectionReason.trim()">
+          Reject Leave
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

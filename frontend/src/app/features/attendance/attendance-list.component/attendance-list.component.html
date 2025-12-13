@@ -1,0 +1,124 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h2>
+        <i class="bi bi-list-check me-2"></i>
+        Attendance Records
+      </h2>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <label class="form-label">Student ID</label>
+          <input type="text" class="form-control" [(ngModel)]="filters.studentId"
+                 placeholder="Filter by student ID">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Date From</label>
+          <input type="date" class="form-control" [(ngModel)]="filters.dateFrom">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Date To</label>
+          <input type="date" class="form-control" [(ngModel)]="filters.dateTo">
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Status</label>
+          <select class="form-select" [(ngModel)]="filters.status">
+            <option value="">All Statuses</option>
+            <option value="present">Present</option>
+            <option value="late">Late</option>
+            <option value="absent">Absent</option>
+            <option value="half-day">Half Day</option>
+            <option value="on-leave">On Leave</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary me-2" (click)="applyFilters()">
+            <i class="bi bi-funnel me-2"></i>Apply Filters
+          </button>
+          <button class="btn btn-outline-secondary me-2" (click)="clearFilters()">
+            <i class="bi bi-x-circle me-2"></i>Clear
+          </button>
+          <button class="btn btn-success" (click)="exportData()">
+            <i class="bi bi-download me-2"></i>Export CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Date</th>
+              <th>Student</th>
+              <th>Check-in</th>
+              <th>Check-out</th>
+              <th>Status</th>
+              <th>Late By</th>
+              <th>Work Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let record of attendanceRecords">
+              <td>{{ attendanceService.formatDate(record.date) }}</td>
+              <td>
+               {{record.student?.firstName}}
+               {{record.student?.lastName}}
+              </td>
+              @if(record.checkInTime != null){
+              <td>{{ attendanceService.formatTime(record.checkInTime) }}</td>
+              }@else{
+              <td class="text-danger">No CheckIn</td>
+              }
+              <td>{{ attendanceService.formatTime(record.checkOutTime) }}</td>
+              <td>
+                <span [class]="'badge bg-' + attendanceService.getStatusColor(record.status)">
+                  {{ record.status }}
+                </span>
+              </td>
+              <td>
+
+                <span *ngIf="record.isLate" class="text-warning">
+                  {{ record.lateBy }} min
+                </span>
+                <span *ngIf="!record.isLate" class="text-success">No Late</span>
+              </td>
+              <td>{{ record.workHours }} hrs</td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <!-- <div class="d-flex justify-content-between align-items-center p-3 border-top">
+        <div class="text-muted">
+          Showing {{ (currentPage - 1) * 20 + 1 }} to {{ Math.min(currentPage * 20, totalRecords) }}
+          of {{ totalRecords }} records
+        </div>
+        <nav>
+          <ul class="pagination mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <a class="page-link" (click)="changePage(currentPage - 1)">Previous</a>
+            </li>
+            <li class="page-item active">
+              <span class="page-link">{{ currentPage }}</span>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
+            </li>
+          </ul>
+        </nav>
+      </div> -->
+    </div>
+  </div>
+</div>

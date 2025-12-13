@@ -1,0 +1,168 @@
+<div class="container-fluid py-4">
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="mb-1">
+        <i class="bi bi-x-circle me-2"></i>Mark Students Absent
+      </h2>
+      <p class="text-muted">Bulk mark students as absent for a specific date</p>
+    </div>
+  </div>
+
+  <!-- Date and Note Selection -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0">
+        <i class="bi bi-calendar-x me-2"></i>Absence Details
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-calendar-event me-1"></i>Date
+          </label>
+          <input
+            type="date"
+            class="form-control form-control-lg"
+            [(ngModel)]="selectedDate"
+            required
+          />
+        </div>
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-sticky me-1"></i>Note (Optional)
+          </label>
+          <input
+            type="text"
+            class="form-control form-control-lg"
+            [(ngModel)]="note"
+            placeholder="Reason for absence..."
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Students List -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">
+          <i class="bi bi-people me-2"></i>Select Students
+        </h5>
+        <span class="badge bg-primary rounded-pill">
+          {{ selectedCount }} selected
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Select All -->
+      <div class="form-check mb-3 p-3 bg-light rounded">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="selectAll"
+          [checked]="allSelected"
+          (change)="toggleAll($event)"
+        />
+        <label class="form-check-label fw-bold" for="selectAll">
+          Select All Students
+        </label>
+      </div>
+
+      <!-- Students List -->
+      <div class="row g-3">
+        <div class="col-md-6 col-lg-4" *ngFor="let student of students">
+          <div class="card h-100" [ngClass]="{'border-danger': student.selected}">
+            <div class="card-body">
+              <div class="form-check">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [id]="'student-' + student._id"
+                  [(ngModel)]="student.selected"
+                />
+                <label class="form-check-label w-100" [attr.for]="'student-' + student._id">
+                  <div>
+                    <strong>{{ student.firstName}} {{ student.lastName }}</strong>
+                    <br>
+                    <small class="text-muted">{{ student.user.email }}</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- No Students -->
+      <div *ngIf="students.length === 0" class="text-center py-4">
+        <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+        <p class="text-muted mt-2">No students available</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <div class="d-flex justify-content-end gap-2">
+    <button
+      class="btn btn-outline-secondary btn-lg"
+      (click)="clearSelection()"
+      [disabled]="loading || selectedCount === 0"
+    >
+      <i class="bi bi-x-lg me-2"></i>Clear Selection
+    </button>
+    <button
+      class="btn btn-danger btn-lg"
+      (click)="markAbsent()"
+      [disabled]="loading || selectedCount === 0"
+    >
+      <i class="bi me-2" [ngClass]="loading ? 'bi-arrow-repeat spin' : 'bi-check-lg'"></i>
+      {{ loading ? 'Processing...' : 'Mark Absent (' + selectedCount + ')' }}
+    </button>
+  </div>
+</div>
+
+<!-- Results Modal -->
+<div *ngIf="showResults">
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">
+            <i class="bi bi-clipboard-check me-2"></i>Mark Absent Results
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="closeResults()"></button>
+        </div>
+        <div class="modal-body">
+          <div class="list-group">
+            <div
+              *ngFor="let result of results"
+              class="list-group-item"
+              [ngClass]="{
+                'list-group-item-success': result.success,
+                'list-group-item-danger': !result.success
+              }"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="bi me-2" [ngClass]="result.success ? 'bi-check-circle-fill text-success' : 'bi-x-circle-fill text-danger'"></i>
+                  <strong>Student ID: {{ result.studentId }}</strong>
+                </div>
+                <span class="badge" [ngClass]="result.success ? 'bg-success' : 'bg-danger'">
+                  {{ result.message }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" (click)="closeResults()">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

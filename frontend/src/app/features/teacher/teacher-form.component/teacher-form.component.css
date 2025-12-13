@@ -1,0 +1,109 @@
+/* Subject Selection Styles */
+.subjects-selection-container {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+}
+
+.subjects-list {
+    max-height: 400px;
+    overflow-y: auto;
+    background: white;
+}
+
+.subjects-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.subjects-list::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.subjects-list::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.subjects-list::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+.subject-item {
+    background: white;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.subject-item:hover {
+    background: #e3f2fd;
+    border-color: #90caf9 !important;
+    transform: translateX(4px);
+}
+
+.subject-item.subject-selected {
+    background: #d4edda;
+    border-color: #28a745 !important;
+    box-shadow: 0 2px 4px rgba(40, 167, 69, 0.2);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.form-check-input {
+    cursor: pointer;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.form-check-label {
+    cursor: pointer;
+}
+
+.selected-tags .badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 0.75rem;
+    font-weight: 500;
+}
+
+.selected-tags .btn-close {
+    padding: 0;
+    margin-left: 0.25rem;
+}
+
+/* Animation for selected badges */
+.selected-tags .badge {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .subjects-selection-container {
+        padding: 1rem;
+    }
+
+    .subjects-list {
+        max-height: 300px;
+    }
+
+    .subject-item {
+        padding: 0.75rem !important;
+    }
+
+    .col-md-4.d-flex.gap-2 {
+        margin-top: 0.75rem;
+    }
+}

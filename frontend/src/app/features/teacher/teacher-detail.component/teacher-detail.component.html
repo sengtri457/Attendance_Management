@@ -1,0 +1,164 @@
+ <div class="container-fluid py-4">
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-success"></div>
+        </div>
+      } @else if (teacher) {
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <div>
+            @if (!isTeacherUser) {
+              <button routerLink="/teachers" class="btn btn-link text-decoration-none p-0 mb-2">
+                <i class="bi bi-arrow-left me-2"></i>Back to Teachers
+              </button>
+            }
+            <h1 class="h2 mb-0">Teacher Details</h1>
+          </div>
+          @if (canEdit) {
+            <button [routerLink]="['/teachers/edit', teacher._id]" class="btn btn-success">
+              <i class="bi bi-pencil me-2"></i>Edit Teacher
+            </button>
+          }
+        </div>
+
+        <div class="row">
+          <!-- Teacher Information -->
+          <div class="col-lg-4 mb-4">
+            <div class="card">
+              <div class="card-body text-center">
+                <div class="bg-success text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+                     style="width: 120px; height: 120px; font-size: 2.5rem;">
+                  {{ teacher.name.charAt(0) }}
+                </div>
+                <h3 class="mb-1">{{ teacher.name }}</h3>
+                <p class="text-muted mb-3">{{ teacher.user.email }}</p>
+
+                @if (!teacher.user.isActive) {
+                  <span class="badge bg-danger mb-3">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Inactive
+                  </span>
+                } @else {
+                  <span class="badge bg-success mb-3">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Active
+                  </span>
+                }
+
+                <hr>
+
+                <div class="text-start">
+                  <div class="mb-3">
+                    <small class="text-muted d-block">Username</small>
+                    <strong>{{ teacher.user.username }}</strong>
+                  </div>
+
+                  @if (teacher.phone) {
+                    <div class="mb-3">
+                      <small class="text-muted d-block">Phone</small>
+                      <strong>
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ teacher.phone }}
+                      </strong>
+                    </div>
+                  }
+
+                  <div class="mb-3">
+                    <small class="text-muted d-block">Subjects Teaching</small>
+                    <h4 class="mb-0">
+                      <span class="badge bg-info">{{ subjects.length }}</span>
+                    </h4>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Subjects List -->
+          <div class="col-lg-8">
+            <div class="card">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="bi bi-book me-2"></i>
+                  Subjects
+                </div>
+              </div>
+              <div class="card-body">
+                @if (loadingSubjects) {
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm"></div>
+                  </div>
+                } @else if (subjects.length > 0) {
+                  <div class="row g-3">
+                    @for (subject of subjects; track subject._id) {
+                      <div class="col-md-6">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="d-flex align-items-start">
+                              <div class="bg-info text-white rounded d-flex align-items-center justify-content-center me-3"
+                                   style="width: 48px; height: 48px;">
+                                <i class="bi bi-book" style="font-size: 1.5rem;"></i>
+                              </div>
+                              <div class="flex-grow-1">
+                                <h6 class="mb-1">{{ subject.subjectName }}</h6>
+                                @if (subject.teachTime && subject.endTime) {
+                                  <p class="text-muted small mb-1">
+                                    <i class="bi bi-clock me-1"></i>
+                                    {{ subject.teachTime | date:'shortTime' }} - {{ subject.endTime | date:'shortTime' }}
+                                  </p>
+                                }
+                                @if (subject.teachTime) {
+                                  <p class="text-muted small mb-0">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{ subject.teachTime | date:'mediumDate' }}
+                                  </p>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-5 text-muted">
+                    <i class="bi bi-book" style="font-size: 3rem;"></i>
+                    <p class="mt-2">No subjects assigned to this teacher</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Quick Stats -->
+            @if (subjects.length > 0) {
+              <div class="row g-3 mt-3">
+                <div class="col-md-4">
+                  <div class="card bg-success text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">Total Subjects</h6>
+                      <h2 class="mb-0">{{ subjects.length }}</h2>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-info text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">This Week</h6>
+                      <h2 class="mb-0">{{ getThisWeekSubjects() }}</h2>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="card bg-primary text-white">
+                    <div class="card-body">
+                      <h6 class="mb-0">Account Status</h6>
+                      <h2 class="mb-0">{{ teacher.user.isActive ? 'Active' : 'Inactive' }}</h2>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>

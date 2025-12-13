@@ -1,0 +1,215 @@
+<div class="container-fluid py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <button routerLink="/teachers" class="btn btn-link text-decoration-none p-0 mb-2">
+          <i class="bi bi-arrow-left me-2"></i>Back to Teachers
+        </button>
+        <h1 class="h2 mb-0">{{ isEditMode ? 'Edit Teacher' : 'Add New Teacher' }}</h1>
+      </div>
+
+      @if (errorMessage) {
+      <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+      </div>
+      }
+
+      @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-success"></div>
+      </div>
+      } @else {
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="teacherForm" (ngSubmit)="onSubmit()">
+
+            @if (!isEditMode) {
+            <h5 class="mb-3">
+              <i class="bi bi-person-badge me-2"></i>
+              Account Information
+            </h5>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Username *</label>
+                <input type="text" formControlName="username" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('username')" placeholder="Enter username" />
+                @if (isFieldInvalid('username')) {
+                <div class="invalid-feedback">Username is required</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('email')" placeholder="Enter email" />
+                @if (isFieldInvalid('email')) {
+                <div class="invalid-feedback">Valid email is required</div>
+                }
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Password *</label>
+              <input type="password" formControlName="password" class="form-control"
+                [class.is-invalid]="isFieldInvalid('password')" placeholder="Enter password" />
+              @if (isFieldInvalid('password')) {
+              <div class="invalid-feedback">Password is required (min 6 characters)</div>
+              }
+            </div>
+
+            <hr>
+            }
+
+            <h5 class="mb-3">
+              <i class="bi bi-person me-2"></i>
+              Personal Information
+            </h5>
+
+            <div class="mb-3">
+              <label class="form-label">Full Name *</label>
+              <input type="text" formControlName="name" class="form-control" [class.is-invalid]="isFieldInvalid('name')"
+                placeholder="Enter full name" />
+              @if (isFieldInvalid('name')) {
+              <div class="invalid-feedback">Name is required</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Phone</label>
+              <input type="tel" formControlName="phone" class="form-control" placeholder="+1234567890" />
+            </div>
+
+            <hr>
+
+            <!-- Subject Selection Section (Single Subject) -->
+            <h5 class="mb-3">
+              <i class="bi bi-book me-2"></i>
+              Assign Subject *
+            </h5>
+
+            <div class="subjects-selection-container mb-4">
+              <!-- Search -->
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" class="form-control" [(ngModel)]="searchTerm"
+                      [ngModelOptions]="{ standalone: true }" placeholder="Search subjects..."
+                      (input)="filterSubjects()" />
+                    @if (selectedSubject()) {
+                    <button type="button" class="btn btn-outline-secondary" (click)="clearSubject()">
+                      <i class="bi bi-x-circle me-1"></i>
+                      Clear Selection
+                    </button>
+                    }
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subjects List (Radio Selection) -->
+              @if (loadingSubjects()) {
+              <div class="text-center py-4">
+                <div class="spinner-border spinner-border-sm text-success me-2"></div>
+                <span class="text-muted">Loading subjects...</span>
+              </div>
+              } @else {
+              <div class="subjects-list border rounded p-2" [class.is-invalid]="isFieldInvalid('subjectId')">
+                @if (filteredSubjects().length > 0) {
+                @for (subject of filteredSubjects(); track subject._id) {
+                <div class="subject-item p-3 mb-2 border rounded cursor-pointer"
+                  [class.subject-selected]="isSubjectSelected(subject._id)" (click)="selectSubject(subject._id)">
+                  <div class="form-check">
+                    <input class="form-check-input" type="radio" name="subjectSelection"
+                      [checked]="isSubjectSelected(subject._id)" [id]="'subject-' + subject._id"
+                      (click)="$event.stopPropagation()" />
+                    <label class="form-check-label w-100 cursor-pointer" [for]="'subject-' + subject._id">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong class="d-block">{{ subject.subjectName }}</strong>
+                          <small class="text-muted">
+                            <i class="bi bi-clock me-1"></i>
+                            {{ formatTime(subject.teachTime) }} - {{ formatTime(subject.endTime) }}
+                          </small>
+                        </div>
+                        @if (isSubjectSelected(subject._id)) {
+                        <i class="bi bi-check-circle-fill text-success"></i>
+                        }
+                      </div>
+                    </label>
+                  </div>
+                </div>
+                }
+                } @else {
+                <div class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                  <p class="mb-0">No subjects found</p>
+                </div>
+                }
+              </div>
+              @if (isFieldInvalid('subjectId')) {
+              <div class="text-danger mt-2">
+                <small>Please select a subject for this teacher</small>
+              </div>
+              }
+              }
+
+              <!-- Selected Subject Display -->
+              @if (selectedSubject()) {
+              <div class="alert alert-success mt-3 mb-0">
+                <div class="d-flex align-items-center justify-content-between">
+                  <div>
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Selected Subject:</strong>
+                    <span class="ms-2">{{ getSubjectName(selectedSubject()!) }}</span>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline-success" (click)="clearSubject()">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Change
+                  </button>
+                </div>
+                @if (getSelectedSubjectDetails()) {
+                <div class="mt-2 text-muted">
+                  <small>
+                    <i class="bi bi-clock me-1"></i>
+                    {{ formatTime(getSelectedSubjectDetails()!.teachTime) }} -
+                    {{ formatTime(getSelectedSubjectDetails()!.endTime) }}
+                  </small>
+                </div>
+                }
+              </div>
+              } @else {
+              <div class="alert alert-info mt-3 mb-0">
+                <i class="bi bi-info-circle me-2"></i>
+                Select a subject that this teacher will teach
+              </div>
+              }
+            </div>
+
+            <hr>
+
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" routerLink="/teachers" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancel
+              </button>
+              <button type="submit" [disabled]="teacherForm.invalid || submitting" class="btn btn-success">
+                @if (submitting) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Saving...
+                } @else {
+                <i class="bi bi-check-circle me-2"></i>
+                {{ isEditMode ? 'Update' : 'Create' }} Teacher
+                }
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+</div>

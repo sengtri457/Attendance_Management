@@ -101,7 +101,7 @@ exports.getAttendance = async (req, res) => {
       status,
       isLate,
       page = 1,
-      limit = 20,
+      limit = 200,
     } = req.query;
 
     let query = {};
@@ -734,6 +734,35 @@ exports.markAbsent = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to mark absent",
+      error: error.message,
+    });
+  }
+};
+
+// get LeaveRequest findByIdAndDelete
+//
+exports.getLeaveRequest = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const leaveRequest = await LeaveRequest.findById(id);
+
+    if (!leaveRequest) {
+      return res.status(404).json({
+        success: false,
+        message: "Leave request not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      leaveRequest,
+    });
+  } catch (error) {
+    console.error("Error getting leave request:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to get leave request",
       error: error.message,
     });
   }

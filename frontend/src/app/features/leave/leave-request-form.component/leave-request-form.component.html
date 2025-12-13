@@ -1,0 +1,150 @@
+<div class="leave-request-form-container">
+  <div class="form-card">
+    <!-- Header -->
+    <div class="form-header">
+      <h2>
+        <i class="icon-calendar"></i>
+        Request Leave
+      </h2>
+      <p class="subtitle">Submit a leave request for approval</p>
+    </div>
+
+    <!-- Alert Messages -->
+    <div *ngIf="error" class="alert alert-danger">
+      <i class="icon-alert-circle"></i>
+      {{ error }}
+    </div>
+
+    <div *ngIf="success" class="alert alert-success">
+      <i class="icon-check-circle"></i>
+      {{ success }}
+    </div>
+
+    <!-- Form -->
+    <form [formGroup]="leaveForm" (ngSubmit)="onSubmit()">
+
+      <!-- Date Range Section -->
+      <div class="form-section">
+        <h3 class="section-title">Leave Period</h3>
+
+        <div class="row">
+          <!-- From Date -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="fromDate" class="form-label required">
+                <i class="icon-calendar"></i>
+                From Date
+              </label>
+              <input
+                type="date"
+                id="fromDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('fromDate')"
+                formControlName="fromDate"
+                [min]="minDate"
+              />
+              <div *ngIf="isFieldInvalid('fromDate')" class="invalid-feedback">
+                {{ getFieldError('fromDate') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- To Date -->
+          <div class="col-md-6">
+            <div class="form-group">
+              <label for="toDate" class="form-label required">
+                <i class="icon-calendar"></i>
+                To Date
+              </label>
+              <input
+                type="date"
+                id="toDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('toDate')"
+                formControlName="toDate"
+                [min]="leaveForm.get('fromDate')?.value || minDate"
+              />
+              <div *ngIf="isFieldInvalid('toDate')" class="invalid-feedback">
+                {{ getFieldError('toDate') }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculated Days -->
+        <div *ngIf="calculatedDays > 0" class="leave-duration">
+          <div class="duration-badge">
+            <i class="icon-clock"></i>
+            <span class="duration-text">
+              <strong>{{ calculatedDays }}</strong>
+              {{ calculatedDays === 1 ? 'Day' : 'Days' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reason Section -->
+      <div class="form-section">
+        <h3 class="section-title">Reason for Leave</h3>
+
+        <div class="form-group">
+          <label for="reason" class="form-label required">
+            <i class="icon-file-text"></i>
+            Please provide a detailed reason
+          </label>
+          <textarea
+            id="reason"
+            class="form-control"
+            [class.is-invalid]="isFieldInvalid('reason')"
+            formControlName="reason"
+            rows="5"
+            placeholder="Example: I need to attend a family function in my hometown..."
+          ></textarea>
+          <div class="form-text">
+            {{ leaveForm.get('reason')?.value?.length || 0 }} / 500 characters
+            (minimum 10 required)
+          </div>
+          <div *ngIf="isFieldInvalid('reason')" class="invalid-feedback">
+            {{ getFieldError('reason') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Guidelines -->
+      <div class="guidelines-section">
+        <h4>
+          <i class="icon-info"></i>
+          Important Guidelines
+        </h4>
+        <ul>
+          <li>Leave requests must be submitted at least 2 days in advance</li>
+          <li>Provide a clear and valid reason for your leave</li>
+          <li>You will be notified once your request is reviewed</li>
+          <li>Approved leaves will automatically update your attendance</li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onCancel()"
+          [disabled]="loading"
+        >
+          <i class="icon-x"></i>
+          Cancel
+        </button>
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="loading || leaveForm.invalid"
+        >
+          <span *ngIf="loading" class="spinner-border spinner-border-sm"></span>
+          <i *ngIf="!loading" class="icon-send"></i>
+          {{ loading ? 'Submitting...' : 'Submit Request' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

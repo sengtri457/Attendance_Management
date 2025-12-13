@@ -60,4 +60,11 @@ router.get(
   authMiddleware,
   attendanceController.checkStudentLeaveStatus,
 );
+// LeaveRequest ByID
+router.get(
+  "/leave-request/:id",
+  authMiddleware,
+  attendanceController.getLeaveRequest,
+);
+
 module.exports = router;

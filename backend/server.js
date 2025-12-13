@@ -28,6 +28,8 @@ const roleRoutes = require("./src/routes/role.routes");
 const subjectRoutes = require("./src/routes/subject.routes");
 const attendanceRoutes = require("./src/routes/attendance.routes");
 const leaveRequestRoutes = require("./src/routes/leaveRequest.routes");
+// const leaveRequestApproveRoutes = require("./src/routes/leaveRequestApprove.routes");
+
 const parentStudentRoutes = require("./src/routes/parentStududent.routes");
 
 // API Routes
@@ -41,6 +43,7 @@ app.use("/api/subjects", subjectRoutes);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/leave-requests", leaveRequestRoutes);
 app.use("/api/parent-students", parentStudentRoutes);
+// app.use("/api/leave-request-approves", leaveRequestApproveRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

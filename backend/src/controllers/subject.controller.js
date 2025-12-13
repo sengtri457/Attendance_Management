@@ -28,13 +28,9 @@ exports.getAllSubjects = async (req, res) => {
 
 exports.getSubjectById = async (req, res) => {
   try {
-    const subject = await Subject.findById(req.params.id)
-      .populate("teacher", "name phone")
-      .populate({
-        path: "teacher",
-        populate: { path: "user", select: "username email" },
-      });
+    const { id } = req.params;
 
+    const subject = await Subject.findById(id);
     if (!subject) {
       return res.status(404).json({
         success: false,
@@ -57,7 +53,15 @@ exports.getSubjectById = async (req, res) => {
 
 exports.createSubject = async (req, res) => {
   try {
-    const { subjectName, teachTime, endTime } = req.body;
+    const {
+      subjectName,
+      teachTime,
+      endTime,
+      teacherId,
+      credit,
+      dayOfWeek,
+      subjectCode,
+    } = req.body;
 
     // Check if teacher exists
     const teacher = await Teacher.find();
@@ -80,6 +84,10 @@ exports.createSubject = async (req, res) => {
       subjectName,
       teachTime,
       endTime,
+      teacherId: teacherId,
+      credit,
+      dayOfWeek,
+      subjectCode,
     });
 
     await subject.save();

@@ -1,0 +1,173 @@
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-primary text-white py-3">
+          <h4 class="mb-0">
+            <i class="bi bi-plus-circle me-2"></i>
+            Mark Attendance
+          </h4>
+        </div>
+        <div class="card-body p-4">
+          <!-- Success Alert -->
+          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            Attendance marked successfully!
+            <button type="button" class="btn-close" (click)="success = false"></button>
+          </div>
+
+          <!-- Error Alert -->
+          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ error }}
+            <button type="button" class="btn-close" (click)="error = ''"></button>
+          </div>
+
+          <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()">
+            <div class="row g-3">
+              <!-- Student Search -->
+              <div class="col-md-6">
+                <label class="form-label">Student *</label>
+                <div class="search-wrapper">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="studentSearchTerm"
+                    [ngModelOptions]="{standalone: true}"
+                    (input)="onStudentSearchChange($event)"
+                    (focus)="showStudentDropdown = true"
+                    placeholder="Search student by name or ID..."
+                    [disabled]="loadingStudents"
+                  />
+
+                  <div class="dropdown-menu show" *ngIf="showStudentDropdown && filteredStudents.length > 0">
+                    <button
+                      type="button"
+                      class="dropdown-item"
+                      *ngFor="let student of filteredStudents"
+                      (click)="selectStudent(student)"
+                    >
+                      <div class="d-flex flex-column">
+                        <strong>{{ student.firstName }} {{ student.lastName }}</strong>
+                        <small class="text-muted">ID: {{ student._id }}</small>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div class="no-results" *ngIf="showStudentDropdown && filteredStudents.length === 0 && studentSearchTerm">
+                    <small class="text-muted">No students found</small>
+                  </div>
+
+                  <div *ngIf="loadingStudents" class="loading-text">
+                    <small class="text-muted">Loading students...</small>
+                  </div>
+                </div>
+
+                <div *ngIf="selectedStudent" class="selected-info mt-2">
+                  <i class="bi bi-check-circle-fill text-success me-1"></i>
+                  <strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong>
+                </div>
+
+                <div *ngIf="attendanceForm.get('studentId')?.invalid && attendanceForm.get('studentId')?.touched"
+                     class="text-danger small mt-1">
+                  Student ID is required
+                </div>
+              </div>
+
+              <!-- Date -->
+              <div class="col-md-6">
+                <label class="form-label">Date *</label>
+                <input type="date" class="form-control" formControlName="date">
+              </div>
+
+              <!-- Check-in Time -->
+              <div class="col-md-6">
+                <label class="form-label">Check-in Time *</label>
+                <input type="datetime-local" class="form-control" formControlName="checkInTime">
+              </div>
+
+              <!-- Check-out Time -->
+              <div class="col-md-6">
+                <label class="form-label">Check-out Time</label>
+                <input type="datetime-local" class="form-control" formControlName="checkOutTime">
+              </div>
+
+              <!-- Teacher Search -->
+              <div class="col-md-12">
+                <label class="form-label">Marked By (Teacher) *</label>
+                <div class="search-wrapper">
+                  <input
+                    type="text"
+                    class="form-control"
+                    [(ngModel)]="teacherSearchTerm"
+                    [ngModelOptions]="{standalone: true}"
+                    (input)="onTeacherSearchChange($event)"
+                    (focus)="showTeacherDropdown = true"
+                    placeholder="Search teacher by name or ID..."
+                    [disabled]="loadingTeachers"
+                  />
+
+                  <div class="dropdown-menu show" *ngIf="showTeacherDropdown && filteredTeachers.length > 0">
+                    <button
+                      type="button"
+                      class="dropdown-item"
+                      *ngFor="let teacher of filteredTeachers"
+                      (click)="selectTeacher(teacher)"
+                    >
+                      <div class="d-flex flex-column">
+                        <strong>{{ teacher.name }}</strong>
+                        <small class="text-muted">ID: {{ teacher._id }}</small>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div class="no-results" *ngIf="showTeacherDropdown && filteredTeachers.length === 0 && teacherSearchTerm">
+                    <small class="text-muted">No teachers found</small>
+                  </div>
+
+                  <div *ngIf="loadingTeachers" class="loading-text">
+                    <small class="text-muted">Loading teachers...</small>
+                  </div>
+                </div>
+
+                <div *ngIf="selectedTeacher" class="selected-info mt-2">
+                  <i class="bi bi-check-circle-fill text-success me-1"></i>
+                  <strong>{{ selectedTeacher.name }}</strong>
+                </div>
+              </div>
+
+              <!-- Note -->
+              <div class="col-md-12">
+                <label class="form-label">Note</label>
+                <textarea class="form-control" rows="3" formControlName="note"
+                          placeholder="Add any notes (optional)"></textarea>
+              </div>
+
+              <!-- Buttons -->
+              <div class="col-12">
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary" [disabled]="loading || attendanceForm.invalid">
+                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+                    <i *ngIf="!loading" class="bi bi-check-circle me-2"></i>
+                    {{ loading ? 'Submitting...' : 'Mark Attendance' }}
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary"
+                          (click)="resetForm()" [disabled]="loading">
+                    <i class="bi bi-x-circle me-2"></i>
+                    Reset
+                  </button>
+                  <button
+                      (click)="backToDashboard()"
+                      type="button" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    Back to Dashboard
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
