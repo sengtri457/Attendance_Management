@@ -1,37 +1,38 @@
-import { Component } from "@angular/core";
-import { LeaveRequest } from "../../../models/user.model";
-import { LeaveRequestService } from "../../../services/leaveRequestservice/leave-request.service";
-import { AuthService } from "../../../services/authservice/auth.service";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { RouterModule } from "@angular/router";
+import { Component } from '@angular/core';
+import { LeaveRequest } from '../../../models/user.model';
+import { LeaveRequestService } from '../../../services/leaveRequestservice/leave-request.service';
+import { AuthService } from '../../../services/authservice/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: "app-leave-review.component",
+  selector: 'app-leave-review.component',
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: "./leave-review.component.html",
-  styleUrl: "./leave-review.component.css",
+  templateUrl: './leave-review.component.html',
+  styleUrl: './leave-review.component.css',
 })
 export class LeaveReviewComponent {
   leaveRequests: LeaveRequest[] = [];
   filteredRequests: LeaveRequest[] = [];
   loading = false;
-  selectedStatus = "all";
-  reviewerId = "";
+  selectedStatus = 'all';
+  reviewerId = '';
 
   selectedRequest: LeaveRequest | null = null;
   showReviewModal = false;
-  reviewAction: "approved" | "rejected" = "approved";
+  reviewAction: 'approved' | 'rejected' = 'approved';
   processing = false;
 
   constructor(
     private leaveRequestService: LeaveRequestService,
-    private authService: AuthService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
     this.reviewerId = this.authService.getCurrentUser().id;
     this.loadLeaveRequests();
+    console.log(this.pendingCount);
   }
 
   loadLeaveRequests(): void {
@@ -44,18 +45,18 @@ export class LeaveReviewComponent {
         this.loading = false;
       },
       error: (error) => {
-        console.error("Error loading leave requests:", error);
+        console.error('Error loading leave requests:', error);
         this.loading = false;
       },
     });
   }
 
   filterRequests(): void {
-    if (this.selectedStatus === "all") {
+    if (this.selectedStatus === 'all') {
       this.filteredRequests = this.leaveRequests;
     } else {
       this.filteredRequests = this.leaveRequests.filter(
-        (req) => req.status === this.selectedStatus,
+        (req) => req.status === this.selectedStatus
       );
     }
   }
@@ -66,7 +67,7 @@ export class LeaveReviewComponent {
 
   openReviewModal(
     request: LeaveRequest,
-    action: "approved" | "rejected",
+    action: 'approved' | 'rejected'
   ): void {
     this.selectedRequest = request;
     this.reviewAction = action;
@@ -86,7 +87,7 @@ export class LeaveReviewComponent {
       .reviewLeaveRequest(
         this.selectedRequest._id,
         this.reviewAction,
-        this.reviewerId,
+        this.reviewerId
       )
       .subscribe({
         next: (response) => {
@@ -95,8 +96,8 @@ export class LeaveReviewComponent {
           this.loadLeaveRequests();
         },
         error: (error) => {
-          console.error("Error reviewing leave request:", error);
-          alert("Failed to review leave request");
+          console.error('Error reviewing leave request:', error);
+          alert('Failed to review leave request');
           this.processing = false;
         },
       });
@@ -104,39 +105,39 @@ export class LeaveReviewComponent {
 
   getStatusClass(status: string): string {
     switch (status) {
-      case "approved":
-        return "success";
-      case "rejected":
-        return "danger";
-      case "pending":
-        return "warning";
+      case 'approved':
+        return 'success';
+      case 'rejected':
+        return 'danger';
+      case 'pending':
+        return 'warning';
       default:
-        return "secondary";
+        return 'secondary';
     }
   }
 
   getStatusIcon(status: string): string {
     switch (status) {
-      case "approved":
-        return "bi-check-circle-fill";
-      case "rejected":
-        return "bi-x-circle-fill";
-      case "pending":
-        return "bi-clock-fill";
+      case 'approved':
+        return 'bi-check-circle-fill';
+      case 'rejected':
+        return 'bi-x-circle-fill';
+      case 'pending':
+        return 'bi-clock-fill';
       default:
-        return "bi-question-circle-fill";
+        return 'bi-question-circle-fill';
     }
   }
 
   get pendingCount(): number {
-    return this.leaveRequests.filter((r) => r.status === "pending").length;
+    return this.leaveRequests.filter((r) => r.status === 'pending').length;
   }
 
   get approvedCount(): number {
-    return this.leaveRequests.filter((r) => r.status === "approved").length;
+    return this.leaveRequests.filter((r) => r.status === 'approved').length;
   }
 
   get rejectedCount(): number {
-    return this.leaveRequests.filter((r) => r.status === "rejected").length;
+    return this.leaveRequests.filter((r) => r.status === 'rejected').length;
   }
 }

@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { StudentService } from '../../../services/studentservices/student.service';
 import {
   Attendance,
+  LeaveRequest,
   Parent,
   Student,
   Teacher,
@@ -24,6 +25,7 @@ import { AttendanceService } from '../../../services/attendanceservice/attendanc
 import { ParentService } from '../../../services/parentservice/parent.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import { SubjectService } from '../../../services/subjectservice/subject.service';
+import { LeaveRequestService } from '../../../services/leaveRequestservice/leave-request.service';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -113,6 +115,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
       this.loadParentDashboard();
     }
   }
+  // load LeaveRequest
 
   ngAfterViewInit(): void {
     // Initialize charts after view is ready

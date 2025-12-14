@@ -84,8 +84,8 @@
 
       <div class="navbar-right">
         <button class="nav-icon-btn" title="Notifications">
-          <i class="bi bi-bell"></i>
-          <span class="badge">3</span>
+          <i class="bi bi-bell" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+          <span class="badge">{{pendingCount}}</span>
         </button>
 
         <button class="nav-icon-btn" title="Messages">
@@ -125,6 +125,56 @@
     <main class="page-content">
       <router-outlet />
     </main>
+  </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Review Request</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of leaveRequests; track $index) {
+            <tr>
+              @if (item.status === 'pending') {
+              <td>
+                {{ item.student.firstName }} {{ item.student.lastName }}
+              </td>
+              <td>
+                {{ item.reason }}
+              </td>
+              <td>
+                <span class="badge bg-warning text-dark">Pending</span>
+              </td>
+              <td>
+                <button routerLink="/leave/review" class="btn btn-outline-primary" title="View Details"
+                  data-bs-dismiss="modal">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </td>
+              }
+            </tr>
+            }
+          </tbody>
+        </table>
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
   </div>
 </div>
 } @else {
