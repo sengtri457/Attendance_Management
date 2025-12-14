@@ -23,6 +23,7 @@ import { TeacherService } from '../../../services/teacherservice/teacher.service
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
 import { ParentService } from '../../../services/parentservice/parent.service';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
+import { SubjectService } from '../../../services/subjectservice/subject.service';
 
 // Register Chart.js components
 Chart.register(...registerables);
@@ -61,6 +62,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     halfDay: 0,
     onLeave: 0,
   };
+
   // User and role information
   currentUser: any;
   isStudent = false;
@@ -79,6 +81,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
   parents: any[] = [];
   attendance: any[] = [];
   todayAttendance: any[] = [];
+
   // Student specific information
   studentSpecificInformation: any;
 
@@ -109,15 +112,6 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     } else if (this.isParent && this.parentId) {
       this.loadParentDashboard();
     }
-    if (this.barChart) {
-      this.barChart.data.datasets[0].data = [
-        this.students.length,
-        this.teacher.length,
-        this.parents.length,
-        this.todayAttendance.length,
-      ];
-      this.barChart.update();
-    }
   }
 
   ngAfterViewInit(): void {
@@ -145,7 +139,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
         datasets: [
           {
             label: 'Total Count',
-            data: [0, 0, 0, 0],
+            data: [0, 1, 2, 10],
             backgroundColor: [
               'rgba(79, 70, 229, 0.8)',
               'rgba(16, 185, 129, 0.8)',
@@ -206,6 +200,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
     this.barChart = new Chart(this.barCanvas.nativeElement, config);
   }
+
   // Create Doughnut Chart
   createDoughnutChart(): void {
     if (!this.doughnutCanvas) return;
@@ -213,7 +208,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     const config: ChartConfiguration = {
       type: 'doughnut',
       data: {
-        labels: ['Present', 'Absent', 'Late', 'on Leave'],
+        labels: ['Present', 'Absent', 'Late', 'On Leave'],
         datasets: [
           {
             data: [0, 0, 0, 0],
@@ -259,7 +254,8 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
                   (a: number, b: number) => a + (typeof b === 'number' ? b : 0),
                   0
                 );
-                const percentage = ((value / total) * 100).toFixed(1);
+                const percentage =
+                  total > 0 ? ((value / total) * 100).toFixed(1) : '0.0';
                 return `${label}: ${value} (${percentage}%)`;
               },
             },
@@ -270,9 +266,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, config);
   }
-
-  // Create Line Chart
-  // Create Line Chart
+  // Create Modern Line Chart
   createLineChart(): void {
     if (!this.lineCanvas) return;
 
@@ -286,20 +280,36 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
         datasets: [
           {
             label: 'Total Attendance',
-            data: [0, 0, 0, 0, 0, 0, 0],
-            borderColor: 'rgb(79, 70, 229)',
-            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+            data: [0, 1, 3, 4, 5, 6, 7, 8],
+            borderColor: 'rgba(99, 102, 241, 1)',
+            backgroundColor: (context: any) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+              gradient.addColorStop(0, 'rgba(99, 102, 241, 0.3)');
+              gradient.addColorStop(0.5, 'rgba(99, 102, 241, 0.1)');
+              gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
+              return gradient;
+            },
             borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: 'rgb(79, 70, 229)',
+            pointBackgroundColor: 'rgba(99, 102, 241, 1)',
             pointBorderColor: '#fff',
-            pointBorderWidth: 2,
-            pointRadius: 5,
-            pointHoverRadius: 7,
-            pointHoverBackgroundColor: '#fff',
-            pointHoverBorderColor: 'rgb(79, 70, 229)',
-            pointHoverBorderWidth: 3,
+            pointBorderWidth: 3,
+            pointRadius: 6,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: 'rgba(99, 102, 241, 1)',
+            pointHoverBorderColor: '#fff',
+            pointHoverBorderWidth: 4,
+            segment: {
+              borderColor: (ctx) => {
+                const p0Value = ctx.p0?.parsed?.y ?? 0;
+                const p1Value = ctx.p1?.parsed?.y ?? 0;
+                return p0Value > p1Value
+                  ? 'rgba(239, 68, 68, 0.8)'
+                  : 'rgba(99, 102, 241, 1)';
+              },
+            },
           },
         ],
       },
@@ -314,57 +324,138 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
           legend: {
             display: true,
             position: 'top',
+            align: 'end',
             labels: {
-              font: { size: 12, weight: 'bold' },
-              padding: 15,
+              font: {
+                size: 13,
+                weight: 600,
+                family: "'Inter', 'Segoe UI', sans-serif",
+              },
+              padding: 20,
+              usePointStyle: true,
+              pointStyle: 'circle',
+              color: '#374151',
             },
           },
           title: {
             display: true,
-            text: 'Attendance Trend (Last 7 Days)',
-            font: { size: 16, weight: 'bold' },
-            padding: { top: 10, bottom: 20 },
+            text: 'Attendance Trend Overview',
+            font: {
+              size: 20,
+              weight: 700,
+              family: "'Inter', 'Segoe UI', sans-serif",
+            },
+            color: '#111827',
+            padding: { top: 15, bottom: 30 },
+            align: 'start',
           },
           tooltip: {
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            padding: 12,
-            cornerRadius: 8,
+            backgroundColor: 'rgba(17, 24, 39, 0.95)',
+            padding: 16,
+            cornerRadius: 12,
+            titleColor: '#fff',
+            bodyColor: '#e5e7eb',
+            borderColor: 'rgba(99, 102, 241, 0.3)',
+            borderWidth: 1,
+            displayColors: true,
+            boxPadding: 6,
+            usePointStyle: true,
             callbacks: {
               title: (context) => {
                 const index = context[0].dataIndex;
                 return last7Days[index];
               },
               label: (context) => {
-                return `Total Records: ${context.parsed.y}`;
+                const value = context.parsed.y ?? 0;
+                const prev =
+                  context.dataIndex > 0
+                    ? (context.dataset.data[context.dataIndex - 1] as number)
+                    : 0;
+                const change = value - prev;
+                const trend = change > 0 ? '↑' : change < 0 ? '↓' : '→';
+                return [
+                  `Records: ${value}`,
+                  change !== 0
+                    ? `${trend} ${Math.abs(change)} from previous`
+                    : '',
+                ].filter(Boolean);
               },
+            },
+            titleFont: {
+              size: 14,
+              weight: 600,
+              family: "'Inter', 'Segoe UI', sans-serif",
+            },
+            bodyFont: {
+              size: 13,
+              weight: 500,
+              family: "'Inter', 'Segoe UI', sans-serif",
             },
           },
         },
         scales: {
           y: {
             beginAtZero: true,
+            suggestedMax: 10,
             ticks: {
-              font: { size: 11 },
+              font: {
+                size: 12,
+                weight: 500,
+                family: "'Inter', 'Segoe UI', sans-serif",
+              },
               stepSize: 1,
+              color: '#6b7280',
+              padding: 10,
+              precision: 0,
             },
-            grid: { color: 'rgba(0, 0, 0, 0.05)' },
+            grid: {
+              color: 'rgba(229, 231, 235, 0.8)',
+              lineWidth: 1,
+              display: true,
+            },
+            border: {
+              display: false,
+            },
             title: {
               display: true,
               text: 'Number of Records',
-              font: { size: 12, weight: 'bold' },
+              font: {
+                size: 13,
+                weight: 600,
+                family: "'Inter', 'Segoe UI', sans-serif",
+              },
+              color: '#374151',
+              padding: { bottom: 10 },
             },
           },
           x: {
-            grid: { display: false },
+            grid: {
+              display: false,
+            },
+            border: {
+              display: false,
+            },
             ticks: {
-              font: { size: 11, weight: 'bold' },
-              maxRotation: 45,
-              minRotation: 45,
+              font: {
+                size: 12,
+                weight: 600,
+                family: "'Inter', 'Segoe UI', sans-serif",
+              },
+              maxRotation: 0,
+              minRotation: 0,
+              color: '#6b7280',
+              padding: 10,
             },
             title: {
               display: true,
-              text: 'Date',
-              font: { size: 12, weight: 'bold' },
+              text: 'Last 7 Days',
+              font: {
+                size: 13,
+                weight: 600,
+                family: "'Inter', 'Segoe UI', sans-serif",
+              },
+              color: '#374151',
+              padding: { top: 10 },
             },
           },
         },
@@ -394,8 +485,8 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     this.countStudents();
     this.countTeachers();
     this.countParents();
-    this.countAttendance();
     this.loadTodayAttendance();
+    this.countAttendance();
   }
 
   // Parent Dashboard
@@ -451,6 +542,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
       next: (response: any) => {
         this.attendance = response.data;
         console.log('Total Attendance Records:', this.attendance.length);
+        console.log('Sample attendance record:', this.attendance[0]);
         this.updateAttendanceCharts();
       },
       error: (error) => {
@@ -458,27 +550,37 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
       },
     });
   }
-  // today Attendance
+
+  // Today Attendance
   loadTodayAttendance(): void {
     this.attendanceService.getTodayAttendance().subscribe({
       next: (response) => {
         this.summary = response.summary;
         this.todayAttendance = response.data;
-        console.log(this.todayAttendance);
         console.log("Today's attendance:", this.todayAttendance);
+        this.updateCharts();
+        this.updateAttendanceCharts();
       },
       error: (error) => {
         console.error("Error loading today's attendance:", error);
       },
     });
   }
+
   // Update charts with real data
   updateCharts(): void {
     const studentCount = this.students.length;
     const teacherCount = this.teacher.length;
     const parentCount = this.parents.length;
     const attendanceCount = this.todayAttendance.length;
-    console.log(attendanceCount);
+
+    console.log('Updating bar chart with:', {
+      students: studentCount,
+      teachers: teacherCount,
+      parents: parentCount,
+      attendance: attendanceCount,
+    });
+
     // Update Bar Chart
     if (this.barChart) {
       this.barChart.data.datasets[0].data = [
@@ -493,10 +595,10 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
   // Update attendance charts
   updateAttendanceCharts(): void {
-    let present = this.summary?.present;
-    let absent = this.summary?.absent;
-    let late = this.summary?.late;
-    let onleave = this.summary?.onLeave;
+    const present = this.summary?.present || 0;
+    const absent = this.summary?.absent || 0;
+    const late = this.summary?.late || 0;
+    const onleave = this.summary?.onLeave || 0;
 
     // Update Doughnut Chart
     if (this.doughnutChart) {
@@ -509,11 +611,16 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
       this.doughnutChart.update();
     }
 
-    // Update Line Chart
     // Update Line Chart with actual date-based data
     const weeklyData = this.getWeeklyAttendance();
     const last7Days = this.getLast7Days();
     const labels = last7Days.map((date) => this.formatDateLabel(date));
+
+    console.log('Line chart data:', {
+      dates: last7Days,
+      labels: labels,
+      counts: weeklyData,
+    });
 
     if (this.lineChart) {
       this.lineChart.data.labels = labels;
@@ -521,13 +628,14 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
       this.lineChart.update();
     }
   }
+
   // Helper method to calculate attendance by date
   getWeeklyAttendance(): number[] {
-    // Get last 7 days of attendance data
     const attendanceByDate = this.groupAttendanceByDate();
     const last7Days = this.getLast7Days();
 
-    // Map dates to counts
+    console.log('Grouped attendance:', attendanceByDate);
+
     const weekData = last7Days.map((dateStr) => {
       return attendanceByDate[dateStr] || 0;
     });
@@ -535,38 +643,35 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     return weekData;
   }
 
-  // Group attendance records by date
+  // Group attendance records by date - FIXED FOR TIMEZONE
   groupAttendanceByDate(): { [key: string]: number } {
     const grouped: { [key: string]: number } = {};
 
     this.attendance.forEach((record: any) => {
       if (record.date) {
-        // Format date as YYYY-MM-DD
-        console.log(record.date);
-        const date = new Date(record.date);
-        const dateStr = date.toISOString().split('T')[0];
+        // Parse the date string directly without timezone conversion
+        const dateStr = record.date.split('T')[0]; // Gets "2025-12-12" from "2025-12-12T17:00:00.000Z"
 
-        // Count all attendance records (you can filter by status if needed)
-        if (grouped[dateStr]) {
-          grouped[dateStr]++;
-        } else {
-          grouped[dateStr] = 1;
-        }
+        grouped[dateStr] = (grouped[dateStr] || 0) + 1;
       }
     });
 
     return grouped;
   }
 
-  // Get last 7 days as array of date strings
+  // Get last 7 days as array of date strings - FIXED FOR TIMEZONE
   getLast7Days(): string[] {
     const dates: string[] = [];
     const today = new Date();
 
-    for (let i = 7; i >= 0; i--) {
+    for (let i = 6; i >= 0; i--) {
       const date = new Date(today);
       date.setDate(today.getDate() - i);
-      dates.push(date.toISOString().split('T')[0]);
+
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      dates.push(`${year}-${month}-${day}`);
     }
 
     return dates;
@@ -574,7 +679,8 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
   // Format date for chart labels (e.g., "Dec 12")
   formatDateLabel(dateStr: string): string {
-    const date = new Date(dateStr);
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
     const months = [
       'Jan',
       'Feb',

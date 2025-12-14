@@ -6,13 +6,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from "@angular/forms";
+import Swal from "sweetalert2";
 import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
 import { CommonModule } from "@angular/common";
 import { StudentService } from "../../../services/studentservices/student.service";
 import { TeacherService } from "../../../services/teacherservice/teacher.service";
 import { Student, Teacher } from "../../../models/user.model";
 import { Router, RouterModule } from "@angular/router";
-
 @Component({
   selector: "app-mark-attendance.component",
   imports: [ReactiveFormsModule, CommonModule, FormsModule, RouterModule],
@@ -186,7 +186,7 @@ export class MarkAttendanceComponent implements OnInit {
         this.resetForm();
 
         if (response.data.isLate) {
-          alert(`Student was ${response.data.lateBy} minutes late!`);
+          Swal.fire(`Student was ${response.data.lateBy} minutes late!`);
         }
       },
       error: (error) => {

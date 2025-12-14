@@ -1,3 +1,4 @@
+@defer(on timer(3000ms)){
 @if (authService.isAuthenticated()) {
 <div class="wrapper">
   <!-- Sidebar -->
@@ -128,4 +129,14 @@
 </div>
 } @else {
 <router-outlet />
+}
+}@placeholder {
+<!-- From Uiverse.io by PriyanshuGupta28 -->
+<div class="wrapper-spnner">
+  <!-- From Uiverse.io by thekuntal49 -->
+  <div class="loader">
+    <div class="progress" data-percentage="100%"></div>
+  </div>
+
+</div>
 }
