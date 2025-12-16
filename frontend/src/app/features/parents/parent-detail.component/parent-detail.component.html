@@ -22,8 +22,9 @@
         </div>
 
         <div class="row">
+
           <!-- Parent Information -->
-          <div class="col-lg-4 mb-4">
+          <div class="col-lg-4">
             <div class="card">
               <div class="card-body text-center">
                 <div class="bg-warning text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
@@ -64,6 +65,28 @@
 
           <!-- Children List -->
           <div class="col-lg-8">
+
+          <!-- Quick Stats -->
+          @if (children.length > 0) {
+            <div class="row mb-4">
+              <div class="col-md-6 ">
+                <div class="card bg-primary text-white">
+                  <div class="card-body">
+                    <h6 class="mb-0">Total Children</h6>
+                    <h2 class="mb-0">{{ children.length }}</h2>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card bg-success text-white">
+                  <div class="card-body">
+                    <h6 class="mb-0">Active Students</h6>
+                    <h2 class="mb-0">{{ getActiveChildren() }}</h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
             <div class="card">
               <div class="card-header d-flex justify-content-between align-items-center">
                 <div>
@@ -89,8 +112,8 @@
                 } @else if (children.length > 0) {
                   <div class="row g-3">
                     @for (child of children; track child._id) {
-                      <div class="col-md-6">
-                        <div class="card">
+                      <div class="col-md-12">
+                        <div class="card  border-start border-4 border-success">
                           <div class="card-body">
                             <div class="d-flex align-items-start">
                               @if (child.photo) {
@@ -128,13 +151,13 @@
                                     View Profile
                                   </button>
                                   @if (canEdit) {
-                                    <button
-                                      (click)="removeChild(child._id)"
-                                      class="btn btn-sm btn-outline-danger"
-                                    >
-                                      <i class="bi bi-trash me-1"></i>
-                                      Remove
-                                    </button>
+                                  <button
+                                    class="btn btn-sm btn-outline-danger"
+                                    (click)="removeChild(child._id)"
+                                  >
+                                    <i class="bi bi-trash me-1"></i>
+                                    Remove
+                                  </button>
                                   }
                                 </div>
                               </div>
@@ -163,35 +186,6 @@
               </div>
             </div>
 
-            <!-- Quick Stats -->
-            @if (children.length > 0) {
-              <div class="row g-3 mt-3">
-                <div class="col-md-4">
-                  <div class="card bg-primary text-white">
-                    <div class="card-body">
-                      <h6 class="mb-0">Total Children</h6>
-                      <h2 class="mb-0">{{ children.length }}</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-success text-white">
-                    <div class="card-body">
-                      <h6 class="mb-0">Active Students</h6>
-                      <h2 class="mb-0">{{ getActiveChildren() }}</h2>
-                    </div>
-                  </div>
-                </div>
-                <div class="col-md-4">
-                  <div class="card bg-info text-white">
-                    <div class="card-body">
-                      <h6 class="mb-0">Avg. Attendance</h6>
-                      <h2 class="mb-0">-</h2>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            }
           </div>
         </div>
       }

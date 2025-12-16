@@ -7,7 +7,7 @@
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
           <div>
-            <button routerLink="/students" class="btn btn-link text-decoration-none p-0 mb-2">
+            <button routerLink="/dashboard" class="btn btn-link text-decoration-none p-0 mb-2">
               <i class="bi bi-arrow-left me-2"></i>Back to Students
             </button>
             <h1 class="h2 mb-0">Student Details</h1>
@@ -86,14 +86,14 @@
                 </div>
                 <ul class="list-group list-group-flush">
                   @for (parent of parents; track $index) {
-                    <li class="list-group-item">
-                      <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                          <strong>{{ parent?.name }}</strong>
+                    <li class="list-group-item card border-top border-4">
+                      <div class="d-flex justify-content-between align-items-center ">
+                        <div >
+                          <strong>{{ parent?.name || "unavailable" }}</strong>
                           @if (parent?.phone) {
                             <div class="small text-muted">
                               <i class="bi bi-telephone me-1"></i>
-                              {{ parent?.phone }}
+                              {{ parent?.phone || "unavailable" }}
                             </div>
                           }
                         </div>
@@ -107,80 +107,10 @@
 
           <!-- Attendance & Activities -->
           <div class="col-lg-8">
-            <!-- Attendance Card -->
-            <div class="card mb-4">
-              <div class="card-header d-flex justify-content-between align-items-center">
-                <div>
-                  <i class="bi bi-calendar-check me-2"></i>
-                  Recent Attendance
-                </div>
-                <button class="btn btn-sm btn-outline-primary">
-                  View All
-                </button>
-              </div>
-              <div class="card-body">
-                @if (loadingAttendance) {
-                  <div class="text-center py-3">
-                    <div class="spinner-border spinner-border-sm"></div>
-                  </div>
-                } @else if (attendanceRecords.length > 0) {
-                  <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                      <thead>
-                        <tr>
-                          <th>Date</th>
-                          <th>Check In</th>
-                          <th>Check Out</th>
-                          <th>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (record of attendanceRecords; track record._id) {
-                          <tr>
-                            <td>{{ record.date | date:'mediumDate' }}</td>
-                            <td>
-                              @if (record.checkInTime) {
-                                <span class="badge bg-success">
-                                  {{ record.checkInTime | date:'shortTime'  }}
-                                </span>
-                              } @else {
-                                <span class="text-muted">No Check-In</span>
-                              }
-                            </td>
-                            <td>
-                              @if (record.checkOutTime) {
-                                <span class="badge bg-info">
-                                  {{ record.checkOutTime | date:'shortTime' }}
-                                </span>
-                              } @else {
-                                <span class="text-muted">No Check-Out</span>
-                              }
-                            </td>
-                            <td>
-                              @if (record.checkInTime) {
-                                <span class="badge bg-success">Present</span>
-                              } @else {
-                                <span class="badge bg-danger">Absent</span>
-                              }
-                            </td>
-                          </tr>
-                        }
-                      </tbody>
-                    </table>
-                  </div>
-                } @else {
-                  <div class="text-center py-4 text-muted">
-                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
-                    <p class="mt-2 mb-0">No attendance records found</p>
-                  </div>
-                }
-              </div>
-            </div>
-
             <!-- Quick Stats -->
-            <div class="row g-3">
+            <div class="row g-3 mb-4">
               <div class="col-md-4">
-                <div class="card bg-primary text-white">
+                <div class="card bg-primary text-white border-start border-4">
                   <div class="card-body">
                     <div class="d-flex justify-content-between">
                       <div>
@@ -193,7 +123,7 @@
                 </div>
               </div>
               <div class="col-md-4">
-                <div class="card bg-success text-white">
+                <div class="card bg-success text-white border-start border-4">
                   <div class="card-body">
                     <div class="d-flex justify-content-between">
                       <div>
@@ -206,7 +136,7 @@
                 </div>
               </div>
               <div class="col-md-4">
-                <div class="card bg-danger text-white">
+                <div class="card bg-danger text-white border-start border-4 border-gray">
                   <div class="card-body">
                     <div class="d-flex justify-content-between">
                       <div>
@@ -217,6 +147,83 @@
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+            <!-- Attendance Card -->
+            <div class="card mb-4">
+              <div class="card-header d-flex justify-content-between align-items-center">
+                <div>
+                  <i class="bi bi-calendar-check me-2"></i>
+                  Recent Attendance
+                </div>
+              </div>
+              <div class="card-body">
+                @if (loadingAttendance) {
+                  <div class="text-center py-3">
+                    <div class="spinner-border spinner-border-sm"></div>
+                  </div>
+                } @else if (attendanceRecords.length > 0) {
+                  <div class="row g-3">
+                    @for (record of attendanceRecords; track record._id) {
+                      <div class="col-md-6 col-lg-6">
+                        <div class="card border-start border-4"
+                             [ngClass]="{
+                               'border-success': record.checkInTime && !record.isLate,
+                               'border-warning': record.checkInTime && record.isLate,
+                               'border-danger ': !record.checkInTime
+                             }">
+                          <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                              <div>
+                                <h6 class="mb-0 fw-semibold">
+                                  {{ record.date | date:'EEE, MMM d, y' }}
+                                </h6>
+                              </div>
+                              <span class="badge"
+                                    [ngClass]="{
+                                      'bg-success': record.checkInTime && !record.isLate,
+                                      'bg-warning text-dark': record.checkInTime && record.isLate,
+                                      'bg-danger': !record.checkInTime
+                                    }">
+                                @if (record.checkInTime && !record.isLate) {
+                                  <i class="bi bi-check-circle me-1"></i>Present
+                                } @else if (record.checkInTime && record.isLate) {
+                                  <i class="bi bi-clock me-1"></i>Late
+                                } @else {
+                                  <i class="bi bi-x-circle me-1"></i>Absent
+                                }
+                              </span>
+                            </div>
+
+                            <div class="row g-2">
+                              <div class="col-6">
+                                <small class="text-muted d-block mb-1">Check In Time</small>
+                                @if (record.checkInTime) {
+                                  <strong>{{ record.checkInTime | date:'shortTime' }}</strong>
+                                } @else {
+                                  <small class="text-muted d-block mb-1">Absente</small>
+                                }
+                              </div>
+                              <div class="col-6">
+                                <small class="text-muted d-block mb-1">Check Out Time</small>
+                                @if (record.checkOutTime) {
+                                  <strong>{{ record.checkOutTime | date:'shortTime' }}</strong>
+                                } @else {
+                                  <small   class="text-muted d-block mb-1">Absente</small>
+                                }
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="text-center py-4 text-muted">
+                    <i class="bi bi-calendar-x" style="font-size: 2rem;"></i>
+                    <p class="mt-2 mb-0">No attendance records found</p>
+                  </div>
+                }
               </div>
             </div>
           </div>

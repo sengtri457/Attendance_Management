@@ -1,128 +1,157 @@
 /* Smooth transitions */
 .card {
-    transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
 }
 
 /* Spinner animation */
 @keyframes spin {
-    0% {
-        transform: rotate(0deg);
-    }
-    100% {
-        transform: rotate(360deg);
-    }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .spin {
-    animation: spin 1s linear infinite;
+  animation: spin 1s linear infinite;
 }
 
 /* Progress bar animations */
 .progress-bar {
-    transition: width 1s ease-in-out;
+  transition: width 1s ease-in-out;
 }
 
 /* Icon hover effects */
 .bi:hover {
-    transform: scale(1.1);
-    transition: transform 0.2s ease;
+  transform: scale(1.1);
+  transition: transform 0.2s ease;
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-    width: 8px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+  background: #f1f1f1;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
+  background: #888;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #555;
+  background: #555;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .container-fluid {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 
-    h2 {
-        font-size: 1.5rem;
-    }
+  h2 {
+    font-size: 1.5rem;
+  }
 
-    .card-body h3 {
-        font-size: 1.75rem;
-    }
+  .card-body h3 {
+    font-size: 1.75rem;
+  }
 }
 
 /* Badge pulse effect */
 @keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
-    }
+  0% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+  }
 }
 
 .badge {
-    animation: pulse 2s infinite;
+  animation: pulse 2s infinite;
 }
 
 /* Form controls focus */
 .form-control:focus {
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
 }
 
 /* Button effects */
 .btn {
-    transition: all 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .btn:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
 .btn:active:not(:disabled) {
-    transform: translateY(0);
+  transform: translateY(0);
 }
 
 /* Card border effects */
 .border-start {
-    border-left-width: 4px !important;
+  border-left-width: 4px !important;
 }
 
 /* Loading skeleton */
 @keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-    100% {
-        background-position: 1000px 0;
-    }
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
 }
 
 .loading-skeleton {
-    animation: shimmer 2s infinite;
-    background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
-    background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+  background: linear-gradient(to right, #f0f0f0 8%, #e0e0e0 18%, #f0f0f0 33%);
+  background-size: 1000px 100%;
+}
+.form-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.375rem;
+}
+
+.form-select,
+.form-control {
+  font-size: 0.875rem;
+}
+
+.badge {
+  font-size: 0.8rem;
+  padding: 0.375rem 0.75rem;
+  font-weight: 500;
+}
+
+.btn-close-sm {
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 0.5;
+}
+
+.btn-close-sm:hover {
+  opacity: 1;
+}
+
+.card {
+  border-radius: 0.5rem;
 }

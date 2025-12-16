@@ -16,130 +16,35 @@
   </div>
   <div class="row g-4">
     <div class="col-md-6">
-      <div class="card">
+      <div class="card border-start border-4 border-success">
         <div class="card-body">
           <h5 class="card-title">
             <i class="bi bi-person-circle me-2"></i>
             My Profile
           </h5>
           <p class="card-text">View and manage your student information</p>
-          <button [routerLink]="['/students', studentId]" class="btn btn-primary">
+          <button
+            [routerLink]="['/students', studentId]"
+            class="btn btn-primary"
+          >
             <i class="bi bi-eye me-2"></i>
             View Profile
           </button>
-          <div class="card">
-            <div class="card-body p-0">
-              <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                  <thead class="table-light">
-                    <tr>
-                      <th scope="col">
-                        <i class="bi bi-person me-1"></i>
-                        Name
-                      </th>
-                      <th scope="col">
-                        <i class="bi bi-envelope me-1"></i>
-                        Email
-                      </th>
-                      <th scope="col">
-                        <i class="bi bi-telephone me-1"></i>
-                        Phone
-                      </th>
-                      <th scope="col">
-                        <i class="bi bi-gender-ambiguous me-1"></i>
-                        Gender
-                      </th>
-                      <th scope="col">
-                        <i class="bi bi-calendar2-event"></i>
-                        Date of Birth
-                      </th>
-                      <th scope="col">
-                        <i class="bi bi-card-checklist"></i>
-                        Blacklisted
-                      </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    <tr>
-                      <td class="align-middle">
-                        <div class="d-flex align-items-center">
-                          @if (studentSpecificInformation?.data.photo) {
-                          <img [src]="studentSpecificInformation?.data?.photo" class="rounded-circle me-2" width="32"
-                            height="32" alt="Photo" />
-                          } @else {
-                          <div
-                            class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2"
-                            style="width: 32px; height: 32px">
-                            {{
-                            studentSpecificInformation.data.firstName.charAt(0)
-                            }}{{
-                            studentSpecificInformation.data.lastName.charAt(0)
-                            }}
-                          </div>
-                          }
-                          <strong>{{ studentSpecificInformation.data.firstName }} {{
-                            studentSpecificInformation.data.lastName }}</strong>
-                        </div>
-                      </td>
-                      <td class="align-middle">
-                        {{ studentSpecificInformation.data.user.email }}
-                      </td>
-                      <td class="align-middle">
-                        @if (studentSpecificInformation.data.phone) {
-                        <i class="bi bi-telephone-fill text-success me-1"></i>
-                        {{ studentSpecificInformation.data.phone }} } @else {
-                        <span class="text-muted">-</span>
-                        }
-                      </td>
-                      <td class="align-middle">
-                        @if (studentSpecificInformation.data.gender) {
-                        <span class="badge bg-secondary">{{ studentSpecificInformation.data.gender }}</span>
-                        } @else {
-                        <span class="text-muted">-</span>
-                        }
-                      </td>
-                      <td class="align-middle">
-                        {{ studentSpecificInformation.data.dob |
-                        date:'shortDate' }}
-                      </td>
-                      <td class="align-middle">
-                        @if (studentSpecificInformation.data.isBlacklisted) {
-                        <span class="badge bg-danger">Yes</span>
-                        } @else {
-                        <span class="badge bg-success">No</span>
-                        }
-                      </td>
-                    </tr>
-                    <!-- @empty {
-                            <tr>
-                              <td colspan="5" class="text-center py-5">
-                                <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
-                                <p class="text-muted mt-2">No students found</p>
-                                <button routerLink="/students/create" class="btn btn-primary btn-sm">
-                                  <i class="bi bi-plus-circle me-1"></i>
-                                  Add First Student
-                                </button>
-                              </td>
-                            </tr>
-                          } -->
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
     <div class="col-md-6">
-      <div class="card">
+      <div class="card border-danger border-start border-4">
         <div class="card-body">
           <h5 class="card-title">
             <i class="bi bi-calendar-check me-2"></i>
             My Attendance
           </h5>
           <p class="card-text">Check your attendance records</p>
-          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
+          <button
+            class="btn btn-primary"
+            [routerLink]="['/attendance/stats/', studentId]"
+          >
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
@@ -192,7 +97,10 @@
             My Profile
           </h5>
           <p class="card-text">View your teacher profile</p>
-          <button [routerLink]="['/teachers', teacherId]" class="btn btn-primary">
+          <button
+            [routerLink]="['/teachers', teacherId]"
+            class="btn btn-primary"
+          >
             <i class="bi bi-arrow-right me-2"></i>
             View Profile
           </button>
@@ -255,7 +163,10 @@
             </div>
             <i class="bi bi-people" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
-          <button routerLink="/students" class="btn btn-light btn-sm mt-3 w-100">
+          <button
+            routerLink="/students"
+            class="btn btn-light btn-sm mt-3 w-100"
+          >
             View All
           </button>
         </div>
@@ -269,9 +180,15 @@
               <h6 class="card-title">Teachers</h6>
               <h2 class="mb-0">{{teacher.length}}</h2>
             </div>
-            <i class="bi bi-person-badge" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-person-badge"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
-          <button routerLink="/teachers" class="btn btn-light btn-sm mt-3 w-100">
+          <button
+            routerLink="/teachers"
+            class="btn btn-light btn-sm mt-3 w-100"
+          >
             View All
           </button>
         </div>
@@ -285,7 +202,10 @@
               <h6 class="card-title">Parents</h6>
               <h2 class="mb-0">{{parents.length}}</h2>
             </div>
-            <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-people-fill"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
           <button class="btn btn-light btn-sm mt-3 w-100" routerLink="/parents">
             View All
@@ -301,9 +221,15 @@
               <h6 class="card-title">Attendance</h6>
               <h2 class="mb-0">{{attendance.length}}</h2>
             </div>
-            <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-calendar-check"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
-          <button routerLink="/attendance" class="btn btn-light btn-sm mt-3 w-100">
+          <button
+            routerLink="/attendance"
+            class="btn btn-light btn-sm mt-3 w-100"
+          >
             View Records
           </button>
         </div>
@@ -320,7 +246,7 @@
           </h5>
           <!-- Line Chart -->
           <div class="chart-container chart-wide">
-            <canvas #lineCanvas style="height: 400px;"></canvas>
+            <canvas #lineCanvas style="height: 400px"></canvas>
           </div>
         </div>
         <div class="card-body">
@@ -340,7 +266,7 @@
         </div>
         <div class="card-body">
           <div class="chart-container">
-            <canvas #barCanvas style="height: 400px;"></canvas>
+            <canvas #barCanvas style="height: 400px"></canvas>
           </div>
         </div>
       </div>
@@ -355,7 +281,7 @@
         </div>
         <div class="card-body">
           <div class="chart-container">
-            <canvas #doughnutCanvas style="height: 400px;"></canvas>
+            <canvas #doughnutCanvas style="height: 400px"></canvas>
           </div>
         </div>
       </div>
@@ -392,7 +318,10 @@
               <i class="bi bi-file-earmark-text me-2"></i>
               Review Leave Requests
             </button>
-            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
+            <button
+              [routerLink]="['/students/blacklist']"
+              class="btn btn-danger"
+            >
               <i class="bi bi-file-earmark-text me-2"></i>
               View Blacklisted Students
             </button>

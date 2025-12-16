@@ -1,15 +1,23 @@
-@defer(on timer(3000ms)){
-@if (authService.isAuthenticated()) {
+@defer(on timer(3000ms)){ @if (authService.isAuthenticated()) {
+
 <div class="wrapper">
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-header">
       <div class="logo">
-        <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="" class="user-avatar-img rounded-0" />
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png"
+          alt=""
+          class="user-avatar-img rounded-0"
+        />
         <span class="logo-text">Attendance</span>
       </div>
       <button class="sidebar-toggle" (click)="toggleSidebar()">
-        <i class="bi" [class.bi-chevron-left]="!sidebarCollapsed" [class.bi-chevron-right]="sidebarCollapsed"></i>
+        <i
+          class="bi"
+          [class.bi-chevron-left]="!sidebarCollapsed"
+          [class.bi-chevron-right]="sidebarCollapsed"
+        ></i>
       </button>
     </div>
 
@@ -34,13 +42,27 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/attendance" routerLinkActive="active">
+          <a class="nav-link" routerLink="/parents" routerLinkActive="active">
+            <i class="bi bi-person-badge"></i>
+            <span class="nav-text">Parents</span>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            routerLink="/attendance"
+            routerLinkActive="active"
+          >
             <i class="bi bi-calendar-check"></i>
             <span class="nav-text">Attendance</span>
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" routerLink="/leave/request" routerLinkActive="active">
+          <a
+            class="nav-link"
+            routerLink="/leave/request"
+            routerLinkActive="active"
+          >
             <i class="bi bi-calendar-x"></i>
             <span class="nav-text">Leave Request</span>
           </a>
@@ -58,13 +80,19 @@
       <div class="user-info">
         <div class="user-avatar">
           @if(currentUser?.role === 'Student') {
-          <img src="{{studentData?.photo}}" alt="User" class="user-avatar-img" />
+          <img
+            src="{{studentData?.photo}}"
+            alt="User"
+            class="user-avatar-img"
+          />
           }@else {
           <i class="bi bi-person-circle"></i>
           }
         </div>
         <div class="user-details">
-          <span class="username">{{ currentUser?.username.toUpperCase() }}</span>
+          <span class="username"
+            >{{ currentUser?.username.toUpperCase() }}</span
+          >
           <span class="user-role">{{currentUser?.role}}</span>
         </div>
       </div>
@@ -83,22 +111,35 @@
       </div>
 
       <div class="navbar-right">
+        @if(currentUser?.role !== 'Student') {
+
         <button class="nav-icon-btn" title="Notifications">
-          <i class="bi bi-bell" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
+          <i
+            class="bi bi-bell"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          ></i>
           <span class="badge">{{pendingCount}}</span>
         </button>
 
         <button class="nav-icon-btn" title="Messages">
           <i class="bi bi-envelope"></i>
         </button>
-
+        }
         <div class="user-menu">
           <button class="user-menu-btn" (click)="toggleUserMenu()">
             @if(currentUser.role === "Student"){
-            <img src="{{studentData?.photo}}" alt="User" class="user-avatar-img" />
+            <img
+              src="{{studentData?.photo}}"
+              alt="User"
+              class="user-avatar-img"
+            />
             }@else {
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUlOnqog4d0763K2WzYq1ugV5OFhgq69ilnw&s"
-              alt="User" class="user-avatar-img" />
+            <img
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUlOnqog4d0763K2WzYq1ugV5OFhgq69ilnw&s"
+              alt="User"
+              class="user-avatar-img"
+            />
             }
             <span class="user-name">{{ currentUser?.username }}</span>
             <i class="bi bi-chevron-down"></i>
@@ -128,12 +169,23 @@
   </div>
 </div>
 <!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
         <h1 class="modal-title fs-5" id="exampleModalLabel">Review Request</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="modal-body">
         <table class="table table-striped">
@@ -149,18 +201,18 @@
             @for (item of leaveRequests; track $index) {
             <tr>
               @if (item.status === 'pending') {
-              <td>
-                {{ item.student.firstName }} {{ item.student.lastName }}
-              </td>
-              <td>
-                {{ item.reason }}
-              </td>
+              <td>{{ item.student.firstName }} {{ item.student.lastName }}</td>
+              <td>{{ item.reason }}</td>
               <td>
                 <span class="badge bg-warning text-dark">Pending</span>
               </td>
               <td>
-                <button routerLink="/leave/review" class="btn btn-outline-primary" title="View Details"
-                  data-bs-dismiss="modal">
+                <button
+                  routerLink="/leave/review"
+                  class="btn btn-outline-primary"
+                  title="View Details"
+                  data-bs-dismiss="modal"
+                >
                   <i class="bi bi-eye"></i>
                 </button>
               </td>
@@ -169,24 +221,23 @@
             }
           </tbody>
         </table>
-
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
       </div>
     </div>
   </div>
 </div>
 } @else {
 <router-outlet />
-}
-}@placeholder {
+} }@placeholder {
 <!-- From Uiverse.io by PriyanshuGupta28 -->
 <div class="wrapper-spnner">
   <!-- From Uiverse.io by thekuntal49 -->
   <div class="loader">
     <div class="progress" data-percentage="100%"></div>
   </div>
-
 </div>
 }

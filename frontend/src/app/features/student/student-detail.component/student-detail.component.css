@@ -1,0 +1,15 @@
+.card.border-start {
+  border-left-width: 4px !important;
+}
+
+.card-body h6 {
+  font-size: 0.95rem;
+}
+
+.card-body small {
+  font-size: 0.75rem;
+}
+
+.card-body strong {
+  font-size: 0.9rem;
+}

@@ -118,16 +118,21 @@ export class ParentDetailComponent {
         },
       });
   }
-
+  testClick(child: any): void {
+    console.log("Button clicked!", child);
+    alert("Button works! Child: " + JSON.stringify(child));
+  }
   removeChild(studentId: string): void {
     if (!this.parent) return;
-
     if (
       confirm("Are you sure you want to remove this child from this parent?")
     ) {
-      this.parentService.removeChild(this.parent._id, studentId).subscribe({
+      const parentId = this.parent._id; // ← Capture the ID first
+
+      this.parentService.removeChild(parentId, studentId).subscribe({
         next: () => {
-          this.loadChildren(this.parent!._id);
+          this.loadChildren(parentId); // ← Use captured ID
+          console.log("Child removed successfully");
         },
         error: (error) => {
           console.error("Error removing child:", error);
