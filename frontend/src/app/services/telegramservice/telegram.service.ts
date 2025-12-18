@@ -89,7 +89,7 @@ export class TelegramService {
     if (data.note) {
       message += `📝 <b>Note:</b> ${data.note}`;
     }
-    message += `\n${"=".repeat(30)}\n`;
+    message += `\n${"=".repeat(27)}\n`;
     data.students.forEach((student, index) => {
       message += `<b>${index + 1}. ${student.firstName} ${student.lastName}</b>\n`;
 
@@ -113,14 +113,14 @@ export class TelegramService {
       if (student.photo) {
         message += `   📷 Photo: Available`;
       }
-      message += `\n${"=".repeat(30)}`;
+      message += `\n${"=".repeat(27)}`;
       message += `\n`;
     });
     const studentsWithPhotos = data.students.filter((s) => s.photo).length;
     if (studentsWithPhotos > 0) {
       message += `\n📸 <b>${studentsWithPhotos} photo(s) will be sent separately</b>`;
     }
-    message += `\n${"=".repeat(30)}\n`;
+    message += `\n${"=".repeat(27)}\n`;
     message += `⏰ Reported at: ${new Date().toLocaleString()}`;
 
     return message;
