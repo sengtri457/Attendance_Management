@@ -6,20 +6,72 @@ const ParentStudent = require("../models/ParentStudent");
 const Student = require("../models/Student");
 exports.getAllParents = async (req, res) => {
   try {
-    const parents = await Parent.find()
-      .populate("user", "username email isActive")
-      .populate({
-        path: "student",
-        select: "firstName lastName dob gender phone photo isBlacklisted user",
-        populate: {
-          path: "user",
-          select: "username email role",
-        },
-      });
+    // Extract query parameters
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = req.query;
+
+    // Convert to numbers
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build search query
+    const searchQuery = {};
+
+    // Add search conditions if search term exists
+    if (search) {
+      searchQuery.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Build sort object
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+
+    // Execute query with pagination
+    const [parents, totalCount] = await Promise.all([
+      Parent.find(searchQuery)
+        .populate("user", "username email isActive")
+        .populate({
+          path: "student",
+          select:
+            "firstName lastName dob gender phone photo isBlacklisted user",
+          populate: {
+            path: "user",
+            select: "username email role",
+          },
+        })
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Parent.countDocuments(searchQuery),
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limitNum);
+    const hasNextPage = pageNum < totalPages;
+    const hasPrevPage = pageNum > 1;
 
     res.json({
       success: true,
       data: parents,
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        totalCount,
+        limit: limitNum,
+        hasNextPage,
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error("Error fetching parents:", error);

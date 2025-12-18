@@ -6,13 +6,67 @@ const ParentStudent = require("../models/ParentStudent");
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find({ isBlacklisted: false })
-      .populate("user", "username email")
-      .populate("parentStudent", "name phone");
+    // Extract query parameters
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      sortBy = "createdAt",
+      sortOrder = "desc",
+    } = req.query;
+
+    // Convert to numbers
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build search query
+    const searchQuery = {
+      isBlacklisted: false,
+    };
+
+    // Add search conditions if search term exists
+    if (search) {
+      searchQuery.$or = [
+        { firstName: { $regex: search, $options: "i" } },
+        { studentId: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Build sort object
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+
+    // Execute query with pagination
+    const [students, totalCount] = await Promise.all([
+      Student.find(searchQuery)
+        .populate("user", "username email")
+        .populate("parentStudent", "name phone")
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(), // Use lean() for better performance
+      Student.countDocuments(searchQuery),
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limitNum);
+    const hasNextPage = pageNum < totalPages;
+    const hasPrevPage = pageNum > 1;
 
     res.json({
       success: true,
       data: students,
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        totalCount,
+        limit: limitNum,
+        hasNextPage,
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error("Error fetching students:", error);
