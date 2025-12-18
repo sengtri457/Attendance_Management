@@ -110,15 +110,35 @@ exports.createSubject = async (req, res) => {
     });
   }
 };
-
 exports.updateSubject = async (req, res) => {
   try {
-    const { teacherId, subjectName, teachTime, endTime } = req.body;
+    const {
+      teacherId,
+      subjectName,
+      teachTime,
+      endTime,
+      credit,
+      dayOfWeek,
+      subjectCode,
+    } = req.body;
 
+    // First, find the existing subject
+    const subject = await Subject.findById(req.params.id);
+    if (!subject) {
+      return res.status(404).json({
+        success: false,
+        message: "Subject not found",
+      });
+    }
+
+    // Build update data object
     const updateData = {};
     if (subjectName) updateData.subjectName = subjectName;
     if (teachTime) updateData.teachTime = teachTime;
     if (endTime) updateData.endTime = endTime;
+    if (credit !== undefined) updateData.credit = credit;
+    if (dayOfWeek) updateData.dayOfWeek = dayOfWeek;
+    if (subjectCode) updateData.subjectCode = subjectCode;
 
     // If teacher is being updated, verify teacher exists
     if (teacherId) {
@@ -129,18 +149,10 @@ exports.updateSubject = async (req, res) => {
           message: "Teacher not found",
         });
       }
-      updateData.teacher = teacherId;
+      updateData.teacherId = teacherId; // Fixed: use teacherId instead of teacher
     }
 
-    // Validate time range if both times are provided
-    const subject = await Subject.findById(req.params.id);
-    if (!subject) {
-      return res.status(404).json({
-        success: false,
-        message: "Subject not found",
-      });
-    }
-
+    // Validate time range if either time is being updated
     const newTeachTime = teachTime || subject.teachTime;
     const newEndTime = endTime || subject.endTime;
 
@@ -155,11 +167,12 @@ exports.updateSubject = async (req, res) => {
       });
     }
 
+    // Update the subject
     const updatedSubject = await Subject.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true },
-    ).populate("teacher", "name phone");
+      { new: true, runValidators: true } // Added runValidators
+    );
 
     res.json({
       success: true,
@@ -171,6 +184,7 @@ exports.updateSubject = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to update subject",
+      error: error.message, // Added for debugging
     });
   }
 };
@@ -202,7 +216,7 @@ exports.deleteSubject = async (req, res) => {
 exports.getSubjectsByTeacher = async (req, res) => {
   try {
     const subjects = await Subject.find({ teacher: req.params.teacherId }).sort(
-      { teachTime: 1 },
+      { teachTime: 1 }
     );
 
     res.json({

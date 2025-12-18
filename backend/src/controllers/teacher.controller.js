@@ -75,23 +75,83 @@ exports.createTeacher = async (req, res) => {
     });
   }
 };
-
 exports.updateTeacher = async (req, res) => {
   try {
-    const { name, phone } = req.body;
+    const { name, phone, subjectId } = req.body;
 
-    const teacher = await Teacher.findByIdAndUpdate(
-      req.params.id,
-      { name, phone },
-      { new: true }
-    );
+    // Validate input
+    if (!name && !phone && !subjectId) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Please provide at least one field to update (name, phone, or subject)",
+      });
+    }
 
-    if (!teacher) {
+    // Check if teacher exists
+    const existingTeacher = await Teacher.findById(req.params.id);
+    if (!existingTeacher) {
       return res.status(404).json({
         success: false,
         message: "Teacher not found",
       });
     }
+
+    // If phone is being updated, check for duplicates
+    if (phone && phone !== existingTeacher.phone) {
+      const duplicatePhone = await Teacher.findOne({
+        phone,
+        _id: { $ne: req.params.id },
+      });
+
+      if (duplicatePhone) {
+        return res.status(400).json({
+          success: false,
+          message: "Phone number already in use by another teacher",
+        });
+      }
+    }
+
+    // Build update object
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (phone !== undefined) updateData.phone = phone;
+
+    // If subject is being updated, verify subject exists
+    if (subjectId) {
+      const subject = await Subject.findById(subjectId);
+      if (!subject) {
+        return res.status(404).json({
+          success: false,
+          message: "Subject not found",
+        });
+      }
+
+      // Optional: Check if another teacher is already assigned to this subject
+      if (subjectId !== existingTeacher.subject) {
+        const subjectTaken = await Teacher.findOne({
+          subject: subjectId,
+          _id: { $ne: req.params.id },
+        });
+
+        if (subjectTaken) {
+          return res.status(400).json({
+            success: false,
+            message: "This subject is already assigned to another teacher",
+          });
+        }
+      }
+
+      updateData.subject = subjectId;
+    }
+
+    // Update teacher
+    const teacher = await Teacher.findByIdAndUpdate(req.params.id, updateData, {
+      new: true,
+      runValidators: true,
+    })
+      .populate("subject", "subjectName subjectCode credit dayOfWeek")
+      .populate("user", "username email");
 
     res.json({
       success: true,
@@ -100,9 +160,26 @@ exports.updateTeacher = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating teacher:", error);
+
+    if (error.name === "ValidationError") {
+      return res.status(400).json({
+        success: false,
+        message: "Validation error",
+        errors: Object.values(error.errors).map((err) => err.message),
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: "Duplicate value provided",
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Failed to update teacher",
+      error: error.message,
     });
   }
 };
