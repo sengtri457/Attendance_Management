@@ -15,6 +15,48 @@
         }
       </div>
 
+      <!-- Search and Filters -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text">
+                  <i class="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control"
+                  placeholder="Search by name, email, or phone..."
+                  [(ngModel)]="searchTerm"
+                  (input)="onSearch()"
+                />
+                @if (searchTerm) {
+                <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
+                  <i class="bi bi-x-lg"></i>
+                </button>
+                }
+              </div>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" [(ngModel)]="selectedLimit" (change)="onLimitChange()">
+                <option [value]="10">10 per page</option>
+                <option [value]="25">25 per page</option>
+                <option [value]="50">50 per page</option>
+                <option [value]="100">100 per page</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <select class="form-select" [(ngModel)]="selectedSort" (change)="onSortChange()">
+                <option value="name-asc">Name (A-Z)</option>
+                <option value="name-desc">Name (Z-A)</option>
+                <option value="createdAt-desc">Newest First</option>
+                <option value="createdAt-asc">Oldest First</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
       @if (loading) {
         <div class="text-center py-5">
           <div class="spinner-border text-primary"></div>
@@ -104,11 +146,55 @@
             </div>
           </div>
         </div>
+        <!-- Pagination -->
+        @if (totalCount > 0) {
+        <div class="d-flex justify-content-between align-items-center mt-3">
+          <p class="text-muted mb-0">
+            Showing {{ ((currentPage - 1) * limit) + 1 }} to {{ Math.min(currentPage * limit, totalCount) }} of {{ totalCount }} student(s)
+            @if (searchTerm) {
+              <span class="badge bg-info ms-2">
+                <i class="bi bi-search me-1"></i>Filtered
+              </span>
+            }
+          </p>
+          <nav>
+            <ul class="pagination pagination-sm mb-0">
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="goToPage(1)" [disabled]="currentPage === 1">
+                  <i class="bi bi-chevron-double-left"></i>
+                </button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === 1">
+                <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">
+                  <i class="bi bi-chevron-left"></i> Previous
+                </button>
+              </li>
 
-        @if (parents.length > 0) {
-          <div class="d-flex justify-content-between align-items-center mt-3">
-            <p class="text-muted mb-0">Showing {{ parents.length }} parent(s)</p>
-          </div>
+              @for (page of getPageNumbers(); track page) {
+                @if (page === '...') {
+                  <li class="page-item disabled">
+                    <span class="page-link">...</span>
+                  </li>
+                } @else {
+                  <li class="page-item" [class.active]="currentPage === page">
+                    <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
+                  </li>
+                }
+              }
+
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
+                  Next <i class="bi bi-chevron-right"></i>
+                </button>
+              </li>
+              <li class="page-item" [class.disabled]="currentPage === totalPages">
+                <button class="page-link" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
+                  <i class="bi bi-chevron-double-right"></i>
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
         }
       }
     </div>

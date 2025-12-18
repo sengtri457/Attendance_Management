@@ -1,74 +1,69 @@
-import { Routes } from "@angular/router";
-import { authGuardGuard } from "./core/guards/auth.guard-guard";
-import { LeaveRequestFormComponent } from "./features/leave/leave-request-form.component/leave-request-form.component";
-import { LeaveApproveComponent } from "./features/leave/leave-approve.component/leave-approve.component";
-import { SubjectComponent } from "./features/subject/subject.component/subject.component";
+import { Routes } from '@angular/router';
+import { authGuardGuard } from './core/guards/auth.guard-guard';
+import { LeaveRequestFormComponent } from './features/leave/leave-request-form.component/leave-request-form.component';
+import { LeaveApproveComponent } from './features/leave/leave-approve.component/leave-approve.component';
+import { SubjectComponent } from './features/subject/subject.component/subject.component';
 
 export const routes: Routes = [
   {
-    path: "auth",
+    path: 'auth',
     loadChildren: () =>
-      import("./features/auth/auth.routes").then((m) => m.AUTH_ROUTES),
+      import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
   },
 
   {
-    path: "",
-    redirectTo: "auth/login",
-    pathMatch: "full",
+    path: '',
+    redirectTo: 'auth/login',
+    pathMatch: 'full',
   },
   {
-    path: "newLeave",
+    path: 'newLeave',
     component: LeaveRequestFormComponent,
   },
   {
-    path: "dashboard",
+    path: 'dashboard',
     loadComponent: () =>
-      import("./features/dashboard/dashboardcomponent/dashboardcomponent").then(
-        (m) => m.Dashboardcomponent,
+      import('./features/dashboard/dashboardcomponent/dashboardcomponent').then(
+        (m) => m.Dashboardcomponent
       ),
     canActivate: [authGuardGuard],
   },
   {
-    path: "students",
+    path: 'students',
     loadChildren: () =>
-      import("./features/student/student.routes").then((m) => m.STUDENT_ROUTES),
+      import('./features/student/student.routes').then((m) => m.STUDENT_ROUTES),
     canActivate: [authGuardGuard],
   },
   {
-    path: "parents",
+    path: 'parents',
     loadChildren: () =>
-      import("./features/parents/parent.routes").then((m) => m.PARENT_ROUTES),
+      import('./features/parents/parent.routes').then((m) => m.PARENT_ROUTES),
     canActivate: [authGuardGuard],
   },
   {
-    path: "subjects",
+    path: 'subjects',
     loadChildren: () =>
-      import("./features/subject/subject.routes").then((m) => m.SUBJECT_ROUTES),
+      import('./features/subject/subject.routes').then((m) => m.SUBJECT_ROUTES),
     canActivate: [authGuardGuard],
   },
   {
-    path: "teachers",
+    path: 'teachers',
     loadChildren: () =>
-      import("./features/teacher/teacher.routes").then((m) => m.TEACHER_ROUTES),
+      import('./features/teacher/teacher.routes').then((m) => m.TEACHER_ROUTES),
     canActivate: [authGuardGuard],
   },
   {
-    path: "attendance",
+    path: 'attendance',
     loadChildren: () =>
-      import("./features/attendance/attendance.routes").then(
-        (m) => m.ATTENDANCE_ROUTES,
+      import('./features/attendance/attendance.routes').then(
+        (m) => m.ATTENDANCE_ROUTES
       ),
     canActivate: [authGuardGuard],
   },
   {
-    path: "leave",
+    path: 'leave',
     loadChildren: () =>
-      import("./features/leave/leave.routes").then((m) => m.LEAVE_ROUTES),
+      import('./features/leave/leave.routes').then((m) => m.LEAVE_ROUTES),
     // canActivate: [authGuardGuard],
-  },
-  {
-    path: "leave-request-approves",
-    component: LeaveApproveComponent,
-    // canActivate: [authGuardGuard], // ← Only teachers!
   },
 ];
