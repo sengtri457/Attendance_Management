@@ -1,16 +1,17 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { TeacherService } from '../../../services/teacherservice/teacher.service';
-import { AuthService } from '../../../services/authservice/auth.service';
-import { Router, RouterModule } from '@angular/router';
-import { Teacher } from '../../../models/user.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
+import { Component, inject, OnInit } from "@angular/core";
+import { TeacherService } from "../../../services/teacherservice/teacher.service";
+import { AuthService } from "../../../services/authservice/auth.service";
+import { Router, RouterModule } from "@angular/router";
+import { Teacher } from "../../../models/user.model";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Subject } from "rxjs";
+import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 @Component({
-  selector: 'app-teacher-list.component',
+  selector: "app-teacher-list.component",
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: './teacher-list.component.html',
-  styleUrl: './teacher-list.component.css',
+  templateUrl: "./teacher-list.component.html",
+  styleUrl: "./teacher-list.component.css",
 })
 export class TeacherListComponent implements OnInit {
   private teacherService = inject(TeacherService);
@@ -22,17 +23,39 @@ export class TeacherListComponent implements OnInit {
   canCreate = false;
   canEdit = false;
   canDelete = false;
+  // Pagination
+  currentPage = 1;
+  totalPages = 0;
+  totalCount = 0;
+  limit = 10;
+  selectedLimit = 10;
+
+  // Search
+  searchTerm = "";
+  private searchSubject = new Subject<string>();
+
+  // Sorting
+  selectedSort = "name-asc"; // Sort by name by default
+  sortBy = "name";
+  sortOrder: "asc" | "desc" = "asc";
+
+  Math = Math;
 
   ngOnInit(): void {
     // If teacher user, redirect to their profile
     if (this.authService.isTeacher()) {
       const teacherId = this.authService.getTeacherId();
       if (teacherId) {
-        this.router.navigate(['/teachers', teacherId]);
+        this.router.navigate(["/teachers", teacherId]);
         return;
       }
     }
-
+    this.searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged())
+      .subscribe(() => {
+        this.currentPage = 1;
+        this.loadTeachers();
+      });
     this.checkPermissions();
     this.loadTeachers();
   }
@@ -40,36 +63,124 @@ export class TeacherListComponent implements OnInit {
   checkPermissions(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.canCreate = user.role === 'Admin';
-      this.canEdit = user.role === 'Admin';
-      this.canDelete = user.role === 'Admin';
+      this.canCreate = user.role === "Admin";
+      this.canEdit = user.role === "Admin";
+      this.canDelete = user.role === "Admin";
     }
   }
 
-  loadTeachers(): void {
-    this.teacherService.getAll().subscribe({
-      next: (response) => {
-        this.teachers = response.data;
-        console.log('Loaded teachers:', this.teachers);
-        this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error loading teachers:', error);
-        this.loading = false;
-      },
-    });
+  loadTeachers() {
+    this.loading = true;
+
+    this.teacherService
+      .getAll({
+        page: this.currentPage,
+        limit: this.limit,
+        search: this.searchTerm,
+        sortBy: this.sortBy,
+        sortOrder: this.sortOrder,
+      })
+      .subscribe({
+        next: (response: any) => {
+          this.teachers = response.data;
+          this.currentPage = response.pagination.currentPage;
+          this.totalPages = response.pagination.totalPages;
+          this.totalCount = response.pagination.totalCount;
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error("Error loading teachers:", error);
+          this.loading = false;
+        },
+      });
+  }
+
+  onSearch() {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  clearSearch() {
+    this.searchTerm = "";
+    this.currentPage = 1;
+    this.loadTeachers();
+  }
+
+  onLimitChange() {
+    this.limit = this.selectedLimit;
+    this.currentPage = 1;
+    this.loadTeachers();
+  }
+
+  onSortChange() {
+    const [sortBy, sortOrder] = this.selectedSort.split("-");
+    this.sortBy = sortBy;
+    this.sortOrder = sortOrder as "asc" | "desc";
+    this.loadTeachers();
+  }
+
+  goToPage(page: any) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadTeachers();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadTeachers();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadTeachers();
+    }
+  }
+
+  getPageNumbers(): (number | string)[] {
+    const pages: (number | string)[] = [];
+    const maxPages = 5;
+
+    if (this.totalPages <= maxPages) {
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      pages.push(1);
+
+      if (this.currentPage > 3) {
+        pages.push("...");
+      }
+
+      const start = Math.max(2, this.currentPage - 1);
+      const end = Math.min(this.totalPages - 1, this.currentPage + 1);
+
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      if (this.currentPage < this.totalPages - 2) {
+        pages.push("...");
+      }
+
+      pages.push(this.totalPages);
+    }
+
+    return pages;
   }
 
   deleteTeacher(id: string, event: Event): void {
     event.stopPropagation();
-    if (confirm('Are you sure you want to delete this teacher?')) {
+    if (confirm("Are you sure you want to delete this teacher?")) {
       this.teacherService.delete(id).subscribe({
         next: () => {
           this.loadTeachers();
         },
         error: (error) => {
-          console.error('Error deleting teacher:', error);
-          alert(error.error?.message || 'Failed to delete teacher');
+          console.error("Error deleting teacher:", error);
+          alert(error.error?.message || "Failed to delete teacher");
         },
       });
     }

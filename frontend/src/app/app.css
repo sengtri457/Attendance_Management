@@ -98,10 +98,17 @@
 /* Sidebar Styles */
 .sidebar {
   width: 260px;
-  background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
-
+  /*background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);*/
+  /*background: #0a04b8;
+  background: linear-gradient(
+    188deg,
+    rgba(10, 4, 184, 1) 0%,
+    rgba(9, 9, 121, 1) 35%,
+    rgba(0, 102, 122, 1) 100%
+  );*/
+  background-color: #fdfdfd;
   /* background: #197901da; */
-  color: #ecf0f1;
+  color: black;
   display: flex;
   flex-direction: column;
   transition: width 0.3s ease;
@@ -111,7 +118,7 @@
 }
 
 .sidebar.collapsed {
-  width: 70px;
+  width: 80px;
 }
 
 /* Sidebar Header */
@@ -130,12 +137,12 @@
   gap: 0.75rem;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #fff;
+  color: #000d15;
 }
 
 .logo i {
   font-size: 1.75rem;
-  color: #3498db;
+  color: #000d15;
 }
 
 .sidebar.collapsed .logo-text {
@@ -145,7 +152,7 @@
 .sidebar-toggle {
   background: none;
   border: none;
-  color: #ecf0f1;
+  color: #000d15;
   font-size: 1.25rem;
   cursor: pointer;
   padding: 0.25rem;
@@ -155,7 +162,7 @@
 
 .sidebar-toggle:hover {
   background: rgba(255, 255, 255, 0.1);
-  color: #3498db;
+  color: #000d15;
 }
 
 .sidebar.collapsed .sidebar-toggle {
@@ -185,11 +192,12 @@
   align-items: center;
   gap: 1rem;
   padding: 0.875rem 1.25rem;
-  color: #bdc3c7;
+  color: black;
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
   position: relative;
   font-size: 0.95rem;
+  letter-spacing: 0px;
 }
 
 .nav-link i {
@@ -199,14 +207,15 @@
 }
 
 .nav-link:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: rgba(164, 169, 172, 0.21);
+  color: #000d15;
+  letter-spacing: 2px;
 }
 
 .nav-link.active {
-  background: rgba(52, 152, 219, 0.15);
-  color: #3498db;
-  border-left: 3px solid #3498db;
+  background: rgba(164, 169, 172, 0.21);
+  color: #000d15;
+  border-left: 3px solid #515557;
 }
 
 .sidebar.collapsed .nav-text {
@@ -221,7 +230,7 @@
 /* Sidebar Footer */
 .sidebar-footer {
   padding: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.36);
   margin-top: auto;
 }
 
@@ -242,7 +251,7 @@
 
 .user-avatar {
   font-size: 2rem;
-  color: #3498db;
+  color: #000d15;
   min-width: 40px;
   text-align: center;
 }
@@ -256,7 +265,7 @@
 .username {
   font-weight: 600;
   font-size: 0.9rem;
-  color: #fff;
+  color: #000d15;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -468,7 +477,7 @@
   flex: 1;
   overflow-y: auto;
   /* padding: 2rem; */
-  background: #f8f9fa;
+  background: white;
 }
 
 /* Responsive Design */

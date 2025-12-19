@@ -4,19 +4,21 @@
   <!-- Sidebar -->
   <aside class="sidebar" [class.collapsed]="sidebarCollapsed">
     <div class="sidebar-header">
+      @if(!sidebarCollapsed){
       <div class="logo">
         <img
-          src="./assets/images/setec.png"
+          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx4ErfRJsxj2t0dJs1FwXBcKhp_F0VHDKUJQ&s"
           alt=""
           class="user-avatar-img rounded-0"
         />
         <span class="logo-text">Attendance</span>
       </div>
+      }
       <button class="sidebar-toggle" (click)="toggleSidebar()">
         <i
           class="bi"
-          [class.bi-chevron-left]="!sidebarCollapsed"
-          [class.bi-chevron-right]="sidebarCollapsed"
+          [class.bi-layout-sidebar-inset]="!sidebarCollapsed"
+          [class.bi-layout-sidebar-inset-reverse]="sidebarCollapsed"
         ></i>
       </button>
     </div>
