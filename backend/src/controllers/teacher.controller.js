@@ -6,13 +6,65 @@ const Subject = require("../models/Subject");
 
 exports.getAllTeachers = async (req, res) => {
   try {
-    const teachers = await Teacher.find()
-      .populate("user", "username email isActive")
-      .populate("subject", "subjectName teachTime endTime");
+    // Extract query parameters
+    const {
+      page = 1,
+      limit = 10,
+      search = "",
+      sortBy = "name",
+      sortOrder = "asc",
+    } = req.query;
+
+    // Convert to numbers
+    const pageNum = parseInt(page);
+    const limitNum = parseInt(limit);
+    const skip = (pageNum - 1) * limitNum;
+
+    // Build search query
+    const searchQuery = {};
+
+    // Add search conditions if search term exists
+    if (search) {
+      searchQuery.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { phone: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { qualification: { $regex: search, $options: "i" } },
+      ];
+    }
+
+    // Build sort object
+    const sortOptions = {};
+    sortOptions[sortBy] = sortOrder === "asc" ? 1 : -1;
+
+    // Execute query with pagination
+    const [teachers, totalCount] = await Promise.all([
+      Teacher.find(searchQuery)
+        .populate("user", "username email isActive")
+        .populate("subject", "subjectName teachTime endTime")
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      Teacher.countDocuments(searchQuery),
+    ]);
+
+    // Calculate pagination metadata
+    const totalPages = Math.ceil(totalCount / limitNum);
+    const hasNextPage = pageNum < totalPages;
+    const hasPrevPage = pageNum > 1;
 
     res.json({
       success: true,
       data: teachers,
+      pagination: {
+        currentPage: pageNum,
+        totalPages,
+        totalCount,
+        limit: limitNum,
+        hasNextPage,
+        hasPrevPage,
+      },
     });
   } catch (error) {
     console.error("Error fetching teachers:", error);
@@ -27,7 +79,7 @@ exports.getTeacherById = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id).populate(
       "user",
-      "username email isActive"
+      "username email isActive",
     );
 
     if (!teacher) {
@@ -187,7 +239,7 @@ exports.getTeacherSubjects = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id).populate(
       "subject",
-      "subjectName teachTime endTime"
+      "subjectName teachTime endTime",
     );
 
     if (!teacher) {
