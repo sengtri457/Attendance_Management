@@ -8,30 +8,39 @@ body {
 .navbar-brand {
   font-weight: 600;
 }
+
 .success {
   background: #e8f5e9;
   border: 1.5px solid #66bb6a;
 }
+
 .warning {
   background: #fff3e0;
   border: 1.5px solid #ffa726;
 }
+
 .primary {
   background: #e3f2fd;
   border: 1.5px solid #42a5f5;
 }
+
 .sec {
   background: #f3e5f5;
   border: 1.5px solid #ab47bc;
 }
+
 .card {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  border: none;
+  /* box-shadow: 0 2px 8px rgba(0, 0, 0.1); */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
 .table-hover tbody tr:hover {
   background-color: #f8f9fa;
 }
+
 .avatar-circle {
   width: 40px;
   height: 40px;
@@ -45,8 +54,7 @@ body {
 }
 
 .card {
-  transition:
-    transform 0.2s,
+  transition: transform 0.2s,
     box-shadow 0.2s;
 }
 
@@ -55,7 +63,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
 }
 
-.table > :not(caption) > * > * {
+.table> :not(caption)>*>* {
   padding: 1rem 0.75rem;
 }
 

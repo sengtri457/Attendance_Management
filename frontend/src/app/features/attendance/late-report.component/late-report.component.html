@@ -1,146 +1,136 @@
 <div class="report-container">
-      <div class="card">
-        <div class="card-header">
-          <h2>⏰ Late Arrivals Report</h2>
-          <button
-            class="btn btn-primary"
-            (click)="exportToCSV()"
-            [disabled]="!lateReport.length || loading">
-            📥 Export CSV
-          </button>
-        </div>
+  <div class="card">
+    <div class="card-header">
+      <h2>⏰ Late Arrivals Report</h2>
+      <button class="btn btn-primary" (click)="exportToCSV()" [disabled]="!lateReport.length || loading">
+        📥 Export CSV
+      </button>
+    </div>
 
-        <!-- Filters -->
-        <div class="filters">
-          <div class="form-group">
-            <label>From Date</label>
-            <input
-              type="date"
-              [(ngModel)]="dateFrom"
-              (change)="loadLateReport()">
-          </div>
-          <div class="form-group">
-            <label>To Date</label>
-            <input
-              type="date"
-              [(ngModel)]="dateTo"
-              (change)="loadLateReport()">
-          </div>
-          <div class="form-group">
-            <label>Min Late Count</label>
-            <input
-              type="number"
-              [(ngModel)]="minLateCount"
-              min="1"
-              (change)="loadLateReport()"
-              placeholder="e.g., 3">
-          </div>
-          <button class="btn btn-secondary" (click)="loadLateReport()">
-            🔍 Apply Filters
-          </button>
-          <button class="btn btn-outline" (click)="clearFilters()">
-            Clear
-          </button>
-        </div>
+    <!-- Filters -->
+    <div class="filters">
+      <div class="form-group">
+        <label>From Date</label>
+        <input type="date" [(ngModel)]="dateFrom" (change)="loadLateReport()">
+      </div>
+      <div class="form-group">
+        <label>To Date</label>
+        <input type="date" [(ngModel)]="dateTo" (change)="loadLateReport()">
+      </div>
+      <div class="form-group">
+        <label>Min Late Count</label>
+        <input type="number" [(ngModel)]="minLateCount" min="1" (change)="loadLateReport()" placeholder="e.g., 3">
+      </div>
+      <button class="btn btn-secondary" (click)="loadLateReport()">
+        🔍 Apply Filters
+      </button>
+      <button class="btn btn-outline" (click)="clearFilters()">
+        Clear
+      </button>
+      <button (click)="backToDashboard()" type="button" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Back to Dashboard
+      </button>
+    </div>
 
-        <!-- Loading State -->
-        <div *ngIf="loading" class="loading">
-          <div class="spinner"></div>
-          <p>Loading late report...</p>
-        </div>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Loading late report...</p>
+    </div>
 
-        <!-- Error State -->
-        <div *ngIf="errorMessage && !loading" class="alert alert-error">
-          {{ errorMessage }}
-        </div>
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !loading" class="alert alert-error">
+      {{ errorMessage }}
+    </div>
 
-        <!-- Stats Summary -->
-        <div *ngIf="!loading && lateReport.length > 0" class="stats-summary">
-          <div class="stat-item">
-            <div class="stat-value">{{ totalCount }}</div>
-            <div class="stat-label">Total Students</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ totalLateInstances }}</div>
-            <div class="stat-label">Total Late Instances</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ averageLateCount }}</div>
-            <div class="stat-label">Avg Late Count</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">{{ averageLateMinutes }} min</div>
-            <div class="stat-label">Avg Late Duration</div>
-          </div>
-        </div>
-
-        <!-- Report Table -->
-        <div *ngIf="!loading" class="table-container">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th (click)="sortBy('studentId')" class="sortable">
-                  Student ID
-                  <span class="sort-icon">{{ getSortIcon('studentId') }}</span>
-                </th>
-                <th (click)="sortBy('name')" class="sortable">
-                  Name
-                  <span class="sort-icon">{{ getSortIcon('name') }}</span>
-                </th>
-                <th (click)="sortBy('lateCount')" class="sortable">
-                  Late Count
-                  <span class="sort-icon">{{ getSortIcon('lateCount') }}</span>
-                </th>
-
-                <th (click)="sortBy('totalLateMinutes')" class="sortable">
-                  Total Late (min)
-                  <span class="sort-icon">{{ getSortIcon('totalLateMinutes') }}</span>
-                </th>
-                <th>Last Late Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let item of lateReport; let i = index">
-                <td>{{ i + 1 }}</td>
-                <td>
-                  <span class="student-id">{{ item.studentId }}</span>
-                </td>
-                <td>
-                  <div class="student-info">
-                    <strong>{{ item.student.firstName }} {{ item.student.lastName }}</strong>
-                    <small>{{ item.email }}</small>
-                  </div>
-                </td>
-                <td>
-                  <span class="badge badge-warning">{{ item.lateCount }}</span>
-                </td>
-
-                <td>
-                  <span class="late-minutes-total">{{ item.avgLateMinutes}} mins</span>
-                </td>
-                <td>
-                  <span class="date">{{ formatDate(item.latestLateDate) }}</span>
-                </td>
-              </tr>
-              <tr *ngIf="lateReport.length === 0">
-                <td colspan="7" class="no-data">
-                  <div class="empty-state">
-                    <div class="empty-icon">📊</div>
-                    <p>No late arrivals found for the selected period</p>
-                    <small>Try adjusting the filters or date range</small>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Pagination -->
-        <div *ngIf="!loading && lateReport.length > 0" class="pagination">
-          <div class="pagination-info">
-            Showing {{ lateReport.length }} of {{ totalCount }} students
-          </div>
-        </div>
+    <!-- Stats Summary -->
+    <div *ngIf="!loading && lateReport.length > 0" class="stats-summary">
+      <div class="stat-item">
+        <div class="stat-value">{{ totalCount }}</div>
+        <div class="stat-label">Total Students</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ totalLateInstances }}</div>
+        <div class="stat-label">Total Late Instances</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ averageLateCount }}</div>
+        <div class="stat-label">Avg Late Count</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ averageLateMinutes }} min</div>
+        <div class="stat-label">Avg Late Duration</div>
       </div>
     </div>
+
+    <!-- Report Table -->
+    <div *ngIf="!loading" class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th (click)="sortBy('studentId')" class="sortable">
+              Student ID
+              <span class="sort-icon">{{ getSortIcon('studentId') }}</span>
+            </th>
+            <th (click)="sortBy('name')" class="sortable">
+              Name
+              <span class="sort-icon">{{ getSortIcon('name') }}</span>
+            </th>
+            <th (click)="sortBy('lateCount')" class="sortable">
+              Late Count
+              <span class="sort-icon">{{ getSortIcon('lateCount') }}</span>
+            </th>
+
+            <th (click)="sortBy('totalLateMinutes')" class="sortable">
+              Total Late (min)
+              <span class="sort-icon">{{ getSortIcon('totalLateMinutes') }}</span>
+            </th>
+            <th>Last Late Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of lateReport; let i = index">
+            <td>{{ i + 1 }}</td>
+            <td>
+              <span class="student-id">{{ item.studentId }}</span>
+            </td>
+            <td>
+              <div class="student-info">
+                <strong>{{ item.student.firstName }} {{ item.student.lastName }}</strong>
+                <small>{{ item.email }}</small>
+              </div>
+            </td>
+            <td>
+              <span class="badge badge-warning">{{ item.lateCount }}</span>
+            </td>
+
+            <td>
+              <span class="late-minutes-total">{{ item.avgLateMinutes}} mins</span>
+            </td>
+            <td>
+              <span class="date">{{ formatDate(item.latestLateDate) }}</span>
+            </td>
+          </tr>
+          <tr *ngIf="lateReport.length === 0">
+            <td colspan="7" class="no-data">
+              <div class="empty-state">
+                <div class="empty-icon">📊</div>
+                <p>No late arrivals found for the selected period</p>
+                <small>Try adjusting the filters or date range</small>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="!loading && lateReport.length > 0" class="pagination">
+      <div class="pagination-info">
+        Showing {{ lateReport.length }} of {{ totalCount }} students
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -13,7 +13,7 @@ import { LeaveRequest } from './models/user.model';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
+export class App implements OnInit {
   protected title = 'frontend';
   authService = inject(AuthService);
   studentService = inject(StudentService);
@@ -34,6 +34,7 @@ export class App {
     this.loadStudent();
     this.loadLeaveRequests();
   }
+  ngOnInit(): void {}
   loadLeaveRequests(): void {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {

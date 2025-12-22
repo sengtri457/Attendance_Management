@@ -1,37 +1,37 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
   FormsModule,
   ReactiveFormsModule,
   Validators,
-} from "@angular/forms";
-import Swal from "sweetalert2";
-import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
-import { CommonModule } from "@angular/common";
-import { StudentService } from "../../../services/studentservices/student.service";
-import { TeacherService } from "../../../services/teacherservice/teacher.service";
-import { Student, Teacher } from "../../../models/user.model";
-import { Router, RouterModule } from "@angular/router";
+} from '@angular/forms';
+import Swal from 'sweetalert2';
+import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
+import { CommonModule } from '@angular/common';
+import { StudentService } from '../../../services/studentservices/student.service';
+import { TeacherService } from '../../../services/teacherservice/teacher.service';
+import { Student, Teacher } from '../../../models/user.model';
+import { Router, RouterModule } from '@angular/router';
 @Component({
-  selector: "app-mark-attendance.component",
+  selector: 'app-mark-attendance.component',
   imports: [ReactiveFormsModule, CommonModule, FormsModule, RouterModule],
-  templateUrl: "./mark-attendance.component.html",
-  styleUrl: "./mark-attendance.component.css",
+  templateUrl: './mark-attendance.component.html',
+  styleUrl: './mark-attendance.component.css',
 })
 export class MarkAttendanceComponent implements OnInit {
   attendanceForm: FormGroup;
   loading = false;
   success = false;
-  error = "";
+  error = '';
   loadingStudents = false;
   loadingTeachers = false;
   students: Student[] = [];
   teachers: Teacher[] = [];
 
   // Search functionality
-  studentSearchTerm = "";
-  teacherSearchTerm = "";
+  studentSearchTerm = '';
+  teacherSearchTerm = '';
   filteredStudents: Student[] = [];
   filteredTeachers: Teacher[] = [];
   showStudentDropdown = false;
@@ -44,15 +44,15 @@ export class MarkAttendanceComponent implements OnInit {
     private attendanceService: AttendanceService,
     private studentService: StudentService,
     private teacherService: TeacherService,
-    private router: Router,
+    private router: Router
   ) {
     this.attendanceForm = this.fb.group({
-      studentId: ["", Validators.required],
-      date: [new Date().toISOString().split("T")[0], Validators.required],
+      studentId: ['', Validators.required],
+      date: [new Date().toISOString().split('T')[0], Validators.required],
       checkInTime: [new Date().toISOString().slice(0, 16), Validators.required],
-      checkOutTime: [""],
-      markedByTeacherId: ["", Validators.required],
-      note: [""],
+      checkOutTime: [''],
+      markedByTeacherId: ['', Validators.required],
+      note: [''],
     });
   }
 
@@ -62,7 +62,7 @@ export class MarkAttendanceComponent implements OnInit {
   }
 
   backToDashboard() {
-    this.router.navigateByUrl("/dashboard");
+    this.router.navigateByUrl('/attendance');
   }
 
   loadStudents(): void {
@@ -74,7 +74,7 @@ export class MarkAttendanceComponent implements OnInit {
         this.loadingStudents = false;
       },
       error: (error) => {
-        console.error("Failed to load students:", error);
+        console.error('Failed to load students:', error);
         this.loadingStudents = false;
       },
     });
@@ -89,7 +89,7 @@ export class MarkAttendanceComponent implements OnInit {
         this.loadingTeachers = false;
       },
       error: (error) => {
-        console.error("Failed to load teachers:", error);
+        console.error('Failed to load teachers:', error);
         this.loadingTeachers = false;
       },
     });
@@ -136,7 +136,7 @@ export class MarkAttendanceComponent implements OnInit {
       (teacher) =>
         teacher.name.toLowerCase().includes(term) ||
         teacher._id.toString().includes(term) ||
-        (teacher.user.email && teacher.user.email.toLowerCase().includes(term)),
+        (teacher.user.email && teacher.user.email.toLowerCase().includes(term))
     );
   }
 
@@ -149,11 +149,11 @@ export class MarkAttendanceComponent implements OnInit {
 
   resetForm(): void {
     this.attendanceForm.reset({
-      date: new Date().toISOString().split("T")[0],
+      date: new Date().toISOString().split('T')[0],
       checkInTime: new Date().toISOString().slice(0, 16),
     });
-    this.studentSearchTerm = "";
-    this.teacherSearchTerm = "";
+    this.studentSearchTerm = '';
+    this.teacherSearchTerm = '';
     this.selectedStudent = null;
     this.selectedTeacher = null;
     this.showStudentDropdown = false;
@@ -166,7 +166,7 @@ export class MarkAttendanceComponent implements OnInit {
     }
     this.loading = true;
     this.success = false;
-    this.error = "";
+    this.error = '';
     const formValue = this.attendanceForm.value;
     const data = {
       studentId: formValue.studentId,
@@ -186,12 +186,17 @@ export class MarkAttendanceComponent implements OnInit {
         this.resetForm();
 
         if (response.data.isLate) {
-          Swal.fire(`Student was ${response.data.lateBy} minutes late!`);
+          if (response.data.lateBy > 0) {
+            Swal.fire(`Student was ${response.data.lateBy} minutes late!`);
+          }
+        }
+        if (response.data.lateBy <= 0) {
+          Swal.fire('Student was on time!');
         }
       },
       error: (error) => {
         this.loading = false;
-        this.error = error.error?.message || "Failed to mark attendance";
+        this.error = error.error?.message || 'Failed to mark attendance';
       },
     });
   }

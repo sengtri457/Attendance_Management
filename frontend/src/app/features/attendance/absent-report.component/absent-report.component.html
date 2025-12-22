@@ -7,10 +7,7 @@
         <p class="subtitle">Track and analyze student absences</p>
       </div>
       <div class="header-actions">
-        <button
-          class="btn btn-primary"
-          (click)="exportToCSV()"
-          [disabled]="!absentReport.length || loading">
+        <button class="btn btn-primary" (click)="exportToCSV()" [disabled]="!absentReport.length || loading">
           📥 Export CSV
         </button>
       </div>
@@ -20,40 +17,29 @@
     <div class="filters">
       <div class="form-group">
         <label>From Date</label>
-        <input
-          type="date"
-          [(ngModel)]="dateFrom"
-          (change)="loadAbsentReport()">
+        <input type="date" [(ngModel)]="dateFrom" (change)="loadAbsentReport()">
       </div>
       <div class="form-group">
         <label>To Date</label>
-        <input
-          type="date"
-          [(ngModel)]="dateTo"
-          (change)="loadAbsentReport()">
+        <input type="date" [(ngModel)]="dateTo" (change)="loadAbsentReport()">
       </div>
       <div class="form-group">
         <label>Min Absent Days</label>
-        <input
-          type="number"
-          [(ngModel)]="minAbsentDays"
-          min="1"
-          (input)="filterByAbsentDays()"
-          placeholder="e.g., 5">
+        <input type="number" [(ngModel)]="minAbsentDays" min="1" (input)="filterByAbsentDays()" placeholder="e.g., 5">
       </div>
       <div class="form-group">
         <label>Search Student</label>
-        <input
-          type="text"
-          [(ngModel)]="searchQuery"
-          (input)="filterBySearch()"
-          placeholder="Name or ID...">
+        <input type="text" [(ngModel)]="searchQuery" (input)="filterBySearch()" placeholder="Name or ID...">
       </div>
       <button class="btn btn-action" (click)="loadAbsentReport()">
         🔍 Apply Filters
       </button>
       <button class="btn btn-outline" (click)="clearFilters()">
         Clear
+      </button>
+      <button (click)="backToDashboard()" type="button" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Back to Dashboard
       </button>
     </div>
 
@@ -120,14 +106,10 @@
       <div class="table-header">
         <h3>Absence Details</h3>
         <div class="view-toggle">
-          <button
-            [class.active]="viewMode === 'summary'"
-            (click)="viewMode = 'summary'">
+          <button [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'">
             Summary
           </button>
-          <button
-            [class.active]="viewMode === 'detailed'"
-            (click)="viewMode = 'detailed'">
+          <button [class.active]="viewMode === 'detailed'" (click)="viewMode = 'detailed'">
             Detailed
           </button>
         </div>
@@ -182,16 +164,10 @@
               </span>
             </td>
             <td>
-              <button
-                class="btn-icon"
-                (click)="viewDetails(item)"
-                title="View Details">
+              <button class="btn-icon" (click)="viewDetails(item)" title="View Details">
                 👁️
               </button>
-              <button
-                class="btn-icon"
-                (click)="contactStudent(item)"
-                title="Contact">
+              <button class="btn-icon" (click)="contactStudent(item)" title="Contact">
                 📧
               </button>
             </td>
@@ -238,13 +214,13 @@
               </div>
               <div class="info-item">
                 <label>lastAbsentDate</label>
-                <span class="info-item" >
+                <span class="info-item">
                   {{ item.lastAbsentDate | date:'mediumDate' }}
                 </span>
               </div>
               <div class="info-item">
                 <label>Last Absent Date</label>
-                <span>   {{ item.lastAbsentDate | date:'mediumDate' }}</span>
+                <span> {{ item.lastAbsentDate | date:'mediumDate' }}</span>
               </div>
             </div>
 
@@ -252,10 +228,7 @@
             <div class="absence-dates">
               <label>Absence Dates:</label>
               <div class="dates-grid">
-                <span
-                  *ngFor="let date of item.absentDates"
-                  class="date-chip"
-                  [class.recent]="isRecentDate(date)">
+                <span *ngFor="let date of item.absentDates" class="date-chip" [class.recent]="isRecentDate(date)">
                   {{ formatDate(date) }}
                 </span>
               </div>
@@ -268,9 +241,7 @@
                 <span class="progress-value">{{ calculateAttendanceRate(item) }}%</span>
               </div>
               <div class="progress-bar">
-                <div
-                  class="progress-fill"
-                  [style.width.%]="calculateAttendanceRate(item)"
+                <div class="progress-fill" [style.width.%]="calculateAttendanceRate(item)"
                   [ngClass]="getProgressClass(calculateAttendanceRate(item))">
                 </div>
               </div>
@@ -323,10 +294,12 @@
           <h4>Recommendations</h4>
           <ul class="recommendations">
             <li *ngIf="selectedStudent.consecutiveAbsences >= 3">
-              🚨 <strong>Urgent:</strong> {{ selectedStudent.consecutiveAbsences }} consecutive absences detected. Immediate follow-up required.
+              🚨 <strong>Urgent:</strong> {{ selectedStudent.consecutiveAbsences }} consecutive absences detected.
+              Immediate follow-up required.
             </li>
             <li *ngIf="selectedStudent.absentCount >= 5">
-              ⚠️ <strong>Action Required:</strong> Student has {{ selectedStudent.absentCount }} absences. Contact parents/guardians.
+              ⚠️ <strong>Action Required:</strong> Student has {{ selectedStudent.absentCount }} absences. Contact
+              parents/guardians.
             </li>
             <li *ngIf="selectedStudent.absentCount >= 3 && selectedStudent.absentCount < 5">
               ℹ️ <strong>Monitor:</strong> Keep track of attendance pattern. Consider reaching out.

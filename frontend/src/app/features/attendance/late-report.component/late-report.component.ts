@@ -3,6 +3,7 @@ import { AttendanceService } from '../../../services/attendanceservice/attendanc
 import { LateReportItem } from '../../../models/user.model';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-late-report.component',
@@ -12,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class LateReportComponent {
   attendanceService = inject(AttendanceService);
-
+  router = inject(Router);
   lateReport: any[] = [];
   dateFrom: string = '';
   dateTo: string = '';
@@ -119,7 +120,9 @@ export class LateReportComponent {
   formatDate(date: string | Date): string {
     return this.attendanceService.formatDate(date);
   }
-
+  backToDashboard() {
+    this.router.navigateByUrl('/attendance');
+  }
   exportToCSV() {
     const headers = [
       'Student ID',

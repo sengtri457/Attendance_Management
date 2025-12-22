@@ -1,43 +1,46 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
-import { AbsentReportItem } from "../../../models/user.model";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { RouterModule } from "@angular/router";
+import { Component, inject, OnInit } from '@angular/core';
+import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
+import { AbsentReportItem } from '../../../models/user.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
-  selector: "app-absent-report.component",
+  selector: 'app-absent-report.component',
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: "./absent-report.component.html",
-  styleUrl: "./absent-report.component.css",
+  templateUrl: './absent-report.component.html',
+  styleUrl: './absent-report.component.css',
 })
 export class AbsentReportComponent implements OnInit {
   attendanceService = inject(AttendanceService);
-
+  router = inject(Router);
   // Data
   absentReport: any[] = [];
   filteredReport: any[] = [];
   selectedStudent: any | null = null;
 
   // Filters
-  dateFrom: string = "";
-  dateTo: string = "";
+  dateFrom: string = '';
+  dateTo: string = '';
   minAbsentDays: number | undefined;
-  searchQuery: string = "";
+  searchQuery: string = '';
 
   // UI State
   loading = false;
-  errorMessage = "";
-  viewMode: "summary" | "detailed" = "summary";
+  errorMessage = '';
+  viewMode: 'summary' | 'detailed' = 'summary';
   totalCount = 0;
 
   // Sorting
-  sortColumn: string = "absentCount";
-  sortDirection: "asc" | "desc" = "desc";
+  sortColumn: string = 'absentCount';
+  sortDirection: 'asc' | 'desc' = 'desc';
 
   ngOnInit() {
     this.setDefaultDates();
     this.loadAbsentReport();
+  }
+  backToDashboard() {
+    this.router.navigateByUrl('/attendance');
   }
 
   /**
@@ -48,8 +51,8 @@ export class AbsentReportComponent implements OnInit {
     const thirtyDaysAgo = new Date(today);
     thirtyDaysAgo.setDate(today.getDate() - 30);
 
-    this.dateFrom = thirtyDaysAgo.toISOString().split("T")[0];
-    this.dateTo = today.toISOString().split("T")[0];
+    this.dateFrom = thirtyDaysAgo.toISOString().split('T')[0];
+    this.dateTo = today.toISOString().split('T')[0];
   }
 
   /**
@@ -57,7 +60,7 @@ export class AbsentReportComponent implements OnInit {
    */
   loadAbsentReport() {
     this.loading = true;
-    this.errorMessage = "";
+    this.errorMessage = '';
 
     this.attendanceService
       .getAbsentReport(this.dateFrom, this.dateTo)
@@ -73,7 +76,7 @@ export class AbsentReportComponent implements OnInit {
         },
         error: (error) => {
           this.errorMessage =
-            error.error?.message || "Failed to load absentee report";
+            error.error?.message || 'Failed to load absentee report';
           this.loading = false;
           this.absentReport = [];
           this.filteredReport = [];
@@ -126,7 +129,7 @@ export class AbsentReportComponent implements OnInit {
   clearFilters() {
     this.setDefaultDates();
     this.minAbsentDays = undefined;
-    this.searchQuery = "";
+    this.searchQuery = '';
     this.loadAbsentReport();
   }
 
@@ -135,10 +138,10 @@ export class AbsentReportComponent implements OnInit {
    */
   sortBy(column: string) {
     if (this.sortColumn === column) {
-      this.sortDirection = this.sortDirection === "asc" ? "desc" : "asc";
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.sortColumn = column;
-      this.sortDirection = "desc";
+      this.sortDirection = 'desc';
     }
     this.sortData();
   }
@@ -151,13 +154,13 @@ export class AbsentReportComponent implements OnInit {
       let aVal: any = a[this.sortColumn as keyof AbsentReportItem];
       let bVal: any = b[this.sortColumn as keyof AbsentReportItem];
 
-      if (this.sortColumn === "name") {
+      if (this.sortColumn === 'name') {
         aVal = `${a.firstName} ${a.lastName}`.toLowerCase();
         bVal = `${b.firstName} ${b.lastName}`.toLowerCase();
       }
 
-      if (aVal < bVal) return this.sortDirection === "asc" ? -1 : 1;
-      if (aVal > bVal) return this.sortDirection === "asc" ? 1 : -1;
+      if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
   }
@@ -166,44 +169,44 @@ export class AbsentReportComponent implements OnInit {
    * Get sort icon for column
    */
   getSortIcon(column: string): string {
-    if (this.sortColumn !== column) return "↕";
-    return this.sortDirection === "asc" ? "↑" : "↓";
+    if (this.sortColumn !== column) return '↕';
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   /**
    * Get badge class based on absent count
    */
   getAbsenceBadgeClass(count: number): string {
-    if (count >= 5) return "critical";
-    if (count >= 3) return "warning";
-    return "info";
+    if (count >= 5) return 'critical';
+    if (count >= 3) return 'warning';
+    return 'info';
   }
 
   /**
    * Get status class
    */
   getStatusClass(count: number): string {
-    if (count >= 5) return "critical";
-    if (count >= 3) return "warning";
-    return "normal";
+    if (count >= 5) return 'critical';
+    if (count >= 3) return 'warning';
+    return 'normal';
   }
 
   /**
    * Get status text
    */
   getStatusText(count: number): string {
-    if (count >= 5) return "Critical";
-    if (count >= 3) return "At Risk";
-    return "Monitor";
+    if (count >= 5) return 'Critical';
+    if (count >= 3) return 'At Risk';
+    return 'Monitor';
   }
 
   /**
    * Get progress bar class
    */
   getProgressClass(rate: number): string {
-    if (rate >= 85) return "high";
-    if (rate >= 70) return "medium";
-    return "low";
+    if (rate >= 85) return 'high';
+    if (rate >= 70) return 'medium';
+    return 'low';
   }
 
   /**
@@ -251,13 +254,13 @@ export class AbsentReportComponent implements OnInit {
    */
   getDayOfWeek(date: string | Date): string {
     const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
     ];
     const dateObj = new Date(date);
     return days[dateObj.getDay()];
@@ -282,14 +285,14 @@ export class AbsentReportComponent implements OnInit {
    */
   contactStudent(student: any) {
     const subject = encodeURIComponent(
-      `Attendance Concern - ${student.firstName} ${student.lastName}`,
+      `Attendance Concern - ${student.firstName} ${student.lastName}`
     );
     const body = encodeURIComponent(
       `Dear ${student.firstName},\n\n` +
         `We have noticed that you have been absent for ${student.absentCount} days.\n\n` +
         `Please contact us to discuss your attendance.\n\n` +
         `Best regards,\n` +
-        `School Administration`,
+        `School Administration`
     );
 
     window.location.href = `mailto:${student.email}?subject=${subject}&body=${body}`;
@@ -300,12 +303,12 @@ export class AbsentReportComponent implements OnInit {
    */
   exportToCSV() {
     const headers = [
-      "Student ID",
-      "First Name",
-      "Last Name",
-      "Absent Days",
-      "Last Absent Date",
-      "Status",
+      'Student ID',
+      'First Name',
+      'Last Name',
+      'Absent Days',
+      'Last Absent Date',
+      'Status',
     ];
 
     const rows = this.filteredReport.map((item) => [
@@ -318,13 +321,13 @@ export class AbsentReportComponent implements OnInit {
     ]);
 
     const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n');
 
     this.downloadCSV(
       csvContent,
-      `absentee-report-${this.dateFrom}-to-${this.dateTo}.csv`,
+      `absentee-report-${this.dateFrom}-to-${this.dateTo}.csv`
     );
   }
 
@@ -333,13 +336,13 @@ export class AbsentReportComponent implements OnInit {
    */
   exportDetailedReport() {
     const headers = [
-      "Student ID",
-      "First Name",
-      "Last Name",
-      "Total Absent Days",
-      "Attendance Rate %",
-      "Status",
-      "Absence Dates",
+      'Student ID',
+      'First Name',
+      'Last Name',
+      'Total Absent Days',
+      'Attendance Rate %',
+      'Status',
+      'Absence Dates',
     ];
 
     const rows = this.filteredReport.map((item) => [
@@ -349,17 +352,17 @@ export class AbsentReportComponent implements OnInit {
       item.absentCount.toString(),
       this.calculateAttendanceRate(item).toString(),
       this.getStatusText(item.absentCount),
-      item.absentDates.map((date: Date) => this.formatDate(date)).join("; "),
+      item.absentDates.map((date: Date) => this.formatDate(date)).join('; '),
     ]);
 
     const csvContent = [
-      headers.join(","),
-      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
-    ].join("\n");
+      headers.join(','),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
+    ].join('\n');
 
     this.downloadCSV(
       csvContent,
-      `absentee-detailed-report-${this.dateFrom}-to-${this.dateTo}.csv`,
+      `absentee-detailed-report-${this.dateFrom}-to-${this.dateTo}.csv`
     );
   }
 
@@ -367,13 +370,13 @@ export class AbsentReportComponent implements OnInit {
    * Download CSV file
    */
   private downloadCSV(content: string, filename: string) {
-    const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
+    const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
 
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
+    link.setAttribute('href', url);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -386,7 +389,7 @@ export class AbsentReportComponent implements OnInit {
 
   get moderateAbsences(): number {
     return this.filteredReport.filter(
-      (item) => item.absentCount >= 3 && item.absentCount < 5,
+      (item) => item.absentCount >= 3 && item.absentCount < 5
     ).length;
   }
 
@@ -399,7 +402,7 @@ export class AbsentReportComponent implements OnInit {
   }
 
   get averageAbsences(): string {
-    if (this.filteredReport.length === 0) return "0";
+    if (this.filteredReport.length === 0) return '0';
     return (this.totalAbsenceDays / this.filteredReport.length).toFixed(1);
   }
 }

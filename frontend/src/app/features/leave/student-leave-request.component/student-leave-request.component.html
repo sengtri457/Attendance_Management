@@ -1,33 +1,46 @@
 <div class="container-fluid py-4">
+
   <!-- Header -->
-  <div class="row mb-4">
-    <div class="col">
-      <h2 class="mb-1">
-        <i class="bi bi-calendar-check me-2"></i>Submit Leave Request
-      </h2>
-      <p class="text-muted">Search or select a student and submit their leave request</p>
+  <div class="row align-items-center justify-content-between">
+    <div class="col-9">
+      <div class="mb-4 pb-3 border-bottom">
+        <h2 class="mb-1 fw-bold text-dark">
+          <i class="bi bi-calendar-check me-2 text-primary"></i>
+          Submit Leave Request
+        </h2>
+        <p class="text-muted mb-0">Search or select a student and submit their leave request</p>
+      </div>
+    </div>
+    <div class="col-3" style="text-align: right;">
+      <button (click)="backToDashboard()" type="button" class="btn btn-outline-primary">
+        <i class="bi bi-arrow-left me-2"></i>
+        Back to Dashboard
+      </button>
     </div>
   </div>
 
   <!-- Student Selection Card -->
-  <div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-info text-white">
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
       <h5 class="mb-0">
-        <i class="bi bi-person-check me-2"></i>Step 1: Select Student
+        <i class="bi bi-person-check me-2"></i>
+        Step 1: Select Student
       </h5>
     </div>
     <div class="card-body">
       <div class="row g-3">
+
         <!-- Search Input -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">
-            <i class="bi bi-search me-1"></i>Search Student
+            <i class="bi bi-search me-1"></i>
+            Search Student
           </label>
-          <div class="input-group input-group-lg">
-            <span class="input-group-text bg-white">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
               <i class="bi bi-search text-muted"></i>
             </span>
-            <input type="text" class="form-control" [(ngModel)]="searchTerm" (input)="onSearchChange()"
+            <input type="text" class="form-control border-start-0" [(ngModel)]="searchTerm" (input)="onSearchChange()"
               placeholder="Type to search by name or email..." [disabled]="loadingStudents" />
             <button *ngIf="searchTerm" class="btn btn-outline-secondary" type="button"
               (click)="searchTerm=''; onSearchChange()">
@@ -40,9 +53,10 @@
         <!-- Select Dropdown -->
         <div class="col-md-6">
           <label class="form-label fw-semibold">
-            <i class="bi bi-people me-1"></i>Or Select from List
+            <i class="bi bi-people me-1"></i>
+            Or Select from List
           </label>
-          <select class="form-select form-select-lg" [(ngModel)]="studentId" (change)="onStudentChange($event)"
+          <select class="form-select" [(ngModel)]="studentId" (change)="onStudentChange($event)"
             [disabled]="loadingStudents">
             <option value="">-- Select a Student --</option>
             <option *ngFor="let student of filteredStudents" [value]="student._id">
@@ -67,23 +81,25 @@
 
         <!-- Clear Button -->
         <div class="col-12" *ngIf="selectedStudent || searchTerm">
-          <button type="button" class="btn btn-outline-secondary" (click)="clearStudentSelection()">
-            <i class="bi bi-x-lg me-2"></i>Clear Selection & Search
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearStudentSelection()">
+            <i class="bi bi-x-lg me-2"></i>
+            Clear Selection & Search
           </button>
         </div>
       </div>
 
       <!-- Selected Student Info -->
-      <div *ngIf="selectedStudent" class="alert alert-success mt-3 mb-0">
+      <div *ngIf="selectedStudent" class="alert alert-success border-success mt-3 mb-0">
         <div class="d-flex align-items-center justify-content-between">
           <div class="d-flex align-items-center">
             <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3"
               style="width: 50px; height: 50px; flex-shrink: 0;">
-              <strong
-                class="fs-5">{{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}</strong>
+              <strong class="fs-5">
+                {{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}
+              </strong>
             </div>
             <div>
-              <h6 class="mb-0">
+              <h6 class="mb-0 text-success">
                 <i class="bi bi-check-circle-fill me-1"></i>
                 Selected Student
               </h6>
@@ -91,7 +107,8 @@
                 <strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong>
                 <br>
                 <small class="text-muted">
-                  <i class="bi bi-envelope me-1"></i>{{ selectedStudent.user.email }}
+                  <i class="bi bi-envelope me-1"></i>
+                  {{ selectedStudent.user.email }}
                 </small>
               </div>
             </div>
@@ -105,7 +122,7 @@
 
       <!-- No Results Message -->
       <div *ngIf="searchTerm && filteredStudents.length === 0 && !loadingStudents"
-        class="alert alert-warning mt-3 mb-0">
+        class="alert alert-warning border-warning mt-3 mb-0">
         <i class="bi bi-exclamation-triangle me-2"></i>
         No students found matching "<strong>{{ searchTerm }}</strong>"
         <button type="button" class="btn btn-sm btn-outline-warning ms-2" (click)="searchTerm=''; onSearchChange()">
@@ -116,45 +133,48 @@
   </div>
 
   <!-- Leave Request Form (Only show when student is selected) -->
-  <div *ngIf="selectedStudent" class="card shadow-sm border-0 mb-4">
+  <div *ngIf="selectedStudent" class="card shadow-sm mb-4">
     <div class="card-header bg-primary text-white">
       <h5 class="mb-0">
-        <i class="bi bi-plus-circle me-2"></i>Step 2: Submit Leave Request
+        <i class="bi bi-plus-circle me-2"></i>
+        Step 2: Submit Leave Request
       </h5>
     </div>
     <div class="card-body">
       <form (ngSubmit)="submitLeaveRequest()">
         <div class="row g-3">
+
           <!-- Student Info Summary -->
           <div class="col-12">
             <div class="alert alert-light border">
-              <strong>Submitting leave for:</strong> {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+              <strong>Submitting leave for:</strong>
+              {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
             </div>
           </div>
 
           <!-- From Date -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">
-              <i class="bi bi-calendar-event me-1"></i>From Date
+              <i class="bi bi-calendar-event me-1"></i>
+              From Date
               <span class="text-danger">*</span>
             </label>
-            <input type="date" class="form-control form-control-lg" [(ngModel)]="fromDate" name="fromDate"
-              [min]="fromDate" required />
+            <input type="date" class="form-control" [(ngModel)]="fromDate" name="fromDate" [min]="fromDate" required />
           </div>
 
           <!-- To Date -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">
-              <i class="bi bi-calendar-check me-1"></i>To Date
+              <i class="bi bi-calendar-check me-1"></i>
+              To Date
               <span class="text-danger">*</span>
             </label>
-            <input type="date" class="form-control form-control-lg" [(ngModel)]="toDate" name="toDate" [min]="fromDate"
-              required />
+            <input type="date" class="form-control" [(ngModel)]="toDate" name="toDate" [min]="fromDate" required />
           </div>
 
           <!-- Duration Display -->
           <div class="col-12" *ngIf="fromDate && toDate">
-            <div class="alert alert-info">
+            <div class="alert alert-info border-info">
               <i class="bi bi-info-circle me-2"></i>
               <strong>Duration:</strong> {{ calculateDuration(fromDate, toDate) }} day(s)
             </div>
@@ -163,7 +183,8 @@
           <!-- Reason -->
           <div class="col-12">
             <label class="form-label fw-semibold">
-              <i class="bi bi-chat-left-text me-1"></i>Reason for Leave
+              <i class="bi bi-chat-left-text me-1"></i>
+              Reason for Leave
               <span class="text-danger">*</span>
             </label>
             <textarea class="form-control" rows="5" [(ngModel)]="reason" name="reason"
@@ -179,14 +200,15 @@
           <div class="col-12">
             <hr>
             <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-primary btn-lg px-5"
+              <button type="submit" class="btn btn-primary px-4"
                 [disabled]="submitting || !fromDate || !toDate || !reason.trim()">
-                <i class="bi me-2" [ngClass]="submitting ? 'bi-arrow-repeat spin' : 'bi-send'"></i>
+                <i class="bi me-2" [ngClass]="submitting ? 'bi-arrow-repeat' : 'bi-send'"></i>
                 {{ submitting ? 'Submitting...' : 'Submit Leave Request' }}
               </button>
-              <button type="button" class="btn btn-outline-secondary btn-lg" (click)="reason=''; setMinDate()"
+              <button type="button" class="btn btn-outline-secondary" (click)="reason=''; setMinDate()"
                 [disabled]="submitting">
-                <i class="bi bi-arrow-clockwise me-2"></i>Reset Form
+                <i class="bi bi-arrow-clockwise me-2"></i>
+                Reset Form
               </button>
             </div>
           </div>
@@ -196,7 +218,7 @@
   </div>
 
   <!-- Placeholder when no student selected -->
-  <div *ngIf="!selectedStudent" class="card shadow-sm border-0 mb-4">
+  <div *ngIf="!selectedStudent" class="card shadow-sm mb-4">
     <div class="card-body text-center py-5">
       <i class="bi bi-person-plus-fill text-muted" style="font-size: 5rem;"></i>
       <h4 class="mt-4 text-muted">No Student Selected</h4>
@@ -208,23 +230,25 @@
   </div>
 
   <!-- Student's Leave Requests History -->
-  <div *ngIf="selectedStudent" class="card shadow-sm border-0">
+  <div *ngIf="selectedStudent" class="card shadow-sm">
     <div class="card-header bg-white border-bottom">
       <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
-          <h5 class="mb-0">
-            <i class="bi bi-clock-history me-2"></i>Leave Request History
+          <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-clock-history me-2 text-primary"></i>
+            Leave Request History
           </h5>
           <small class="text-muted">
             All leave requests for {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
           </small>
         </div>
-        <span class="badge bg-primary rounded-pill fs-6">
+        <span class="badge bg-primary rounded-pill">
           {{ myLeaveRequests.length }} Request{{ myLeaveRequests.length !== 1 ? 's' : '' }}
         </span>
       </div>
     </div>
     <div class="card-body">
+
       <!-- Loading -->
       <div *ngIf="loading" class="text-center py-5">
         <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
@@ -305,6 +329,7 @@
       </div>
     </div>
   </div>
+
 </div>
 
 <!-- Success Modal -->
@@ -312,12 +337,15 @@
   <div class="modal-backdrop fade show"></div>
   <div class="modal fade show d-block" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content border-0 shadow-lg">
-        <div class="modal-header bg-success text-white border-0">
-          <h5 class="modal-title">
-            <i class="bi bi-check-circle-fill me-2"></i>Success!
-          </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"></button>
+      <div class="modal-content border-0 shadow">
+        <div class="card-header bg-success text-white border-0">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              Success!
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"></button>
+          </div>
         </div>
         <div class="modal-body text-center py-5">
           <div
@@ -325,26 +353,30 @@
             style="width: 100px; height: 100px;">
             <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
           </div>
-          <h3 class="mb-3">Leave Request Submitted Successfully!</h3>
+          <h4 class="mb-3">Leave Request Submitted Successfully!</h4>
           <p class="text-muted mb-2">
             Leave request for
-            <strong class="text-dark">{{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}</strong>
+            <strong class="text-dark">
+              {{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}
+            </strong>
             has been submitted.
           </p>
-          <div class="alert alert-info mt-4 mb-0 text-start">
-            <h6 class="alert-heading">
-              <i class="bi bi-info-circle me-2"></i>What's Next?
+          <div class="alert alert-info border-info mt-4 mb-0 text-start">
+            <h6 class="alert-heading fw-semibold">
+              <i class="bi bi-info-circle me-2"></i>
+              What's Next?
             </h6>
-            <ul class="mb-0 ps-3">
+            <ul class="mb-0 ps-3 small">
               <li>The request is now pending approval</li>
               <li>An administrator will review it shortly</li>
               <li>The student will be notified of the decision</li>
             </ul>
           </div>
         </div>
-        <div class="modal-footer border-0">
+        <div class="modal-footer border-0 bg-light">
           <button type="button" class="btn btn-success px-4" (click)="closeSuccessModal()">
-            <i class="bi bi-check-lg me-2"></i>Close
+            <i class="bi bi-check-lg me-2"></i>
+            Close
           </button>
         </div>
       </div>

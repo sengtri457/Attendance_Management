@@ -7,7 +7,7 @@ import {
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-attendance-list.component',
@@ -27,12 +27,17 @@ export class AttendanceListComponent implements OnInit {
     limit: 20,
   };
 
-  constructor(public attendanceService: AttendanceService) {}
+  constructor(
+    public attendanceService: AttendanceService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadAttendance();
   }
-
+  backToDashboard() {
+    this.router.navigateByUrl('/attendance');
+  }
   loadAttendance(): void {
     this.loading = true;
     this.attendanceService.getAll(this.filters).subscribe({

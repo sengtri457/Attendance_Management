@@ -23,10 +23,7 @@
             My Profile
           </h5>
           <p class="card-text">View and manage your student information</p>
-          <button
-            [routerLink]="['/students', studentId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/students', studentId]" class="btn btn-primary">
             <i class="bi bi-eye me-2"></i>
             View Profile
           </button>
@@ -41,10 +38,7 @@
             My Attendance
           </h5>
           <p class="card-text">Check your attendance records</p>
-          <button
-            class="btn btn-primary"
-            [routerLink]="['/attendance/stats/', studentId]"
-          >
+          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
@@ -97,10 +91,7 @@
             My Profile
           </h5>
           <p class="card-text">View your teacher profile</p>
-          <button
-            [routerLink]="['/teachers', teacherId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/teachers', teacherId]" class="btn btn-primary">
             <i class="bi bi-arrow-right me-2"></i>
             View Profile
           </button>
@@ -115,7 +106,7 @@
     Welcome, <strong>Parent</strong>! You can view your children's information.
   </div>
   <div class="row g-4">
-    <div class="col-md-6">
+    <div class="col-md-12">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">
@@ -130,7 +121,7 @@
         </div>
       </div>
     </div>
-    <div class="col-md-6">
+    <!-- <div class="col-md-6">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">
@@ -138,13 +129,13 @@
             Attendance Records
           </h5>
           <p class="card-text">Check children's attendance</p>
-          <button class="btn btn-primary" disabled>
+          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
   } @else {
   <!-- Admin Dashboard -->
@@ -177,10 +168,7 @@
               <h6 class="card-title">Teachers</h6>
               <h2 class="mb-0">{{teacher.length}}</h2>
             </div>
-            <i
-              class="bi bi-person-badge"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-person-badge" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button routerLink="/teachers" class="btn btn-sm mt-3 w-100 warning">
             View All
@@ -196,10 +184,7 @@
               <h6 class="card-title">Parents</h6>
               <h2 class="mb-0">{{parents.length}}</h2>
             </div>
-            <i
-              class="bi bi-people-fill"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button class="btn primary btn-sm mt-3 w-100" routerLink="/parents">
             View All
@@ -215,10 +200,7 @@
               <h6 class="card-title">Attendance</h6>
               <h2 class="mb-0">{{attendance.length}}</h2>
             </div>
-            <i
-              class="bi bi-calendar-check"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button routerLink="/attendance" class="btn sec btn-sm mt-3 w-100">
             View Records
@@ -309,10 +291,7 @@
               <i class="bi bi-file-earmark-text me-2"></i>
               Review Leave Requests
             </button>
-            <button
-              [routerLink]="['/students/blacklist']"
-              class="btn btn-danger"
-            >
+            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
               <i class="bi bi-file-earmark-text me-2"></i>
               View Blacklisted Students
             </button>
