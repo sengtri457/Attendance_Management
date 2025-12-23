@@ -33,9 +33,9 @@ export class SubjectComponent implements OnInit {
   checkPermissions(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.canCreate = user.role === 'Admin' || user.role === 'Teacher';
-      this.canEdit = user.role === 'Admin' || user.role === 'Teacher';
-      this.canDelete = user.role === 'Admin' || user.role === 'Teacher';
+      this.canCreate = user.role === 'Admin';
+      this.canEdit = user.role === 'Admin';
+      this.canDelete = user.role === 'Admin';
     }
   }
   constructor(
