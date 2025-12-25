@@ -1,55 +1,63 @@
-import { Routes } from "@angular/router";
-import { roleGuard } from "../../core/guards/auth.guard-guard";
+import { FormAttendanceComponent } from './form-attendance.component/form-attendance.component';
+import { Routes } from '@angular/router';
+import { roleGuard } from '../../core/guards/auth.guard-guard';
 
 export const ATTENDANCE_ROUTES: Routes = [
   {
-    path: "",
+    path: '',
     loadComponent: () =>
-      import("./attendance-dashboard.component/attendance-dashboard.component").then(
-        (m) => m.AttendanceDashboardComponent,
-      ),
-    canActivate: [roleGuard(["Admin", "Teacher"])],
+      import(
+        './attendance-dashboard.component/attendance-dashboard.component'
+      ).then((m) => m.AttendanceDashboardComponent),
+    canActivate: [roleGuard(['Admin', 'Teacher'])],
   },
   {
-    path: "list",
+    path: 'list',
     loadComponent: () =>
-      import("./attendance-list.component/attendance-list.component").then(
-        (m) => m.AttendanceListComponent,
-      ),
-  },
-  {
-    path: "stats/:studentId",
-    loadComponent: () =>
-      import("./attendance-stats.component/attendance-stats.component").then(
-        (m) => m.AttendanceStatsComponent,
+      import('./attendance-list.component/attendance-list.component').then(
+        (m) => m.AttendanceListComponent
       ),
   },
   {
-    path: "mark",
+    path: 'stats/:studentId',
     loadComponent: () =>
-      import("./mark-attendance.component/mark-attendance.component").then(
-        (m) => m.MarkAttendanceComponent,
+      import('./attendance-stats.component/attendance-stats.component').then(
+        (m) => m.AttendanceStatsComponent
       ),
   },
   {
-    path: "lateReport",
+    path: 'mark',
     loadComponent: () =>
-      import("../attendance/late-report.component/late-report.component").then(
-        (m) => m.LateReportComponent,
+      import('./mark-attendance.component/mark-attendance.component').then(
+        (m) => m.MarkAttendanceComponent
       ),
   },
   {
-    path: "absenteeReport",
+    path: 'lateReport',
     loadComponent: () =>
-      import("./absent-report.component/absent-report.component").then(
-        (m) => m.AbsentReportComponent,
+      import('../attendance/late-report.component/late-report.component').then(
+        (m) => m.LateReportComponent
       ),
   },
   {
-    path: "mark-absent",
+    path: 'absenteeReport',
     loadComponent: () =>
-      import("../markmark-absent.component/markmark-absent.component").then(
-        (m) => m.MarkmarkAbsentComponent,
+      import('./absent-report.component/absent-report.component').then(
+        (m) => m.AbsentReportComponent
       ),
+  },
+  {
+    path: 'mark-absent',
+    loadComponent: () =>
+      import('../markmark-absent.component/markmark-absent.component').then(
+        (m) => m.MarkmarkAbsentComponent
+      ),
+  },
+  {
+    path: ':id',
+    loadComponent: () =>
+      import(
+        '../attendance/form-attendance.component/form-attendance.component'
+      ).then((m) => m.FormAttendanceComponent),
   },
 ];

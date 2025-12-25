@@ -6,6 +6,24 @@ import { AuthService } from './services/authservice/auth.service';
 import { StudentService } from './services/studentservices/student.service';
 import { LeaveRequestService } from './services/leaveRequestservice/leave-request.service';
 import { LeaveRequest } from './models/user.model';
+import { CountService } from './service/count.service';
+interface QuickAction {
+  id: string;
+  title: string;
+  description: string;
+  icon: string;
+  iconColor: string;
+  section: 'main' | 'quick';
+}
+
+interface QuickActionsManager {
+  isOpen: boolean;
+  gridBtn: HTMLElement | null;
+  container: HTMLElement | null;
+  overlay: HTMLElement | null;
+  closeBtn: HTMLElement | null;
+  contentArea: HTMLElement | null;
+}
 
 @Component({
   selector: 'app-root',
@@ -17,6 +35,7 @@ export class App implements OnInit {
   protected title = 'frontend';
   authService = inject(AuthService);
   studentService = inject(StudentService);
+  count = inject(CountService);
   private leaveRequestService = inject(LeaveRequestService);
   leaveRequests: LeaveRequest[] = [];
 
@@ -31,14 +50,16 @@ export class App implements OnInit {
       this.currentUser = user;
     });
     this.studentId = this.authService.getStudentId();
-    this.loadStudent();
-    this.loadLeaveRequests();
   }
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadLeaveRequests();
+    console.log(this.leaveRequests.length);
+  }
   loadLeaveRequests(): void {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {
         this.leaveRequests = response.data;
+
         console.log(this.leaveRequests);
       },
       error: (error) => {

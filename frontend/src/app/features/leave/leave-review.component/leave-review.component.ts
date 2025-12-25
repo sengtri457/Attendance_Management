@@ -5,6 +5,7 @@ import { AuthService } from '../../../services/authservice/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CountService } from '../../../service/count.service';
 
 @Component({
   selector: 'app-leave-review.component',
@@ -26,7 +27,8 @@ export class LeaveReviewComponent {
 
   constructor(
     private leaveRequestService: LeaveRequestService,
-    private authService: AuthService
+    private authService: AuthService,
+    private count: CountService
   ) {}
 
   ngOnInit(): void {
@@ -40,6 +42,12 @@ export class LeaveReviewComponent {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {
         this.leaveRequests = response.data;
+        this.count.getCount(
+          this.leaveRequests.filter((f) => {
+            return f.status === 'pending';
+          }).length
+        );
+        console.log(this.count.count);
         console.log(this.leaveRequests);
         this.filterRequests();
         this.loading = false;

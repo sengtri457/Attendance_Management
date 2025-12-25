@@ -17,11 +17,11 @@
           </button>
           <button class="btn btn-primary me-2" (click)="leaveRequest()">
             <i class="bi bi-plus-circle me-2"></i>
-            LeaveRequest
+            Leave Request
           </button>
           @if(auth.isTeacher()){
           <button class="btn btn-danger me-2" routerLink="mark-absent">
-            <i class="bi bi-plus-circle me-2"></i>
+            <i class="bi bi-x-circle me-2"></i>
             Mark Absent
           </button>
           }
@@ -185,74 +185,153 @@
               <th>Status</th>
               <th>Late By</th>
               <th>Study Hours</th>
-              <th>Action</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let attendance of todayAttendance.slice(0, 10)">
-              <td>
-                <div class="d-flex align-items-center">
-                  <div class="avatar-circle me-2">
-                    {{ (attendance.student.firstName || '').charAt(0) }}
-                  </div>
-                  <div>
-                    <div class="fw-medium">
-                      {{ (attendance.student.firstName || '') }}
-                      {{ (attendance.student.lastName || '') }}
+            <!-- Loop through attendance records -->
+            <ng-container *ngFor="let attendance of todayAttendance.slice(0, 10)">
+              <!-- Normal View Row -->
+              <tr *ngIf="!isEditing(attendance._id)" class="view-row">
+                <td>
+                  <div class="d-flex align-items-center">
+                    <div class="avatar-circle me-2">
+                      {{ (attendance.student.firstName || '').charAt(0) }}
                     </div>
-                    <small class="text-muted">
-                      {{ (attendance.student.studentId || '') }}
-                    </small>
+                    <div>
+                      <div class="fw-medium">
+                        {{ (attendance.student.firstName || '') }}
+                        {{ (attendance.student.lastName || '') }}
+                      </div>
+                      <small class="text-muted">
+                        {{ (attendance.student.studentId || '') }}
+                      </small>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>{{ attendanceService.formatTime(attendance.checkInTime) }}</td>
-              <td>
-                <span [class]="'badge bg-' + attendanceService.getStatusColor(attendance.status)">
-                  <i [class]="'bi bi-' + attendanceService.getStatusIcon(attendance.status) + ' me-1'"></i>
-                  {{ attendance.status | uppercase }}
-                </span>
-              </td>
-              <td>
-                  @if(attendance.isLate)
-                  {
-                  <span class="text-warning">
-                    {{ attendance.lateBy || "No Lated" }} min
+                </td>
+                <td>{{ attendanceService.formatTime(attendance.checkInTime) }}</td>
+                <td>
+                  <span [class]="'badge bg-' + attendanceService.getStatusColor(attendance.status)">
+                    <i [class]="'bi bi-' + attendanceService.getStatusIcon(attendance.status) + ' me-1'"></i>
+                    {{ attendance.status | uppercase }}
                   </span>
+                </td>
+                <td>
+                  @if(attendance.isLate) {
+                  <span class="text-warning">
+                    {{ attendance.lateBy || 0 }} min
+                  </span>
+                  } @else {
+                  <span class="text-muted">On time</span>
                   }
-                  @else{
-                <span class="text-muted">No Lated</span>
-                  }
-              </td>
-              <td>
-                  @if(attendance.workHours > 0){
-                <span>
-                  {{ attendance.workHours || 0 }} hrs
-                </span>
-                  }@else
-                  {
+                </td>
+                <td>
+                  @if(attendance.workHours > 0) {
+                  <span>
+                    {{ attendance.workHours | number:'1.1-2' }} hrs
+                  </span>
+                  } @else {
                   <span class="text-muted">
                     0 hrs
                   </span>
                   }
-              </td>
-              <td>
-                <button
-                    [routerLink]="[ 'stats', attendance.student._id]"
-                    class="btn btn-sm btn-outline-primary">
-                  <i class="bi bi-eye"></i>
-                </button>
-              </td>
-            </tr>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button class="btn btn-sm btn-outline-primary me-1" (click)="startEdit(attendance)"
+                      title="Edit attendance">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(attendance)"
+                      title="Delete attendance">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Edit Row (Expanded Form) -->
+              <tr *ngIf="isEditing(attendance._id)" class="edit-row">
+                <td colspan="6" class="p-0">
+                  <div class="edit-form-container p-2">
+                    <!-- Form Header with Student Info -->
+                    <div class="edit-form-header">
+                      <div class="d-flex align-items-center">
+                        <div class="avatar-circle me-3">
+                          {{ (attendance.student.firstName || '').charAt(0) }}
+                        </div>
+                        <div>
+                          <strong class="d-block">
+                            {{ (attendance.student.firstName || '') }}
+                            {{ (attendance.student.lastName || '') }}
+                          </strong>
+                          <small class="text-muted">
+                            ID: {{ (attendance.student.studentId || '') }}
+                          </small>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Form Body -->
+                    <div class="edit-form-body">
+                      <div class="row g-3">
+                        <div class="col-md-4">
+                          <label class="form-label small fw-semibold">Check In Time</label>
+                          <input type="time" [(ngModel)]="editForm.checkInTime" class="form-control form-control-sm" />
+                        </div>
+
+                        <div class="col-md-4">
+                          <label class="form-label small fw-semibold">Check Out Time</label>
+                          <input type="time" [(ngModel)]="editForm.checkOutTime" class="form-control form-control-sm" />
+                        </div>
+
+
+                        <div class="col-12">
+                          <label class="form-label small fw-semibold">Note</label>
+                          <textarea [(ngModel)]="editForm.note" class="form-control form-control-sm" rows="2"
+                            placeholder="Add any notes..."></textarea>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Form Footer with Actions -->
+                    <div class="edit-form-footer">
+                      <button class="btn btn-sm btn-secondary me-2" (click)="cancelEdit()">
+                        <i class="bi bi-x-circle me-1"></i>
+                        Cancel
+                      </button>
+                      <button class="btn btn-sm btn-primary" (click)="saveEdit(attendance._id)" [disabled]="loading">
+                        <i class="bi bi-check-circle me-1"></i>
+                        <span *ngIf="!loading">Save Changes</span>
+                        <span *ngIf="loading">
+                          <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                          Saving...
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+
+            <!-- Empty State -->
             <tr *ngIf="todayAttendance.length === 0">
-              <td colspan="5" class="text-center py-4 text-muted">
-                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                No attendance records yet today
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
+                <p class="mb-0">No attendance records yet today</p>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- View All Link -->
+    <div class="card-footer bg-white text-center" *ngIf="todayAttendance.length > 10">
+      <button class="btn btn-sm btn-outline-primary" routerLink="list">
+        <i class="bi bi-list-ul me-2"></i>
+        View All {{ todayAttendance.length }} Records
+      </button>
     </div>
   </div>
 </div>

@@ -94,13 +94,13 @@
 
       <div class="navbar-right">
         @if(currentUser?.role !== 'Student') {
-        <button class="nav-icon-btn" title="Notifications">
-          <i class="bi bi-bell" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
-          <span class="badge">{{pendingCount}}</span>
+        <button class="nav-icon-btn" title="Notifications" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+          <i [class]="count.isTrue ? 'bi bi-bell' : 'bi bi-bell-fill'"></i>
+          <span class="badge">{{count.count}}</span>
         </button>
-
-        <button class="nav-icon-btn" title="Messages">
-          <i class="bi bi-envelope"></i>
+        <button class="nav-icon-btn" title="Messages" id="closeBtn">
+          <i class="bi bi-grid me-2"></i>
         </button>
         }
         <div class="user-menu">
@@ -138,71 +138,60 @@
     </main>
   </div>
 </div>
-<!-- Modal -->
-
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    @if (pendingCount > 0) {
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">Review Request</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (item of leaveRequests; track $index) {
-            <tr>
-              @if (item.status === 'pending') {
-              <td>{{ item.student.firstName }} {{ item.student.lastName }}</td>
-              <td>{{ item.reason }}</td>
-              <td>
-                <span class="badge bg-warning text-dark">Pending</span>
-              </td>
-              <td>
-                <button routerLink="/leave/review" class="btn btn-outline-primary" title="View Details"
-                  data-bs-dismiss="modal">
-                  <i class="bi bi-eye"></i>
-                </button>
-              </td>
-              }
-            </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-      </div>
-    </div>
-    }@else {
-    <div class="modal-content">
-      <div class="modal-header">
-        <h1 class="modal-title fs-5" id="exampleModalLabel">No Pending Requests</h1>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body text-center">
-        <i class="bi bi-check-circle text-success" style="font-size: 4rem;"></i>
-        <p class="mt-3">There are no pending leave requests to review.</p>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-          Close
-        </button>
-      </div>
-    </div>
-    }
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+  aria-labelledby="offcanvasWithBothOptionsLabel" style="width: 450px;">
+  @if(count.count > 0){
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel"><button type="button"
+        class="btn btn-primary position-relative">
+        Notifications
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+          {{count.count}}
+          <span class="visually-hidden">unread messages</span>
+        </span>
+      </button></h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
+  <div class="offcanvas-body">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Reason</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of leaveRequests; track $index) {
+        <tr>
+          @if (item.status === 'pending') {
+          <td>{{ item.student.firstName }} {{ item.student.lastName }}</td>
+          <td>{{ item.reason }}</td>
+          <td>
+            <span class="badge bg-warning text-dark">Pending</span>
+          </td>
+          <td>
+            <button routerLink="/leave/review" class="btn btn-outline-primary" title="View Details"
+              data-bs-dismiss="modal">
+              <i class="bi bi-eye"></i>
+            </button>
+          </td>
+          }
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  }@else {
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Notifications</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <p>No pending leave requests.</p>
+  </div>
+  }
 </div>
 
 } @else {
