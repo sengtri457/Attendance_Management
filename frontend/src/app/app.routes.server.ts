@@ -1,48 +1,52 @@
-import { RenderMode, ServerRoute } from "@angular/ssr";
+import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
   {
-    path: "students/:id",
+    path: 'students/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "students/restore/:id",
+    path: 'students/restore/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "students/edit/:id",
+    path: 'students/edit/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "parents/edit/:id",
+    path: 'parents/edit/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "parents/:id",
+    path: 'parents/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "subjects/edit/:id",
+    path: 'subjects/edit/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "subjects/:id",
+    path: 'subjects/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "teachers/edit/:id",
+    path: 'teachers/edit/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "teachers/:id",
+    path: 'teachers/:id',
     renderMode: RenderMode.Client,
   },
   {
-    path: "attendance/stats/:studentId",
+    path: 'attendance/stats/:studentId',
     renderMode: RenderMode.Client,
   },
   {
-    path: "**",
+    path: 'attendance/:id',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: '**',
     renderMode: RenderMode.Prerender,
   },
 ];
