@@ -62,8 +62,6 @@ export class App implements OnInit {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {
         this.leaveRequests = response.data;
-
-        console.log(this.leaveRequests);
       },
       error: (error) => {
         console.error('Error loading leave requests:', error);
