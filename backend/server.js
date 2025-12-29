@@ -11,7 +11,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
+// Root health check
+app.get("/", (req, res) => {
+  res.json({
+    success: true,
+    message: "Attendance API is running 🚀",
+  });
+});
 // Database connection
 mongoose
   .connect(process.env.MONGODB_URI)
