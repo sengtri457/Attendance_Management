@@ -8,7 +8,6 @@ const { authMiddleware, roleCheck } = require("../middleware/auth");
 
 router.get(
   "/",
-  authMiddleware,
   (req, res, next) => {
     console.log("🔍 GET /api/leave-requests hit!");
     console.log("User:", req.user);

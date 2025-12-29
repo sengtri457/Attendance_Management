@@ -1,16 +1,17 @@
-import { HttpClient } from "@angular/common/http";
-import { inject, Inject, Injectable } from "@angular/core";
-import { Router } from "@angular/router";
-import { environment } from "../../../environments/environment";
-import { BehaviorSubject, Observable, tap } from "rxjs";
+import { HttpClient } from '@angular/common/http';
+import { inject, Inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
+import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { isPlatformBrowser } from '@angular/common';
 import {
   LoginRequest,
   LoginResponse,
   RegisterRequest,
-} from "../../models/user.model";
+} from '../../models/user.model';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
@@ -20,20 +21,21 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<any>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor() {
-    // Load user from storage on service initialization
-    let user = this.getUserFromStorage();
-    if (user) {
-      this.currentUserSubject.next(user);
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {
+    // Load user from storage on service initialization (browser only)
+    if (isPlatformBrowser(this.platformId)) {
+      const user = this.getUserFromStorage();
+      if (user) {
+        this.currentUserSubject.next(user);
+      }
     }
   }
 
   private getUserFromStorage(): any {
-    if (typeof window !== "undefined" && window.localStorage) {
-      const user = localStorage.getItem("currentUsers");
-      return user ? JSON.parse(user) : null;
-    }
-    return null;
+    if (!isPlatformBrowser(this.platformId)) return null;
+
+    const user = localStorage.getItem('currentUsers');
+    return user ? JSON.parse(user) : null;
   }
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -41,15 +43,15 @@ export class AuthService {
       .post<LoginResponse>(`${this.apiUrl}/login`, credentials)
       .pipe(
         tap((response) => {
-          if (response.success) {
-            localStorage.setItem("tokens", response.data.tokens);
+          if (response.success && isPlatformBrowser(this.platformId)) {
+            localStorage.setItem('tokens', response.data.tokens);
             localStorage.setItem(
-              "currentUsers",
-              JSON.stringify(response.data.user),
+              'currentUsers',
+              JSON.stringify(response.data.user)
             );
             this.currentUserSubject.next(response.data.user);
           }
-        }),
+        })
       );
   }
 
@@ -58,26 +60,27 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem("tokens");
-    localStorage.removeItem("currentUsers");
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('tokens');
+      localStorage.removeItem('currentUsers');
+    }
+
     this.currentUserSubject.next(null);
-    this.router.navigate(["/auth/login"]);
+    this.router.navigate(['/auth/login']);
   }
 
   getToken(): string | null {
-    if (typeof window !== "undefined" && window.localStorage) {
-      return localStorage.getItem("tokens");
-    }
-    return null;
+    if (!isPlatformBrowser(this.platformId)) return null;
+    return localStorage.getItem('tokens');
   }
 
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
-  // Get current user ID
+
   getUserId(): string {
     const user = this.currentUserSubject.value;
-    return user?._id || user?.id || "";
+    return user?._id || user?.id || '';
   }
 
   getCurrentUser(): any {
@@ -89,45 +92,38 @@ export class AuthService {
     return user && roles.includes(user.role);
   }
 
-  // Get student ID if user is a student
   getStudentId(): string | null {
     const user = this.getCurrentUser();
     return user?.studentId || null;
   }
 
-  // Get teacher ID if user is a teacher
   getTeacherId(): string | null {
     const user = this.getCurrentUser();
     return user?.teacherId || null;
   }
 
-  // Get parent ID if user is a parent
   getParentId(): string | null {
     const user = this.getCurrentUser();
     return user?.parentId || null;
   }
 
-  // Check if current user is a student
   isStudent(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === "Student";
+    return user?.role === 'Student';
   }
 
-  // Check if current user is a teacher
   isTeacher(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === "Teacher";
+    return user?.role === 'Teacher';
   }
 
-  // Check if current user is a parent
   isParent(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === "Parent";
+    return user?.role === 'Parent';
   }
 
-  // Check if current user is an admin
   isAdmin(): boolean {
     const user = this.getCurrentUser();
-    return user?.role === "Admin";
+    return user?.role === 'Admin';
   }
 }
