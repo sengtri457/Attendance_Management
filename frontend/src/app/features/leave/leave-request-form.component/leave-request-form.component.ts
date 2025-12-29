@@ -10,6 +10,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { CountService } from '../../../service/count.service';
 
 @Component({
   selector: 'app-leave-request-form.component',
@@ -22,6 +23,7 @@ export class LeaveRequestFormComponent implements OnInit {
   private authService = inject(AuthService);
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  public refreshPage = inject(CountService);
 
   leaveForm!: FormGroup;
   loading = false;
@@ -33,9 +35,6 @@ export class LeaveRequestFormComponent implements OnInit {
   isTeacher = false;
   isAdmin = false;
   leaveRequests: any;
-  refreshPage() {
-    window.location.reload();
-  }
   ngOnInit() {
     // Get current student ID from auth service
     const currentUser = this.authService.getCurrentUser();
@@ -136,6 +135,7 @@ export class LeaveRequestFormComponent implements OnInit {
           this.calculatedDays = 0;
           this.loading = false;
           console.log(response);
+          this.refreshPage.refresh();
         },
         error: (err) => {
           console.error('Error submitting leave request:', err);

@@ -1,35 +1,36 @@
-import { Routes } from "@angular/router";
-import { roleGuard } from "../../core/guards/auth.guard-guard";
+import { Routes } from '@angular/router';
+import { roleGuard } from '../../core/guards/auth.guard-guard';
 
 export const SUBJECT_ROUTES: Routes = [
   {
-    path: "",
+    path: '',
     loadComponent: () =>
-      import("./subject.component/subject.component").then(
-        (m) => m.SubjectComponent,
+      import('./subject.component/subject.component').then(
+        (m) => m.SubjectComponent
       ),
+    canActivate: [roleGuard(['Admin', 'Teacher'])],
   },
   {
-    path: "create",
+    path: 'create',
     loadComponent: () =>
-      import("./subject-form.component/subject-form.component").then(
-        (m) => m.SubjectFormComponent,
+      import('./subject-form.component/subject-form.component').then(
+        (m) => m.SubjectFormComponent
       ),
-    canActivate: [roleGuard(["Admin"])],
+    canActivate: [roleGuard(['Admin'])],
   },
   {
-    path: "edit/:id",
+    path: 'edit/:id',
     loadComponent: () =>
-      import("./subject-form.component/subject-form.component").then(
-        (m) => m.SubjectFormComponent,
+      import('./subject-form.component/subject-form.component').then(
+        (m) => m.SubjectFormComponent
       ),
-    canActivate: [roleGuard(["Admin"])],
+    canActivate: [roleGuard(['Admin'])],
   },
   {
-    path: ":id",
+    path: ':id',
     loadComponent: () =>
-      import("./subject-form.component/subject-form.component").then(
-        (m) => m.SubjectFormComponent,
+      import('./subject-form.component/subject-form.component').then(
+        (m) => m.SubjectFormComponent
       ),
   },
 ];

@@ -94,8 +94,9 @@
 
       <div class="navbar-right">
         @if(currentUser?.role !== 'Student') {
-        <button class="nav-icon-btn" title="Notifications" data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasWithBothOptions" aria-controls="offcanvasWithBothOptions">
+        <button class="nav-icon-btn animate__animated" title="Notifications" data-bs-toggle="offcanvas"
+          [class]="count.isclass ? 'animate__bounce' : 'animate__bounce'" data-bs-target="#offcanvasWithBothOptions"
+          aria-controls="offcanvasWithBothOptions">
           <i [class]="count.isTrue ? 'bi bi-bell' : 'bi bi-bell-fill'"></i>
           <span class="badge">{{count.count}}</span>
         </button>

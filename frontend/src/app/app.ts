@@ -7,6 +7,7 @@ import { StudentService } from './services/studentservices/student.service';
 import { LeaveRequestService } from './services/leaveRequestservice/leave-request.service';
 import { LeaveRequest } from './models/user.model';
 import { CountService } from './service/count.service';
+import 'animate.css';
 interface QuickAction {
   id: string;
   title: string;
@@ -50,6 +51,8 @@ export class App implements OnInit {
       this.currentUser = user;
     });
     this.studentId = this.authService.getStudentId();
+    console.log(this.count.isclass);
+    console.log(this.count.getCount);
   }
   ngOnInit(): void {
     this.loadLeaveRequests();
