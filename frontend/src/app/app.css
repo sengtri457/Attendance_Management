@@ -564,4 +564,8 @@
   .wrapper-spnner {
     left: 10%;
   }
+
+  .loader {
+    width: 300px;
+  }
 }

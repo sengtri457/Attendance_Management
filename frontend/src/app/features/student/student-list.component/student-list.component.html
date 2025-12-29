@@ -1,11 +1,11 @@
 <div class="container-fluid py-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-lg-flex justify-content-between align-items-center mb-4">
     <div>
       <h1 class="h2 mb-0">
         <i class="bi bi-people-fill text-primary me-2"></i>
         Students
       </h1>
-      <p class="text-muted mb-0">Manage student information</p>
+      <p class="text-muted mb-3 mb-lg-0">Manage student information</p>
     </div>
     @if (currentUser?.role === 'Admin') {
     <button routerLink="/students/create" class="btn btn-primary">
@@ -24,13 +24,8 @@
             <span class="input-group-text">
               <i class="bi bi-search"></i>
             </span>
-            <input
-              type="text"
-              class="form-control"
-              placeholder="Search by name, email, phone, or student ID..."
-              [(ngModel)]="searchTerm"
-              (input)="onSearch()"
-            />
+            <input type="text" class="form-control" placeholder="Search by name, email, phone, or student ID..."
+              [(ngModel)]="searchTerm" (input)="onSearch()" />
             @if (searchTerm) {
             <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
               <i class="bi bi-x-lg"></i>
@@ -186,52 +181,63 @@
 
   <!-- Pagination -->
   @if (totalCount > 0) {
-  <div class="d-flex justify-content-between align-items-center mt-3">
-    <p class="text-muted mb-0">
-      Showing {{ ((currentPage - 1) * limit) + 1 }} to {{ Math.min(currentPage * limit, totalCount) }} of {{ totalCount }} student(s)
-      @if (searchTerm) {
-        <span class="badge bg-info ms-2">
+  <div class="row g-3 align-items-center mt-2">
+    <!-- Info Section -->
+    <div class="col-lg-6 col-12">
+      <div class="d-flex align-items-center flex-wrap gap-2">
+        <p class="text-muted mb-0">
+          Showing <strong>{{ ((currentPage - 1) * limit) + 1 }}</strong> to
+          <strong>{{ Math.min(currentPage * limit, totalCount) }}</strong> of
+          <strong>{{ totalCount }}</strong> student(s)
+        </p>
+        @if (searchTerm) {
+        <span class="badge bg-info">
           <i class="bi bi-search me-1"></i>Filtered
         </span>
-      }
-    </p>
-    <nav>
-      <ul class="pagination pagination-sm mb-0">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <button class="page-link" (click)="goToPage(1)" [disabled]="currentPage === 1">
-            <i class="bi bi-chevron-double-left"></i>
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <button class="page-link" (click)="prevPage()" [disabled]="currentPage === 1">
-            <i class="bi bi-chevron-left"></i> Previous
-          </button>
-        </li>
-
-        @for (page of getPageNumbers(); track page) {
-          @if (page === '...') {
-            <li class="page-item disabled">
-              <span class="page-link">...</span>
-            </li>
-          } @else {
-            <li class="page-item" [class.active]="currentPage === page">
-              <button class="page-link" (click)="goToPage(page)">{{ page }}</button>
-            </li>
-          }
         }
+      </div>
+    </div>
 
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <button class="page-link" (click)="nextPage()" [disabled]="currentPage === totalPages">
-            Next <i class="bi bi-chevron-right"></i>
-          </button>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <button class="page-link" (click)="goToPage(totalPages)" [disabled]="currentPage === totalPages">
-            <i class="bi bi-chevron-double-right"></i>
-          </button>
-        </li>
-      </ul>
-    </nav>
+    <!-- Pagination Section -->
+    <div class="col-lg-6 col-12">
+      <nav aria-label="Student pagination">
+        <ul class="pagination pagination-sm mb-0 justify-content-lg-end justify-content-center flex-wrap">
+          <!-- Previous Button -->
+          <li class="page-item" [class.disabled]="currentPage === 1">
+            <button class="page-link d-flex align-items-center" (click)="prevPage()" [disabled]="currentPage === 1"
+              aria-label="Previous page">
+              <i class="bi bi-chevron-left"></i>
+              <span class="d-none d-sm-inline ms-1">Previous</span>
+            </button>
+          </li>
+
+          <!-- Page Numbers -->
+          @for (page of getPageNumbers(); track page) {
+          @if (page === '...') {
+          <li class="page-item disabled d-none d-sm-block">
+            <span class="page-link">...</span>
+          </li>
+          } @else {
+          <li class="page-item" [class.active]="currentPage === page">
+            <button class="page-link" (click)="goToPage(page)" [attr.aria-label]="'Go to page ' + page"
+              [attr.aria-current]="currentPage === page ? 'page' : null">
+              {{ page }}
+            </button>
+          </li>
+          }
+          }
+
+          <!-- Next Button -->
+          <li class="page-item" [class.disabled]="currentPage === totalPages">
+            <button class="page-link d-flex align-items-center" (click)="nextPage()"
+              [disabled]="currentPage === totalPages" aria-label="Next page">
+              <span class="d-none d-sm-inline me-1">Next</span>
+              <i class="bi bi-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
   </div>
   }
   }

@@ -56,6 +56,12 @@
           </a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" routerLink="/leave/review" routerLinkActive="active">
+            <i class="bi bi-calendar-x"></i>
+            <span class="nav-text">Leave Review</span>
+          </a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" routerLink="/subjects" routerLinkActive="active">
             <i class="bi bi-book"></i>
             <span class="nav-text">Subjects</span>
@@ -100,7 +106,8 @@
           <i [class]="count.isTrue ? 'bi bi-bell' : 'bi bi-bell-fill'"></i>
           <span class="badge">{{count.count}}</span>
         </button>
-        <button class="nav-icon-btn" title="Messages" id="closeBtn">
+        <button class="nav-icon-btn" title="Messages" id="closeBtn" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
           <i class="bi bi-grid me-2"></i>
         </button>
         }
@@ -206,3 +213,50 @@
   </div>
 </div>
 }
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+  <div class="offcanvas-header">
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body small">
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-grid me-2"></i>
+              Quick Actions
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="d-flex gap-2 flex-wrap">
+              <button routerLink="/students/create" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-2"></i>
+                Add Student
+              </button>
+              <button routerLink="/teachers/create" class="btn btn-success">
+                <i class="bi bi-plus-circle me-2"></i>
+                Add Teacher
+              </button>
+              <button routerLink="/subjects/create" class="btn btn-secondary">
+                <i class="bi bi-plus-circle me-2"></i>
+                Add Subjects
+              </button>
+              <button routerLink="/attendance/mark" class="btn btn-info">
+                <i class="bi bi-calendar-plus me-2"></i>
+                Mark Attendance
+              </button>
+              <button class="btn btn-warning" routerLink="/leave/review">
+                <i class="bi bi-file-earmark-text me-2"></i>
+                Review Leave Requests
+              </button>
+              <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
+                <i class="bi bi-file-earmark-text me-2"></i>
+                View Blacklisted Students
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
