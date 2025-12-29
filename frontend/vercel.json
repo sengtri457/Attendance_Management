@@ -1,7 +1,7 @@
 {
   "version": 2,
   "buildCommand": "npm run build",
-  "outputDirectory": "dist/frontend/browser",
+  "outputDirectory": "frontend/browser",
   "routes": [
     {
       "src": "/assets/(.*)",
