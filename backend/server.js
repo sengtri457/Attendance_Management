@@ -4,9 +4,9 @@ const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const seedRoles = require("./src/utils/seedRoles");
-
+const morgan = require("morgan");
 const app = express();
-
+app.use(morgan("dev"));
 // Middleware
 app.use(cors());
 app.use(express.json());
