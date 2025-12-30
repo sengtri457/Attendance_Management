@@ -1,4 +1,4 @@
-@defer(on timer(3000ms)){ @if (authService.isAuthenticated()) {
+@defer(on timer(2500ms)){ @if (authService.isAuthenticated()) {
 
 <div class="wrapper">
   <!-- Sidebar -->
@@ -31,30 +31,38 @@
             <span class="nav-text">Students</span>
           </a>
         </li>
+        @if(currentUser?.role !== 'Parent'){
         <li class="nav-item">
           <a class="nav-link" routerLink="/teachers" routerLinkActive="active">
             <i class="bi bi-person-badge"></i>
             <span class="nav-text">Teachers</span>
           </a>
         </li>
+        }
+        @if(currentUser?.role !== 'Student'){
         <li class="nav-item">
           <a class="nav-link" routerLink="/parents" routerLinkActive="active">
             <i class="bi bi-person-vcard"></i>
             <span class="nav-text">Parents</span>
           </a>
         </li>
+        }
+        @if ( currentUser?.role !== 'Parent') {
         <li class="nav-item">
           <a class="nav-link" routerLink="/attendance" routerLinkActive="active">
             <i class="bi bi-calendar-check"></i>
             <span class="nav-text">Attendance</span>
           </a>
         </li>
+
         <li class="nav-item">
           <a class="nav-link" routerLink="/leave/request" routerLinkActive="active">
             <i class="bi bi-calendar-x"></i>
             <span class="nav-text">Leave Request</span>
           </a>
         </li>
+        }
+        @if(currentUser?.role !== 'Student' && currentUser?.role !== 'Parent'){
         <li class="nav-item">
           <a class="nav-link" routerLink="/leave/review" routerLinkActive="active">
             <i class="bi bi-calendar-x"></i>
@@ -67,6 +75,7 @@
             <span class="nav-text">Subjects</span>
           </a>
         </li>
+        }
       </ul>
     </nav>
 
@@ -207,10 +216,8 @@
 } }@placeholder {
 <!-- From Uiverse.io by PriyanshuGupta28 -->
 <div class="wrapper-spnner">
-  <!-- From Uiverse.io by thekuntal49 -->
-  <div class="loader">
-    <div class="progress" data-percentage="100%"></div>
-  </div>
+  <!-- From Uiverse.io by doniaskima -->
+  <div class="loader"></div>
 </div>
 }
 <div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">

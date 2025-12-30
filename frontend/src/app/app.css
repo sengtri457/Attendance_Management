@@ -3,89 +3,44 @@
 .wrapper-spnner {
   position: absolute;
   top: 50%;
-  left: 35%;
+  left: 46%;
   /* width: 100%; */
 }
 
-/* From Uiverse.io by thekuntal49 */
+/* From Uiverse.io by doniaskima */
+/* HTML: <div class="loader"></div> */
 .loader {
-  width: 400px;
-  height: 32px;
-  background-color: #ffffff;
-  position: relative;
-  overflow: hidden;
-  /* border: 3px solid rgb(0, 0, 0); */
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  border: 2px solid #000;
+  --c: no-repeat linear-gradient(#000 0 0) 50%;
+  background: var(--c) calc(50% - 5px)/5px 5px,
+    var(--c) calc(50% + 5px)/5px 5px;
 }
 
-.progress {
-  width: 0%;
-  height: 100%;
-  background-color: #435fff;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  animation: progress-animation 3s ease-in-out forwards infinite;
-}
-
-.progress::after {
-  content: attr(data-percentage);
-  position: absolute;
-  top: 50%;
-  left: 50%;
+.loader::before,
+.loader::after {
+  content: "00 00 23 40 31 45 60 17 45 32 29 42 50 08 14 07 46 11 03 55";
+  font-size: 30px;
+  font-family: monospace;
   font-weight: bold;
-  transform: translate(-50%, -50%);
-  font-size: 1rem;
-  color: rgb(255, 255, 255);
+  line-height: 1em;
+  height: 1em;
+  width: 2ch;
+  color: #0000;
+  text-shadow: 0 0 0 #000;
+  overflow: hidden;
+  margin: 5px 10px;
+  animation: l3 2s steps(20);
 }
 
-@keyframes progress-animation {
-  0% {
-    width: 0%;
-  }
+.loader::before {
+  animation-duration: 2s;
+}
 
-  25% {
-    width: 25%;
-  }
-
-  50% {
-    width: 50%;
-  }
-
-  75% {
-    width: 75%;
-  }
-
+@keyframes l3 {
   100% {
-    width: 100%;
+    text-shadow: 0 -20em 0 #000
   }
-}
-
-@keyframes percentage-animation {
-  0% {
-    content: "0%";
-  }
-
-  25% {
-    content: "25%";
-  }
-
-  50% {
-    content: "50%";
-  }
-
-  75% {
-    content: "75%";
-  }
-
-  100% {
-    content: "100%";
-  }
-}
-
-.progress::after {
-  animation: percentage-animation 3s ease-in-out forwards infinite;
 }
 
 .wrapper {
@@ -523,6 +478,21 @@
   .page-content {
     padding: 1rem;
   }
+
+  .sidebar.collapsed .nav-text {
+    display: block;
+    text-align: left;
+  }
+
+  .sidebar.collapsed .nav-link {
+    justify-content: start;
+    padding: 0.875rem;
+  }
+
+  .sidebar-header {
+    display: block;
+    margin: 0;
+  }
 }
 
 /* Scrollbar Styles */
@@ -562,10 +532,12 @@
 
 @media screen and (max-width: 768px) {
   .wrapper-spnner {
-    left: 10%;
+    left: 35%;
   }
 
   .loader {
-    width: 300px;
+    font-size: 1.5rem;
   }
+
+
 }

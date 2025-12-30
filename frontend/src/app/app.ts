@@ -45,7 +45,11 @@ export class App implements OnInit {
   userMenuOpen = false;
   studentData: any;
   studentId: string | null = null;
+  activeDropdown: string | null = null;
 
+  toggleDropdown(dropdown: string) {
+    this.activeDropdown = this.activeDropdown === dropdown ? null : dropdown;
+  }
   constructor() {
     this.authService.currentUser$.subscribe((user) => {
       this.currentUser = user;
@@ -57,6 +61,8 @@ export class App implements OnInit {
   ngOnInit(): void {
     this.loadLeaveRequests();
     console.log(this.leaveRequests.length);
+    this.currentUser = this.authService.getCurrentUser();
+    console.log('Current User:', this.currentUser);
   }
   loadLeaveRequests(): void {
     this.leaveRequestService.getLeaveRequests().subscribe({
