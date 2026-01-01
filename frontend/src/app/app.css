@@ -13,8 +13,9 @@
   display: inline-flex;
   border: 2px solid #000;
   --c: no-repeat linear-gradient(#000 0 0) 50%;
-  background: var(--c) calc(50% - 5px)/5px 5px,
-    var(--c) calc(50% + 5px)/5px 5px;
+  background:
+    var(--c) calc(50% - 5px) / 5px 5px,
+    var(--c) calc(50% + 5px) / 5px 5px;
 }
 
 .loader::before,
@@ -39,7 +40,7 @@
 
 @keyframes l3 {
   100% {
-    text-shadow: 0 -20em 0 #000
+    text-shadow: 0 -20em 0 #000;
   }
 }
 
@@ -231,12 +232,12 @@
   color: #95a5a6;
 }
 
-.sidebar.collapsed .user-details {
+/*.sidebar.collapsed .user-details {
   display: none;
-}
+}*/
 
 .sidebar.collapsed .user-info {
-  justify-content: center;
+  justify-content: start;
   padding: 0.5rem;
 }
 
@@ -538,6 +539,4 @@
   .loader {
     font-size: 1.5rem;
   }
-
-
 }

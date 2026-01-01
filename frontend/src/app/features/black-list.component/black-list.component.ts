@@ -4,6 +4,7 @@ import { BlacklistService } from "../../services/blacklistservice/blacklist.serv
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-black-list.component",
@@ -65,7 +66,22 @@ export class BlackListComponent implements OnInit {
   // }
 
   restoreStudent(studentId: string): void {
-    if (confirm("Are you sure you want to restore this student?")) {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "you sure you want to restore this student!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, Restore it!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Restore!",
+          text: "Your student has been restored.",
+          icon: "success",
+        });
+      }
       this.blacklistService.restoreStudent(studentId).subscribe({
         next: () => {
           this.loadBlacklistedStudents();
@@ -75,7 +91,7 @@ export class BlackListComponent implements OnInit {
           alert("Failed to restore student");
         },
       });
-    }
+    });
   }
 
   getThisMonthCount(): number {

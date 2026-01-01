@@ -1,10 +1,12 @@
 <div class="container-fluid py-4">
   <div class="mb-4">
-    <h1 class="h2">
+    <h1 class="h2 animate__animated animate__lightSpeedInLeft">
       <i class="bi bi-speedometer2 text-dark me-2"></i>
       Dashboard
     </h1>
-    <p class="text-muted">Welcome back, {{ currentUser?.username }}!</p>
+    <p class="text-muted animate__animated animate__lightSpeedInLeft">
+      Welcome back, {{ currentUser?.username }}!
+    </p>
   </div>
 
   @if (isStudent) {
@@ -23,7 +25,10 @@
             My Profile
           </h5>
           <p class="card-text">View and manage your student information</p>
-          <button [routerLink]="['/students', studentId]" class="btn btn-primary">
+          <button
+            [routerLink]="['/students', studentId]"
+            class="btn btn-primary"
+          >
             <i class="bi bi-eye me-2"></i>
             View Profile
           </button>
@@ -38,7 +43,10 @@
             My Attendance
           </h5>
           <p class="card-text">Check your attendance records</p>
-          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
+          <button
+            class="btn btn-primary"
+            [routerLink]="['/attendance/stats/', studentId]"
+          >
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
@@ -91,7 +99,10 @@
             My Profile
           </h5>
           <p class="card-text">View your teacher profile</p>
-          <button [routerLink]="['/teachers', teacherId]" class="btn btn-primary">
+          <button
+            [routerLink]="['/teachers', teacherId]"
+            class="btn btn-primary"
+          >
             <i class="bi bi-arrow-right me-2"></i>
             View Profile
           </button>
@@ -143,7 +154,7 @@
     <i class="bi bi-shield-check me-2"></i>
     Welcome, <strong>Administrator</strong>! You have full access to the system.
   </div>
-  <div class="row g-4">
+  <div class="row g-4 animate__animated animate__zoomIn animate__delay-0.7s">
     <div class="col-md-3">
       <div class="card text-dark success">
         <div class="card-body">
@@ -168,7 +179,10 @@
               <h6 class="card-title">Teachers</h6>
               <h2 class="mb-0">{{teacher.length}}</h2>
             </div>
-            <i class="bi bi-person-badge" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-person-badge"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
           <button routerLink="/teachers" class="btn btn-sm mt-3 w-100 warning">
             View All
@@ -184,7 +198,10 @@
               <h6 class="card-title">Parents</h6>
               <h2 class="mb-0">{{parents.length}}</h2>
             </div>
-            <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-people-fill"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
           <button class="btn primary btn-sm mt-3 w-100" routerLink="/parents">
             View All
@@ -200,7 +217,10 @@
               <h6 class="card-title">Attendance</h6>
               <h2 class="mb-0">{{attendance.length}}</h2>
             </div>
-            <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3"></i>
+            <i
+              class="bi bi-calendar-check"
+              style="font-size: 3rem; opacity: 0.3"
+            ></i>
           </div>
           <button routerLink="/attendance" class="btn sec btn-sm mt-3 w-100">
             View Records
@@ -291,7 +311,10 @@
               <i class="bi bi-file-earmark-text me-2"></i>
               Review Leave Requests
             </button>
-            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
+            <button
+              [routerLink]="['/students/blacklist']"
+              class="btn btn-danger"
+            >
               <i class="bi bi-file-earmark-text me-2"></i>
               View Blacklisted Students
             </button>

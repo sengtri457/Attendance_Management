@@ -1,37 +1,52 @@
 <div class="container-fluid py-4">
   <!-- Header -->
-  <div class="row mb-4">
-    <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center">
+  <div class="row mb-4 align-items-center">
+
+    <!-- Left: Title -->
+    <div class="col-lg-7 col-md-7 col-12 mb-3 mb-md-0 animate__animated animate__backInLeft">
+      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
         <div>
           <h2 class="mb-1">
             <i class="bi bi-calendar-check me-2"></i>
             Attendance Dashboard
           </h2>
-          <p class="text-muted mb-0">{{ currentDate | date:'fullDate' }}</p>
-        </div>
-        <div>
-          <button class="btn btn-primary me-2" routerLink="mark">
-            <i class="bi bi-plus-circle me-2"></i>
-            Mark Attendance
-          </button>
-          <button class="btn btn-primary me-2" (click)="leaveRequest()">
-            <i class="bi bi-plus-circle me-2"></i>
-            Leave Request
-          </button>
-          @if(auth.isTeacher()){
-          <button class="btn btn-danger me-2" routerLink="mark-absent">
-            <i class="bi bi-x-circle me-2"></i>
-            Mark Absent
-          </button>
-          }
-          <button class="btn btn-outline-secondary" (click)="loadTodayAttendance()">
-            <i class="bi bi-arrow-clockwise"></i>
-          </button>
+          <p class="text-muted mb-0 ">
+            {{ currentDate | date:'fullDate' }}
+          </p>
         </div>
       </div>
     </div>
+
+    <!-- Right: Buttons -->
+    <div class="col-lg-5 col-md-5 col-12">
+      <div class="d-flex flex-wrap justify-content-lg-end justify-content-start gap-2">
+
+        <button class="btn btn-primary" routerLink="mark">
+          <i class="bi bi-plus-circle me-2"></i>
+          Mark Attendance
+        </button>
+
+        <button class="btn btn-primary" (click)="leaveRequest()">
+          <i class="bi bi-plus-circle me-2"></i>
+          Leave Request
+        </button>
+
+        @if(auth.isTeacher()){
+        <button class="btn btn-danger" routerLink="mark-absent">
+          <i class="bi bi-x-circle me-2"></i>
+          Mark Absent
+        </button>
+        }
+
+        <button class="btn btn-outline-secondary" (click)="loadTodayAttendance()">
+          <i class="bi bi-arrow-clockwise"></i>
+        </button>
+
+      </div>
+    </div>
+
   </div>
+
 
   <!-- Loading Spinner -->
   <div *ngIf="loading" class="text-center py-5">
@@ -128,7 +143,7 @@
   </div>
 
   <!-- Quick Actions -->
-  <div class="row g-4 mb-4">
+  <div class="row g-4 mb-4 animate__animated animate__backInUp animate__delay-0.7s">
     <div class="col-md-4">
       <div class="card border-0 shadow-sm h-100">
         <div class="card-body text-center py-4">

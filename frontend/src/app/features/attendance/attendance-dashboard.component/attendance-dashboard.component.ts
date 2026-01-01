@@ -1,17 +1,17 @@
-import { Component, OnInit } from '@angular/core';
-import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
-import { Attendance, TodayAttendanceSummary } from '../../../models/user.model';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router, RouterLink, RouterModule } from '@angular/router';
-import { AuthService } from '../../../services/authservice/auth.service';
-import { LeaveRequestService } from '../../../services/leaveRequestservice/leave-request.service';
-import Swal from 'sweetalert2';
+import { Component, OnInit } from "@angular/core";
+import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
+import { Attendance, TodayAttendanceSummary } from "../../../models/user.model";
+import { CommonModule } from "@angular/common";
+import { FormsModule } from "@angular/forms";
+import { Router, RouterLink, RouterModule } from "@angular/router";
+import { AuthService } from "../../../services/authservice/auth.service";
+import { LeaveRequestService } from "../../../services/leaveRequestservice/leave-request.service";
+import Swal from "sweetalert2";
 @Component({
-  selector: 'app-attendance-dashboard.component',
+  selector: "app-attendance-dashboard.component",
   imports: [CommonModule, FormsModule, RouterModule, RouterLink],
-  templateUrl: './attendance-dashboard.component.html',
-  styleUrl: './attendance-dashboard.component.css',
+  templateUrl: "./attendance-dashboard.component.html",
+  styleUrl: "./attendance-dashboard.component.css",
 })
 export class AttendanceDashboardComponent implements OnInit {
   // Edit modal state
@@ -21,9 +21,9 @@ export class AttendanceDashboardComponent implements OnInit {
   // Edit state (inline editing)
   editingId: string | null = null;
   editForm = {
-    checkInTime: '',
-    checkOutTime: '',
-    note: '',
+    checkInTime: "",
+    checkOutTime: "",
+    note: "",
   };
 
   // Delete confirmation
@@ -47,7 +47,7 @@ export class AttendanceDashboardComponent implements OnInit {
     public attendanceService: AttendanceService,
     public auth: AuthService,
     private router: Router,
-    private leaveService: LeaveRequestService
+    private leaveService: LeaveRequestService,
   ) {}
 
   ngOnInit(): void {
@@ -55,16 +55,16 @@ export class AttendanceDashboardComponent implements OnInit {
     this.loadCountLeave();
   }
   leaveRequest() {
-    this.router.navigateByUrl('leave/request');
+    this.router.navigateByUrl("leave/request");
   }
   loadCountLeave() {
     this.leaveService.getAll().subscribe({
       next: (response) => {
         this.countLeave = response.data;
-        console.log('Count of leave requests:', this.countLeave.length);
+        console.log("Count of leave requests:", this.countLeave.length);
       },
       error: (error) => {
-        console.error('Error loading count of leave requests:', error);
+        console.error("Error loading count of leave requests:", error);
       },
     });
   }
@@ -89,14 +89,15 @@ export class AttendanceDashboardComponent implements OnInit {
   getAttendanceRate(): number {
     if (this.summary.total === 0) return 0;
     return Math.round(
-      ((this.summary.present + this.summary.onLeave) / this.summary.total) * 100
+      ((this.summary.present + this.summary.onLeave) / this.summary.total) *
+        100,
     );
   }
 
   getPunctualityRate(): number {
     if (this.summary.present === 0) return 0;
     return Math.round(
-      ((this.summary.present - this.summary.late) / this.summary.present) * 100
+      ((this.summary.present - this.summary.late) / this.summary.present) * 100,
     );
   }
   /**
@@ -113,7 +114,7 @@ export class AttendanceDashboardComponent implements OnInit {
     this.editForm = {
       checkInTime: this.formatTimeForInput(attendance.checkInTime),
       checkOutTime: this.formatTimeForInput(attendance.checkOutTime),
-      note: attendance.note || '',
+      note: attendance.note || "",
     };
   }
 
@@ -123,9 +124,9 @@ export class AttendanceDashboardComponent implements OnInit {
   cancelEdit(): void {
     this.editingId = null;
     this.editForm = {
-      checkInTime: '',
-      checkOutTime: '',
-      note: '',
+      checkInTime: "",
+      checkOutTime: "",
+      note: "",
     };
   }
 
@@ -140,12 +141,12 @@ export class AttendanceDashboardComponent implements OnInit {
     // Only include times if they've been changed
     if (this.editForm.checkInTime) {
       updateData.checkInTime = this.convertToDateTime(
-        this.editForm.checkInTime
+        this.editForm.checkInTime,
       );
     }
     if (this.editForm.checkOutTime) {
       updateData.checkOutTime = this.convertToDateTime(
-        this.editForm.checkOutTime
+        this.editForm.checkOutTime,
       );
     }
 
@@ -154,9 +155,9 @@ export class AttendanceDashboardComponent implements OnInit {
     this.attendanceService.update(attendanceId, updateData).subscribe({
       next: (response) => {
         Swal.fire({
-          icon: 'success',
-          title: 'Success!',
-          text: 'Attendance updated successfully',
+          icon: "success",
+          title: "Success!",
+          text: "Attendance updated successfully",
           timer: 2000,
           showConfirmButton: false,
         });
@@ -165,14 +166,14 @@ export class AttendanceDashboardComponent implements OnInit {
       },
       error: (err) => {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: "error",
+          title: "Error",
           text:
             err.error?.message ||
-            'Failed to update attendance. Please try again.',
-          confirmButtonColor: '#007bff',
+            "Failed to update attendance. Please try again.",
+          confirmButtonColor: "#007bff",
         });
-        console.error('Error updating attendance:', err);
+        console.error("Error updating attendance:", err);
         this.loading = false;
       },
     });
@@ -182,13 +183,13 @@ export class AttendanceDashboardComponent implements OnInit {
    */
   confirmDelete(attendance: Attendance): void {
     const student =
-      typeof attendance.student === 'object' ? attendance.student : null;
+      typeof attendance.student === "object" ? attendance.student : null;
     const studentName = student
       ? `${student.firstName} ${student.lastName}`
-      : 'Unknown Student';
+      : "Unknown Student";
 
     Swal.fire({
-      title: 'Confirm Delete',
+      title: "Confirm Delete",
       html: `
         <div style="text-align: center;">
           <div style="font-size: 48px; color: #ffc107; margin-bottom: 16px;">⚠️</div>
@@ -201,10 +202,10 @@ export class AttendanceDashboardComponent implements OnInit {
         </div>
       `,
       showCancelButton: true,
-      confirmButtonText: 'Yes, Delete',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#dc3545',
-      cancelButtonColor: '#6c757d',
+      confirmButtonText: "Yes, Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc3545",
+      cancelButtonColor: "#6c757d",
       focusCancel: true,
     }).then((result) => {
       if (result.isConfirmed) {
@@ -218,8 +219,8 @@ export class AttendanceDashboardComponent implements OnInit {
    */
   deleteAttendance(attendanceId: string): void {
     Swal.fire({
-      title: 'Deleting...',
-      text: 'Please wait',
+      title: "Deleting...",
+      text: "Please wait",
       allowOutsideClick: false,
       didOpen: () => {
         Swal.showLoading();
@@ -229,9 +230,9 @@ export class AttendanceDashboardComponent implements OnInit {
     this.attendanceService.delete(attendanceId).subscribe({
       next: (response) => {
         Swal.fire({
-          icon: 'success',
-          title: 'Deleted!',
-          text: 'Attendance record has been deleted',
+          icon: "success",
+          title: "Deleted!",
+          text: "Attendance record has been deleted",
           timer: 2000,
           showConfirmButton: false,
         });
@@ -239,14 +240,14 @@ export class AttendanceDashboardComponent implements OnInit {
       },
       error: (err) => {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
+          icon: "error",
+          title: "Error",
           text:
             err.error?.message ||
-            'Failed to delete attendance. Please try again.',
-          confirmButtonColor: '#007bff',
+            "Failed to delete attendance. Please try again.",
+          confirmButtonColor: "#007bff",
         });
-        console.error('Error deleting attendance:', err);
+        console.error("Error deleting attendance:", err);
       },
     });
   }
@@ -254,10 +255,10 @@ export class AttendanceDashboardComponent implements OnInit {
    * Format time for input field (HH:mm)
    */
   formatTimeForInput(date: Date | string | null): string {
-    if (!date) return '';
+    if (!date) return "";
     const d = new Date(date);
-    const hours = d.getHours().toString().padStart(2, '0');
-    const minutes = d.getMinutes().toString().padStart(2, '0');
+    const hours = d.getHours().toString().padStart(2, "0");
+    const minutes = d.getMinutes().toString().padStart(2, "0");
     return `${hours}:${minutes}`;
   }
 
@@ -265,9 +266,9 @@ export class AttendanceDashboardComponent implements OnInit {
    * Convert time input to full datetime string
    */
   convertToDateTime(timeString: string): string {
-    if (!timeString) return '';
+    if (!timeString) return "";
     const today = new Date();
-    const [hours, minutes] = timeString.split(':');
+    const [hours, minutes] = timeString.split(":");
     today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
     return today.toISOString();
   }
@@ -277,8 +278,8 @@ export class AttendanceDashboardComponent implements OnInit {
    */
   getStudentName(attendance: Attendance): string {
     const student =
-      typeof attendance.student === 'object' ? attendance.student : null;
-    if (!student) return 'Unknown Student';
+      typeof attendance.student === "object" ? attendance.student : null;
+    if (!student) return "Unknown Student";
     return `${student.firstName} ${student.lastName}`;
   }
 
@@ -287,8 +288,8 @@ export class AttendanceDashboardComponent implements OnInit {
    */
   getStudentId(attendance: Attendance): string {
     const student =
-      typeof attendance.student === 'object' ? attendance.student : null;
-    return student?.studentId || 'N/A';
+      typeof attendance.student === "object" ? attendance.student : null;
+    return student?.studentId || "N/A";
   }
 
   /**
@@ -302,10 +303,10 @@ export class AttendanceDashboardComponent implements OnInit {
    * Format date for display
    */
   formatDate(date: Date | string): string {
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(date).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   }
 }

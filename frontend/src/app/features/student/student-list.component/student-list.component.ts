@@ -10,6 +10,7 @@ import { AuthService } from "../../../services/authservice/auth.service";
 import { Subject } from "rxjs";
 import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 import { FormsModule } from "@angular/forms";
+import Swal from "sweetalert2";
 
 @Component({
   selector: "app-student-list.component",
@@ -182,16 +183,31 @@ export class StudentListComponent implements OnInit {
 
   deleteStudent(id: string, event: Event): void {
     event.stopPropagation();
-    if (confirm("Are you sure you want to blacklist this student?")) {
-      this.studentService.delete(id).subscribe({
-        next: () => {
-          this.loadStudents();
-        },
-        error: (error) => {
-          console.error("Error deleting student:", error);
-          alert("Failed to delete student");
-        },
-      });
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You want to blacklist this student?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete it!",
+    }).then((result: any) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Deleted!",
+          text: "student has been deleted.",
+          icon: "success",
+        });
+        this.studentService.delete(id).subscribe({
+          next: () => {
+            this.loadStudents();
+          },
+          error: (error) => {
+            console.error("Error deleting student:", error);
+            alert("Failed to delete student");
+          },
+        });
+      }
+    });
   }
 }

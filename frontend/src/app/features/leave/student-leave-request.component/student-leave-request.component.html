@@ -1,22 +1,32 @@
 <div class="container-fluid py-4">
-
   <!-- Header -->
-  <div class="row align-items-center justify-content-between">
-    <div class="col-9">
-      <div class="mb-4 pb-3 border-bottom">
+  <div class="row align-items-center mb-4">
+
+    <!-- Title -->
+    <div class="col-lg-9 col-md-8 col-12 mb-3 mb-md-0">
+      <div class="pb-3 border-bottom">
         <h2 class="mb-1 fw-bold text-dark">
           <i class="bi bi-calendar-check me-2 text-primary"></i>
           Submit Leave Request
         </h2>
-        <p class="text-muted mb-0">Search or select a student and submit their leave request</p>
+        <p class="text-muted mb-0">
+          Search or select a student and submit their leave request
+        </p>
       </div>
     </div>
-    <div class="col-3" style="text-align: right;">
-      <button (click)="backToDashboard()" type="button" class="btn btn-outline-primary">
+
+    <!-- Back button -->
+    <div class="col-lg-3 col-md-4 col-12 text-md-end text-start">
+      <button
+        (click)="backToDashboard()"
+        type="button"
+        class="btn btn-outline-primary w-100 w-md-auto"
+      >
         <i class="bi bi-arrow-left me-2"></i>
         Back to Dashboard
       </button>
     </div>
+
   </div>
 
   <!-- Student Selection Card -->
