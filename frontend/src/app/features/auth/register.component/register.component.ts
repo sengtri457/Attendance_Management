@@ -8,13 +8,13 @@ import {
   Validators,
 } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RoleService } from '../../../services/rolservices/role.service';
 
 @Component({
   selector: 'app-register.component',
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.component.html',
   styleUrl: './register.component.css',
 })
@@ -51,6 +51,8 @@ export class RegisterComponent implements OnInit {
       next: (response) => {
         this.isLoadingRoles = false;
         this.roles = response.data || response;
+        this.filterRole();
+        console.log(this.roles);
       },
       error: (error) => {
         this.isLoadingRoles = false;
@@ -58,6 +60,12 @@ export class RegisterComponent implements OnInit {
         this.errorMessage = 'Failed to load roles. Please refresh the page.';
       },
     });
+  }
+
+  filterRole() {
+    return (this.roles = this.roles.filter(
+      (role) => role.roleName === 'Student'
+    ));
   }
 
   passwordMatchValidator(group: FormGroup) {
