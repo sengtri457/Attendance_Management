@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
 import { RoleService } from '../../../services/rolservices/role.service';
 import { UserService } from '../../../services/userservice/user.service';
 import { StudentService } from '../../../services/studentservices/student.service';
-
+import Swal from 'sweetalert2';
 @Component({
   selector: 'app-register.component',
   imports: [FormsModule, CommonModule, ReactiveFormsModule, RouterLink],
@@ -48,6 +48,9 @@ export class RegisterComponent implements OnInit {
         confirmPassword: ['', [Validators.required]],
         firstName: ['', [Validators.required]],
         lastName: ['', [Validators.required]],
+        dob: ['', [Validators.required]],
+        gender: ['', [Validators.required]],
+        phone: ['', [Validators.required]],
       },
       { validators: this.passwordMatchValidator }
     );
@@ -137,9 +140,26 @@ export class RegisterComponent implements OnInit {
                   'Registration successful! Redirecting to login...';
                 this.registerForm.reset();
                 console.log('Student created successfully:', studentResponse);
-
+                Swal.fire({
+                  title: 'Register Successful',
+                  icon: 'success',
+                  showClass: {
+                    popup: `
+      animate__animated
+      animate__fadeInUp
+      animate__faster
+    `,
+                  },
+                  hideClass: {
+                    popup: `
+      animate__animated
+      animate__fadeOutDown
+      animate__faster
+    `,
+                  },
+                });
                 setTimeout(() => {
-                  this.router.navigate(['/login']);
+                  this.router.navigate(['/auth/login']);
                 }, 2000);
               },
               error: (error) => {

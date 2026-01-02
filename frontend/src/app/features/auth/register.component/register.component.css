@@ -1,0 +1,316 @@
+/* ===== Glass Registration Form Styles ===== */
+
+/* Background with subtle gradient */
+.registration-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #021fa2 0%, #e4e4e4 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Optional: Animated background elements */
+.registration-wrapper::before {
+    content: '';
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    top: -250px;
+    right: -250px;
+    animation: float 20s infinite ease-in-out;
+}
+
+.registration-wrapper::after {
+    content: '';
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+    bottom: -200px;
+    left: -200px;
+    animation: float 15s infinite ease-in-out reverse;
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0) translateX(0);
+    }
+
+    50% {
+        transform: translateY(-30px) translateX(30px);
+    }
+}
+
+/* Glass Card with Blur Effect */
+.glass-card {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    position: relative;
+    z-index: 1;
+}
+
+.card-body {
+    position: relative;
+}
+
+/* Icon Wrapper */
+.icon-wrapper {
+    display: inline-block;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon-wrapper img {
+    display: block;
+    filter: brightness(0) invert(1);
+}
+
+/* Typography */
+.form-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-subtitle {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0;
+}
+
+/* Custom Labels */
+.custom-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.95);
+    letter-spacing: 0.3px;
+}
+
+.required {
+    color: #ffd6d6;
+}
+
+/* Custom Inputs */
+.custom-input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    color: #2d3748;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.custom-input::placeholder {
+    color: rgba(45, 55, 72, 0.5);
+}
+
+.custom-input:focus {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.15);
+}
+
+.custom-input:disabled {
+    background: rgba(255, 255, 255, 0.6);
+    cursor: not-allowed;
+}
+
+/* Invalid State */
+.custom-input.is-invalid {
+    border-color: rgba(248, 113, 113, 0.8);
+    background: rgba(254, 242, 242, 0.9);
+}
+
+.custom-input.is-invalid:focus {
+    box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.2);
+}
+
+/* Error Messages */
+.error-message {
+    display: block;
+    margin-top: 0.375rem;
+    font-size: 0.8rem;
+    color: #fee;
+    background: rgba(220, 38, 38, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 0.375rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+/* Custom Alerts */
+.custom-alert {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1rem;
+    margin-bottom: 1.25rem;
+    border-radius: 10px;
+    backdrop-filter: blur(10px);
+    border: 1px solid;
+    position: relative;
+    font-size: 0.9rem;
+}
+
+.custom-alert i {
+    font-size: 1.1rem;
+}
+
+.alert-success {
+    background: rgba(209, 250, 229, 0.25);
+    border-color: rgba(52, 211, 153, 0.4);
+    color: #ecfdf5;
+}
+
+.alert-error {
+    background: rgba(254, 226, 226, 0.25);
+    border-color: rgba(248, 113, 113, 0.4);
+    color: #fee;
+}
+
+.alert-close {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: inherit;
+    opacity: 0.7;
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: opacity 0.2s;
+}
+
+.alert-close:hover {
+    opacity: 1;
+}
+
+/* Custom Button */
+.custom-btn {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    letter-spacing: 0.5px;
+}
+
+.custom-btn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.35);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.custom-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.custom-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Loading State */
+.loading-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.spinner-border {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-right-color: rgba(255, 255, 255, 0.9);
+}
+
+/* Login Link */
+.login-link {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.login-link .link {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    padding-bottom: 1px;
+}
+
+.login-link .link:hover {
+    color: #ffffff;
+    border-bottom-color: #ffffff;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .glass-card {
+        border-radius: 15px;
+        margin: 1rem;
+    }
+
+    .card-body {
+        padding: 2rem 1.5rem !important;
+    }
+
+    .form-title {
+        font-size: 1.5rem;
+    }
+
+    .custom-input {
+        font-size: 16px;
+        /* Prevents zoom on iOS */
+    }
+}
+
+@media (max-width: 576px) {
+
+    .registration-wrapper::before,
+    .registration-wrapper::after {
+        display: none;
+        /* Simplify on small screens */
+    }
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+    transition-property: background, border, box-shadow, transform;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+input,
+select,
+button {
+    transition-property: all;
+}
