@@ -8,29 +8,29 @@ const { authMiddleware, roleCheck } = require("../middleware/auth");
 
 router.get("/", authMiddleware, roleCheck("Admin"), userController.getAllUsers);
 router.get("/:id", authMiddleware, userController.getUserById);
-router.post("/", authMiddleware, roleCheck("Admin"), userController.createUser);
+router.post("/", userController.createUser);
 router.put(
   "/:id",
   authMiddleware,
   roleCheck("Admin"),
-  userController.updateUser,
+  userController.updateUser
 );
 router.delete(
   "/:id",
   authMiddleware,
   roleCheck("Admin"),
-  userController.deleteUser,
+  userController.deleteUser
 );
 router.patch(
   "/:id/toggle-status",
   authMiddleware,
   roleCheck("Admin"),
-  userController.toggleUserStatus,
+  userController.toggleUserStatus
 );
 router.patch(
   "/:id/change-password",
   authMiddleware,
-  userController.changePassword,
+  userController.changePassword
 );
 
 module.exports = router;
