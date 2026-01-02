@@ -6,26 +6,26 @@ const router = express.Router();
 const roleController = require("../controllers/role.controller");
 const { authMiddleware, roleCheck } = require("../middleware/auth");
 
-router.get("/", authMiddleware, roleController.getAllRoles);
+router.get("/", roleController.getAllRoles);
 router.get("/:id", authMiddleware, roleController.getRoleById);
 router.post("/", roleController.createRole);
 router.put(
   "/:id",
   authMiddleware,
   roleCheck("Admin"),
-  roleController.updateRole,
+  roleController.updateRole
 );
 router.delete(
   "/:id",
   authMiddleware,
   roleCheck("Admin"),
-  roleController.deleteRole,
+  roleController.deleteRole
 );
 router.get(
   "/:id/users",
   authMiddleware,
   roleCheck("Admin"),
-  roleController.getRoleUsers,
+  roleController.getRoleUsers
 );
 
 module.exports = router;
