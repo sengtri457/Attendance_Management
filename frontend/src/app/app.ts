@@ -60,7 +60,7 @@ export class App implements OnInit {
   }
   ngOnInit(): void {
     this.loadLeaveRequests();
-    console.log(this.leaveRequests.length);
+    console.log(this.count.count);
     this.currentUser = this.authService.getCurrentUser();
     console.log('Current User:', this.currentUser);
   }
@@ -68,6 +68,11 @@ export class App implements OnInit {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {
         this.leaveRequests = response.data;
+        this.count.getCount(
+          this.leaveRequests.filter((f) => {
+            return f.status === 'pending';
+          }).length
+        );
       },
       error: (error) => {
         console.error('Error loading leave requests:', error);

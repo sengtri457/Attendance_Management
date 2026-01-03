@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 @Injectable({
   providedIn: 'root',
 })
@@ -8,8 +8,12 @@ export class CountService {
   isTrue: boolean = false;
   isclass: boolean = false;
   countParam: number = 0;
+  private platformId = inject(PLATFORM_ID);
   getCount(c: number) {
     this.count = c;
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('count', JSON.stringify(this.count));
+    }
     this.isTrue = true;
     this.isclass = true;
   }
