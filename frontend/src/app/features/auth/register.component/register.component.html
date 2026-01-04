@@ -1,14 +1,15 @@
 <div class="registration-wrapper">
     <div class="container">
         <div class="row justify-content-center min-vh-100 align-items-center py-5">
-            <div class="col-md-6 col-lg-5">
+            <div class="col-md-8 col-lg-6 col-xl-5">
                 <div class="glass-card">
-                    <div class="card-body p-4 p-md-5">
+                    <div class="card-body">
                         <!-- Logo/Icon -->
                         <div class="text-center mb-4">
-                            <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="Student Icon"
-                                width="60" height="60">
-                            <h2 class="form-title mt-3 mb-1">Student Registration</h2>
+                            <div class="brand-logo">
+                                <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="Student Icon">
+                            </div>
+                            <h2 class="form-title">Student Registration</h2>
                             <p class="form-subtitle">Create your account to get started</p>
                         </div>
 
@@ -44,7 +45,7 @@
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="firstName" class="custom-label">
-                                        First Name <span class="required">*</span>
+                                        <i class="bi bi-person me-1"></i> First Name <span class="required">*</span>
                                     </label>
                                     <input type="text" class="custom-input" id="firstName" formControlName="firstName"
                                         [class.is-invalid]="isFieldInvalid('firstName')" placeholder="John" />
@@ -55,7 +56,7 @@
 
                                 <div class="col-md-6">
                                     <label for="lastName" class="custom-label">
-                                        Last Name <span class="required">*</span>
+                                        <i class="bi bi-person me-1"></i> Last Name <span class="required">*</span>
                                     </label>
                                     <input type="text" class="custom-input" id="lastName" formControlName="lastName"
                                         [class.is-invalid]="isFieldInvalid('lastName')" placeholder="Doe" />
@@ -68,7 +69,7 @@
                             <!-- Username Field -->
                             <div class="mt-3">
                                 <label for="username" class="custom-label">
-                                    Username <span class="required">*</span>
+                                    <i class="bi bi-at me-1"></i> Username <span class="required">*</span>
                                 </label>
                                 <input type="text" class="custom-input" id="username" formControlName="username"
                                     [class.is-invalid]="isFieldInvalid('username')" placeholder="johndoe" />
@@ -80,7 +81,7 @@
                             <!-- Email Field -->
                             <div class="mt-3">
                                 <label for="email" class="custom-label">
-                                    Email <span class="required">*</span>
+                                    <i class="bi bi-envelope me-1"></i> Email <span class="required">*</span>
                                 </label>
                                 <input type="email" class="custom-input" id="email" formControlName="email"
                                     [class.is-invalid]="isFieldInvalid('email')" placeholder="john.doe@example.com" />
@@ -93,11 +94,15 @@
                             <!-- Date of Birth and Gender Fields -->
                             <div class="row g-3 mt-0">
                                 <div class="col-md-6">
-                                    <label for="dob" class="custom-label">Date of Birth</label>
+                                    <label for="dob" class="custom-label">
+                                        <i class="bi bi-calendar-event me-1"></i> Date of Birth
+                                    </label>
                                     <input type="date" class="custom-input" id="dob" formControlName="dob" />
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="gender" class="custom-label">Gender</label>
+                                    <label for="gender" class="custom-label">
+                                        <i class="bi bi-gender-ambiguous me-1"></i> Gender
+                                    </label>
                                     <select class="custom-input" id="gender" formControlName="gender">
                                         <option value="">Select gender</option>
                                         <option value="male">Male</option>
@@ -109,7 +114,9 @@
 
                             <!-- Phone Field -->
                             <div class="mt-3">
-                                <label for="phone" class="custom-label">Phone</label>
+                                <label for="phone" class="custom-label">
+                                    <i class="bi bi-telephone me-1"></i> Phone
+                                </label>
                                 <input type="tel" class="custom-input" id="phone" formControlName="phone"
                                     placeholder="+1 (555) 123-4567" />
                             </div>
@@ -117,7 +124,7 @@
                             <!-- Password Field -->
                             <div class="mt-3">
                                 <label for="password" class="custom-label">
-                                    Password <span class="required">*</span>
+                                    <i class="bi bi-lock me-1"></i> Password <span class="required">*</span>
                                 </label>
                                 <input type="password" class="custom-input" id="password" formControlName="password"
                                     [class.is-invalid]="isFieldInvalid('password')"
@@ -132,7 +139,8 @@
                             <!-- Confirm Password Field -->
                             <div class="mt-3">
                                 <label for="confirmPassword" class="custom-label">
-                                    Confirm Password <span class="required">*</span>
+                                    <i class="bi bi-lock-fill me-1"></i> Confirm Password <span
+                                        class="required">*</span>
                                 </label>
                                 <input type="password" class="custom-input" id="confirmPassword"
                                     formControlName="confirmPassword"
@@ -150,7 +158,9 @@
                             <!-- Submit Button -->
                             <div class="mt-4">
                                 <button type="submit" class="custom-btn" [disabled]="submitting || loading">
-                                    <span *ngIf="!submitting">Create Account</span>
+                                    <span *ngIf="!submitting">
+                                        <i class="bi bi-person-plus me-2"></i>Create Account
+                                    </span>
                                     <span *ngIf="submitting">
                                         <span class="spinner-border spinner-border-sm me-2" role="status"
                                             aria-hidden="true"></span>

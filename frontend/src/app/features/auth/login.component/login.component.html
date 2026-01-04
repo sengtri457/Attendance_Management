@@ -1,6 +1,6 @@
 <div class="login-wrapper">
   <div class="container">
-    <div class="row justify-content-center align-items-center min-vh-100 py-5">
+    <div class="row justify-content-center align-items-center">
 
       <!-- Left Side - Illustration -->
       <div class="col-lg-6 d-none d-lg-block">
@@ -10,15 +10,15 @@
       </div>
 
       <!-- Right Side - Login Form -->
-      <div class="col-md-8 col-lg-6">
-        <div class="glass-card">
-          <div class="card-body p-4 p-md-5">
+      <div class="col-md-10 col-lg-6">
+        <div class="login-card">
+          <div class="card-body">
 
             <!-- Header -->
             <div class="text-center mb-4">
               <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="Icon" width="60" height="60">
-              <h2 class="form-title mt-3 mb-1">Attendance Management</h2>
-              <p class="form-subtitle">Sign in to your account</p>
+              <h2 class="form-title">Attendance Management</h2>
+              <p class="form-subtitle">Sign in to continue to your account</p>
             </div>
 
             <!-- Error Message -->
@@ -37,7 +37,9 @@
 
               <!-- Username Field -->
               <div class="mb-3">
-                <label class="custom-label">Username</label>
+                <label class="custom-label">
+                  <i class="bi bi-person me-1"></i> Username
+                </label>
                 <input type="text" formControlName="username" class="custom-input"
                   [class.is-invalid]="loginForm.get('username')?.touched && loginForm.get('username')?.invalid"
                   placeholder="Enter your username" />
@@ -48,7 +50,9 @@
 
               <!-- Password Field -->
               <div class="mb-4">
-                <label class="custom-label">Password</label>
+                <label class="custom-label">
+                  <i class="bi bi-lock me-1"></i> Password
+                </label>
                 <input type="password" formControlName="password" class="custom-input"
                   [class.is-invalid]="loginForm.get('password')?.touched && loginForm.get('password')?.invalid"
                   placeholder="Enter your password" />
