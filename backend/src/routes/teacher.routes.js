@@ -20,6 +20,11 @@ router.get(
   authMiddleware,
   teacherController.getTeacherSubjects
 );
-router.delete("/:id", authMiddleware, roleCheck("Admin"), teacherController);
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleCheck("Admin"),
+  teacherController.deletedTeacher
+);
 
 module.exports = router;
