@@ -12,13 +12,14 @@ router.post(
   "/",
   authMiddleware,
   roleCheck("Admin"),
-  teacherController.createTeacher,
+  teacherController.createTeacher
 );
 router.put("/:id", authMiddleware, teacherController.updateTeacher);
 router.get(
   "/:id/subjects",
   authMiddleware,
-  teacherController.getTeacherSubjects,
+  teacherController.getTeacherSubjects
 );
+router.delete("/:id", authMiddleware, roleCheck("Admin"), teacherController);
 
 module.exports = router;

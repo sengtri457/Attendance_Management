@@ -1,17 +1,18 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { TeacherService } from "../../../services/teacherservice/teacher.service";
-import { AuthService } from "../../../services/authservice/auth.service";
-import { Router, RouterModule } from "@angular/router";
-import { Teacher } from "../../../models/user.model";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { Component, inject, OnInit } from '@angular/core';
+import { TeacherService } from '../../../services/teacherservice/teacher.service';
+import { AuthService } from '../../../services/authservice/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { Teacher } from '../../../models/user.model';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 @Component({
-  selector: "app-teacher-list.component",
+  selector: 'app-teacher-list.component',
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: "./teacher-list.component.html",
-  styleUrl: "./teacher-list.component.css",
+  templateUrl: './teacher-list.component.html',
+  styleUrl: './teacher-list.component.css',
 })
 export class TeacherListComponent implements OnInit {
   private teacherService = inject(TeacherService);
@@ -31,13 +32,13 @@ export class TeacherListComponent implements OnInit {
   selectedLimit = 10;
 
   // Search
-  searchTerm = "";
+  searchTerm = '';
   private searchSubject = new Subject<string>();
 
   // Sorting
-  selectedSort = "name-asc"; // Sort by name by default
-  sortBy = "name";
-  sortOrder: "asc" | "desc" = "asc";
+  selectedSort = 'name-asc'; // Sort by name by default
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
 
   Math = Math;
 
@@ -46,7 +47,7 @@ export class TeacherListComponent implements OnInit {
     if (this.authService.isTeacher()) {
       const teacherId = this.authService.getTeacherId();
       if (teacherId) {
-        this.router.navigate(["/teachers", teacherId]);
+        this.router.navigate(['/teachers', teacherId]);
         return;
       }
     }
@@ -63,9 +64,9 @@ export class TeacherListComponent implements OnInit {
   checkPermissions(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.canCreate = user.role === "Admin";
-      this.canEdit = user.role === "Admin";
-      this.canDelete = user.role === "Admin";
+      this.canCreate = user.role === 'Admin';
+      this.canEdit = user.role === 'Admin';
+      this.canDelete = user.role === 'Admin';
     }
   }
 
@@ -89,7 +90,7 @@ export class TeacherListComponent implements OnInit {
           this.loading = false;
         },
         error: (error) => {
-          console.error("Error loading teachers:", error);
+          console.error('Error loading teachers:', error);
           this.loading = false;
         },
       });
@@ -100,7 +101,7 @@ export class TeacherListComponent implements OnInit {
   }
 
   clearSearch() {
-    this.searchTerm = "";
+    this.searchTerm = '';
     this.currentPage = 1;
     this.loadTeachers();
   }
@@ -112,9 +113,9 @@ export class TeacherListComponent implements OnInit {
   }
 
   onSortChange() {
-    const [sortBy, sortOrder] = this.selectedSort.split("-");
+    const [sortBy, sortOrder] = this.selectedSort.split('-');
     this.sortBy = sortBy;
-    this.sortOrder = sortOrder as "asc" | "desc";
+    this.sortOrder = sortOrder as 'asc' | 'desc';
     this.loadTeachers();
   }
 
@@ -151,7 +152,7 @@ export class TeacherListComponent implements OnInit {
       pages.push(1);
 
       if (this.currentPage > 3) {
-        pages.push("...");
+        pages.push('...');
       }
 
       const start = Math.max(2, this.currentPage - 1);
@@ -162,7 +163,7 @@ export class TeacherListComponent implements OnInit {
       }
 
       if (this.currentPage < this.totalPages - 2) {
-        pages.push("...");
+        pages.push('...');
       }
 
       pages.push(this.totalPages);
@@ -173,14 +174,15 @@ export class TeacherListComponent implements OnInit {
 
   deleteTeacher(id: string, event: Event): void {
     event.stopPropagation();
-    if (confirm("Are you sure you want to delete this teacher?")) {
+
+    if (confirm('Are you sure you want to delete this teacher?')) {
       this.teacherService.delete(id).subscribe({
         next: () => {
           this.loadTeachers();
         },
         error: (error) => {
-          console.error("Error deleting teacher:", error);
-          alert(error.error?.message || "Failed to delete teacher");
+          console.error('Error deleting teacher:', error);
+          alert(error.error?.message || 'Failed to delete teacher');
         },
       });
     }

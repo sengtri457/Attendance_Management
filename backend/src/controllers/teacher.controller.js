@@ -79,7 +79,7 @@ exports.getTeacherById = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id).populate(
       "user",
-      "username email isActive",
+      "username email isActive"
     );
 
     if (!teacher) {
@@ -239,7 +239,7 @@ exports.getTeacherSubjects = async (req, res) => {
   try {
     const teacher = await Teacher.findById(req.params.id).populate(
       "subject",
-      "subjectName teachTime endTime",
+      "subjectName teachTime endTime"
     );
 
     if (!teacher) {
@@ -258,6 +258,28 @@ exports.getTeacherSubjects = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to fetch subject",
+    });
+  }
+};
+
+exports.deletedTeacher = async (req, res) => {
+  try {
+    const teacher = await Teacher.findByIdAndDelete(req.params.id);
+    if (!teacher) {
+      return res.status(404).json({
+        success: false,
+        message: "Teacher not found",
+      });
+    }
+    res.json({
+      success: true,
+      message: "Teacher deleted successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting teacher:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete teacher",
     });
   }
 };
