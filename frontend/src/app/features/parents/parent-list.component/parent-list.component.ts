@@ -1,16 +1,17 @@
-import { Component, inject, OnInit } from "@angular/core";
-import { ParentService } from "../../../services/parentservice/parent.service";
-import { AuthService } from "../../../services/authservice/auth.service";
-import { Router, RouterModule } from "@angular/router";
-import { CommonModule } from "@angular/common";
-import { FormsModule } from "@angular/forms";
-import { Subject } from "rxjs";
-import { debounceTime, distinctUntilChanged } from "rxjs/operators";
+import { Component, inject, OnInit } from '@angular/core';
+import { ParentService } from '../../../services/parentservice/parent.service';
+import { AuthService } from '../../../services/authservice/auth.service';
+import { Router, RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 @Component({
-  selector: "app-parent-list.component",
+  selector: 'app-parent-list.component',
   imports: [CommonModule, FormsModule, RouterModule],
-  templateUrl: "./parent-list.component.html",
-  styleUrl: "./parent-list.component.css",
+  templateUrl: './parent-list.component.html',
+  styleUrl: './parent-list.component.css',
 })
 export class ParentListComponent implements OnInit {
   private parentService = inject(ParentService);
@@ -32,13 +33,13 @@ export class ParentListComponent implements OnInit {
   selectedLimit = 10;
 
   // Search
-  searchTerm = "";
+  searchTerm = '';
   private searchSubject = new Subject<string>();
 
   // Sorting
-  selectedSort = "name-asc"; // Sort by name by default
-  sortBy = "name";
-  sortOrder: "asc" | "desc" = "asc";
+  selectedSort = 'name-asc'; // Sort by name by default
+  sortBy = 'name';
+  sortOrder: 'asc' | 'desc' = 'asc';
 
   Math = Math;
   ngOnInit(): void {
@@ -46,7 +47,7 @@ export class ParentListComponent implements OnInit {
     if (this.authService.isParent()) {
       const parentId = this.authService.getParentId();
       if (parentId) {
-        this.router.navigate(["/parents", parentId]);
+        this.router.navigate(['/parents', parentId]);
         return;
       }
     }
@@ -65,9 +66,9 @@ export class ParentListComponent implements OnInit {
   checkPermissions(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.canCreate = user.role === "Admin";
-      this.canEdit = ["Admin", "Teacher"].includes(user.role);
-      this.canDelete = user.role === "Admin";
+      this.canCreate = user.role === 'Admin';
+      this.canEdit = ['Admin', 'Teacher'].includes(user.role);
+      this.canDelete = user.role === 'Admin';
     }
   }
 
@@ -91,7 +92,7 @@ export class ParentListComponent implements OnInit {
           this.loading = false;
         },
         error: (error) => {
-          console.error("Error loading parents:", error);
+          console.error('Error loading parents:', error);
           this.loading = false;
         },
       });
@@ -102,7 +103,7 @@ export class ParentListComponent implements OnInit {
   }
 
   clearSearch() {
-    this.searchTerm = "";
+    this.searchTerm = '';
     this.currentPage = 1;
     this.loadParents();
   }
@@ -114,9 +115,9 @@ export class ParentListComponent implements OnInit {
   }
 
   onSortChange() {
-    const [sortBy, sortOrder] = this.selectedSort.split("-");
+    const [sortBy, sortOrder] = this.selectedSort.split('-');
     this.sortBy = sortBy;
-    this.sortOrder = sortOrder as "asc" | "desc";
+    this.sortOrder = sortOrder as 'asc' | 'desc';
     this.loadParents();
   }
 
@@ -153,7 +154,7 @@ export class ParentListComponent implements OnInit {
       pages.push(1);
 
       if (this.currentPage > 3) {
-        pages.push("...");
+        pages.push('...');
       }
 
       const start = Math.max(2, this.currentPage - 1);
@@ -164,7 +165,7 @@ export class ParentListComponent implements OnInit {
       }
 
       if (this.currentPage < this.totalPages - 2) {
-        pages.push("...");
+        pages.push('...');
       }
 
       pages.push(this.totalPages);
@@ -175,20 +176,31 @@ export class ParentListComponent implements OnInit {
 
   deleteParent(id: string, event: Event): void {
     event.stopPropagation();
-    if (
-      confirm(
-        "Are you sure you want to delete this parent? This will remove all parent-child relationships.",
-      )
-    ) {
-      this.parentService.delete(id).subscribe({
-        next: () => {
-          this.loadParents();
-        },
-        error: (error) => {
-          console.error("Error deleting parent:", error);
-          alert(error.error?.message || "Failed to delete parent");
-        },
-      });
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'This will remove all parent-child relationships!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.parentService.delete(id).subscribe({
+          next: () => {
+            this.loadParents();
+          },
+          error: (error) => {
+            console.error('Error deleting parent:', error);
+            alert(error.error?.message || 'Failed to delete parent');
+          },
+        });
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your Parent has been deleted.',
+          icon: 'success',
+        });
+      }
+    });
   }
 }

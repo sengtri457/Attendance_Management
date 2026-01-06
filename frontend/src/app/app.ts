@@ -62,7 +62,6 @@ export class App implements OnInit {
     this.loadLeaveRequests();
     console.log(this.count.count);
     this.currentUser = this.authService.getCurrentUser();
-    this.loadStudent();
     console.log('Current User:', this.currentUser);
   }
   loadLeaveRequests(): void {
@@ -83,14 +82,6 @@ export class App implements OnInit {
 
   get pendingCount(): number {
     return this.leaveRequests.filter((r) => r.status === 'pending').length;
-  }
-  loadStudent() {
-    this.studentService.getById(this.studentId || '').subscribe({
-      next: (response: any) => {
-        this.studentData.set(response);
-        console.log(this.studentData);
-      },
-    });
   }
 
   logout(): void {

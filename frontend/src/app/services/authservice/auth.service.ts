@@ -63,6 +63,7 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.removeItem('tokens');
       localStorage.removeItem('currentUsers');
+      localStorage.removeItem('studentInfo');
     }
 
     this.currentUserSubject.next(null);

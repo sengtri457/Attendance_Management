@@ -174,17 +174,31 @@ export class TeacherListComponent implements OnInit {
 
   deleteTeacher(id: string, event: Event): void {
     event.stopPropagation();
-
-    if (confirm('Are you sure you want to delete this teacher?')) {
-      this.teacherService.delete(id).subscribe({
-        next: () => {
-          this.loadTeachers();
-        },
-        error: (error) => {
-          console.error('Error deleting teacher:', error);
-          alert(error.error?.message || 'Failed to delete teacher');
-        },
-      });
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.teacherService.delete(id).subscribe({
+          next: () => {
+            this.loadTeachers();
+          },
+          error: (error) => {
+            console.error('Error deleting teacher:', error);
+            alert(error.error?.message || 'Failed to delete teacher');
+          },
+        });
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Your Teacher has been deleted.',
+          icon: 'success',
+        });
+      }
+    });
   }
 }

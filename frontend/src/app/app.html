@@ -80,8 +80,14 @@
       <div class="user-info">
         <div class="user-avatar">
           @if(currentUser?.role === 'Student') {
-          <img src="{{studentData().data?.photo}}" alt="User" class="user-avatar-img" />
-          }@else {
+          <img
+            src="https://img.freepik.com/free-vector/middle-school-male-student_10045-787.jpg?semt=ais_hybrid&w=740&q=80"
+            alt="User" class="user-avatar-img" />
+          }@else if(currentUser.role === 'Teacher') {
+          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgxNEaM7P_NXoToDSHx2WyT1j9lsBKtZZEwQ&s"
+            alt="User" class="user-avatar-img" />
+          }
+          @else {
           <i class="bi bi-person-circle"></i>
           }
         </div>
@@ -120,8 +126,12 @@
         <div class="user-menu">
           <button class="user-menu-btn" (click)="toggleUserMenu()">
             @if(currentUser.role === "Student"){
-            <img src="{{studentData().data?.photo}}" alt="User" class="user-avatar-img" />
-
+            <img
+              src="https://img.freepik.com/free-vector/middle-school-male-student_10045-787.jpg?semt=ais_hybrid&w=740&q=80"
+              alt="User" class="user-avatar-img" />
+            }@else if(currentUser.role === 'Teacher') {
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgxNEaM7P_NXoToDSHx2WyT1j9lsBKtZZEwQ&s"
+              alt="User" class="user-avatar-img" />
             }@else {
             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUlOnqog4d0763K2WzYq1ugV5OFhgq69ilnw&s"
               alt="User" class="user-avatar-img" />

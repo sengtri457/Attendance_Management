@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
     ref: "Role",
     required: true,
   },
+  studentPopulate: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Student",
+  },
   isActive: {
     type: Boolean,
     default: true,

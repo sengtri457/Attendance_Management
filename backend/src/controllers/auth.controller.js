@@ -12,7 +12,6 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     const user = await User.findOne({ username }).populate("role");
-
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -57,7 +56,7 @@ exports.login = async (req, res) => {
         role: user.role.roleName,
       },
       process.env.JWT_SECRET || "your-secret-key",
-      { expiresIn: "30D" },
+      { expiresIn: "30D" }
     );
 
     res.json({
