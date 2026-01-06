@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -43,7 +43,7 @@ export class App implements OnInit {
   currentUser: any;
   sidebarCollapsed = false;
   userMenuOpen = false;
-  studentData: any;
+  studentData = signal<any>({});
   studentId: string | null = null;
   activeDropdown: string | null = null;
 
@@ -62,6 +62,7 @@ export class App implements OnInit {
     this.loadLeaveRequests();
     console.log(this.count.count);
     this.currentUser = this.authService.getCurrentUser();
+    this.loadStudent();
     console.log('Current User:', this.currentUser);
   }
   loadLeaveRequests(): void {
@@ -86,7 +87,7 @@ export class App implements OnInit {
   loadStudent() {
     this.studentService.getById(this.studentId || '').subscribe({
       next: (response: any) => {
-        this.studentData = response.data;
+        this.studentData.set(response);
         console.log(this.studentData);
       },
     });

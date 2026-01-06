@@ -6,20 +6,14 @@
     <div class="sidebar-header">
       @if(!sidebarCollapsed){
       <div class="logo">
-        <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx4ErfRJsxj2t0dJs1FwXBcKhp_F0VHDKUJQ&s"
-          alt=""
-          class="user-avatar-img rounded-0"
-        />
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSx4ErfRJsxj2t0dJs1FwXBcKhp_F0VHDKUJQ&s" alt=""
+          class="user-avatar-img rounded-0" />
         <span class="logo-text">Attendance</span>
       </div>
       }
       <button class="sidebar-toggle" (click)="toggleSidebar()">
-        <i
-          class="bi"
-          [class.bi-layout-sidebar-inset]="!sidebarCollapsed"
-          [class.bi-layout-sidebar-inset-reverse]="sidebarCollapsed"
-        ></i>
+        <i class="bi" [class.bi-layout-sidebar-inset]="!sidebarCollapsed"
+          [class.bi-layout-sidebar-inset-reverse]="sidebarCollapsed"></i>
       </button>
     </div>
 
@@ -53,22 +47,14 @@
         </li>
         } @if ( currentUser?.role !== 'Parent') {
         <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/attendance"
-            routerLinkActive="active"
-          >
+          <a class="nav-link" routerLink="/attendance" routerLinkActive="active">
             <i class="bi bi-calendar-check"></i>
             <span class="nav-text">Attendance</span>
           </a>
         </li>
 
         <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/leave/request"
-            routerLinkActive="active"
-          >
+          <a class="nav-link" routerLink="/leave/request" routerLinkActive="active">
             <i class="bi bi-calendar-x"></i>
             <span class="nav-text">Leave Request</span>
           </a>
@@ -76,11 +62,7 @@
         } @if(currentUser?.role !== 'Student' && currentUser?.role !==
         'Parent'){
         <li class="nav-item">
-          <a
-            class="nav-link"
-            routerLink="/leave/review"
-            routerLinkActive="active"
-          >
+          <a class="nav-link" routerLink="/leave/review" routerLinkActive="active">
             <i class="bi bi-calendar-x"></i>
             <span class="nav-text">Leave Review</span>
           </a>
@@ -99,19 +81,13 @@
       <div class="user-info">
         <div class="user-avatar">
           @if(currentUser?.role === 'Student') {
-          <img
-            src="{{studentData?.photo}}"
-            alt="User"
-            class="user-avatar-img"
-          />
+          <img src="{{studentData().data?.photo}}" alt="User" class="user-avatar-img" />
           }@else {
           <i class="bi bi-person-circle"></i>
           }
         </div>
         <div class="user-details">
-          <span class="username"
-            >{{ currentUser?.username.toUpperCase() }}</span
-          >
+          <span class="username">{{ currentUser?.username.toUpperCase() }}</span>
           <span class="user-role">{{currentUser?.role}}</span>
         </div>
       </div>
@@ -131,42 +107,25 @@
 
       <div class="navbar-right">
         @if(currentUser?.role !== 'Student') {
-        <button
-          class="nav-icon-btn animate__animated"
-          title="Notifications"
-          data-bs-toggle="offcanvas"
-          [class]="count.isclass ? 'animate__bounce' : 'animate__bounce'"
-          data-bs-target="#offcanvasWithBothOptions"
-          aria-controls="offcanvasWithBothOptions"
-        >
+        <button class="nav-icon-btn animate__animated" title="Notifications" data-bs-toggle="offcanvas"
+          [class]="count.isclass ? 'animate__bounce' : 'animate__bounce'" data-bs-target="#offcanvasWithBothOptions"
+          aria-controls="offcanvasWithBothOptions">
           <i [class]="count.isTrue ? 'bi bi-bell' : 'bi bi-bell-fill'"></i>
           <span class="badge">{{count.count}}</span>
         </button>
-        <button
-          class="nav-icon-btn"
-          title="Messages"
-          id="closeBtn"
-          data-bs-toggle="offcanvas"
-          data-bs-target="#offcanvasBottom"
-          aria-controls="offcanvasBottom"
-        >
+        <button class="nav-icon-btn" title="Messages" id="closeBtn" data-bs-toggle="offcanvas"
+          data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
           <i class="bi bi-grid me-2"></i>
         </button>
         }
         <div class="user-menu">
           <button class="user-menu-btn" (click)="toggleUserMenu()">
             @if(currentUser.role === "Student"){
-            <img
-              src="{{studentData?.photo}}"
-              alt="User"
-              class="user-avatar-img"
-            />
+            <img src="{{studentData().data?.photo}}" alt="User" class="user-avatar-img" />
+
             }@else {
-            <img
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUlOnqog4d0763K2WzYq1ugV5OFhgq69ilnw&s"
-              alt="User"
-              class="user-avatar-img"
-            />
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUlOnqog4d0763K2WzYq1ugV5OFhgq69ilnw&s"
+              alt="User" class="user-avatar-img" />
             }
             <span class="user-name">{{ currentUser?.username }}</span>
             <i class="bi bi-chevron-down"></i>
@@ -195,33 +154,20 @@
     </main>
   </div>
 </div>
-<div
-  class="offcanvas offcanvas-start"
-  data-bs-scroll="true"
-  tabindex="-1"
-  id="offcanvasWithBothOptions"
-  aria-labelledby="offcanvasWithBothOptionsLabel"
-  style="width: 450px"
->
+<div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+  aria-labelledby="offcanvasWithBothOptionsLabel" style="width: 450px">
   @if(count.count > 0){
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasScrollingLabel">
       <button type="button" class="btn btn-primary position-relative">
         Notifications
-        <span
-          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
-        >
+        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
           {{count.count}}
           <span class="visually-hidden">unread messages</span>
         </span>
       </button>
     </h5>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="offcanvas"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
     <table class="table table-striped">
@@ -243,12 +189,8 @@
             <span class="badge bg-warning text-dark">Pending</span>
           </td>
           <td>
-            <button
-              routerLink="/leave/review"
-              class="btn btn-outline-primary"
-              title="View Details"
-              data-bs-dismiss="modal"
-            >
+            <button routerLink="/leave/review" class="btn btn-outline-primary" title="View Details"
+              data-bs-dismiss="modal">
               <i class="bi bi-eye"></i>
             </button>
           </td>
@@ -261,12 +203,7 @@
   }@else {
   <div class="offcanvas-header">
     <h5 class="offcanvas-title" id="offcanvasScrollingLabel">Notifications</h5>
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="offcanvas"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body">
     <p>No pending leave requests.</p>
@@ -283,19 +220,9 @@
   <div class="loader"></div>
 </div>
 }
-<div
-  class="offcanvas offcanvas-bottom"
-  tabindex="-1"
-  id="offcanvasBottom"
-  aria-labelledby="offcanvasBottomLabel"
->
+<div class="offcanvas offcanvas-bottom" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
   <div class="offcanvas-header">
-    <button
-      type="button"
-      class="btn-close"
-      data-bs-dismiss="offcanvas"
-      aria-label="Close"
-    ></button>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
   </div>
   <div class="offcanvas-body small">
     <div class="row">
@@ -329,10 +256,7 @@
                 <i class="bi bi-file-earmark-text me-2"></i>
                 Review Leave Requests
               </button>
-              <button
-                [routerLink]="['/students/blacklist']"
-                class="btn btn-danger"
-              >
+              <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
                 <i class="bi bi-file-earmark-text me-2"></i>
                 View Blacklisted Students
               </button>
