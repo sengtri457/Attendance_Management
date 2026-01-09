@@ -44,7 +44,7 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
 
   const graceTime = moment(officeStart).add(
     ATTENDANCE_CONFIG.GRACE_PERIOD_MINUTES,
-    "minutes",
+    "minutes"
   );
 
   let status = "present";
@@ -66,7 +66,9 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
       workHours = checkOut.diff(checkIn, "hours", true);
       workHours = Math.round(workHours * 100) / 100;
 
-      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS) {
+      // Only change status to half-day if NOT already late
+      // OR you could prioritize half-day over late - your business logic choice
+      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS && !isLate) {
         status = "half-day";
       }
     }
@@ -202,7 +204,7 @@ exports.markAttendance = async (req, res) => {
       // Calculate status based on check-in time
       const { status, isLate, lateBy, workHours } = calculateAttendanceStatus(
         checkInTime,
-        checkOutTime,
+        checkOutTime
       );
 
       attendanceData.status = status;
@@ -286,7 +288,7 @@ exports.updateAttendance = async (req, res) => {
     if (checkInTime || checkOutTime) {
       const { status, isLate, lateBy, workHours } = calculateAttendanceStatus(
         attendance.checkInTime,
-        attendance.checkOutTime,
+        attendance.checkOutTime
       );
 
       attendance.status = manualStatus || status; // Allow manual override
