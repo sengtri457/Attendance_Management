@@ -3,14 +3,15 @@
 // ===================================
 const Attendance = require("../models/Attendancce");
 const LeaveRequest = require("../models/LeaveRequest");
-const moment = require("moment");
 const mongoose = require("mongoose");
+const moment = require("moment-timezone");
 // Configuration for attendance rules
 const ATTENDANCE_CONFIG = {
-  OFFICE_START_TIME: "08:00", // 8:00 AM
-  GRACE_PERIOD_MINUTES: 15, // 15 minutes grace period
-  HALF_DAY_HOURS: 4, // 4 hours for half day
-  FULL_DAY_HOURS: 8, // 8 hours for full day
+  OFFICE_START_TIME: "08:00",
+  GRACE_PERIOD_MINUTES: 15,
+  HALF_DAY_HOURS: 4,
+  FULL_DAY_HOURS: 8,
+  TIMEZONE: "Asia/Phnom_Penh",
 };
 const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
   if (!checkInTime) {
@@ -22,7 +23,10 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     };
   }
 
-  const checkIn = moment(checkInTime);
+  // 🔧 FIX: Use moment-timezone and specify your timezone
+  const TIMEZONE = "Asia/Phnom_Penh"; // Change to your timezone
+
+  const checkIn = moment.tz(checkInTime, TIMEZONE);
 
   if (!checkIn.isValid()) {
     return {
@@ -33,7 +37,8 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     };
   }
 
-  const officeStart = moment(checkInTime).set({
+  // Create office start time in the SAME timezone
+  const officeStart = moment.tz(checkInTime, TIMEZONE).set({
     hour: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[0]),
     minute: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[1]),
     second: 0,
@@ -44,12 +49,6 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     "minutes"
   );
 
-  // 🔍 DEBUG LOGS
-  console.log("Check-in time:", checkIn.format("YYYY-MM-DD HH:mm:ss"));
-  console.log("Office start:", officeStart.format("YYYY-MM-DD HH:mm:ss"));
-  console.log("Grace time:", graceTime.format("YYYY-MM-DD HH:mm:ss"));
-  console.log("Is after grace?", checkIn.isAfter(graceTime));
-
   let status = "present";
   let isLate = false;
   let lateBy = 0;
@@ -59,27 +58,25 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     isLate = true;
     lateBy = checkIn.diff(officeStart, "minutes");
     status = "late";
-    console.log("🔴 LATE! Minutes late:", lateBy);
   }
 
+  // Work hour calcs
   let workHours = 0;
   if (checkOutTime) {
-    const checkOut = moment(checkOutTime);
+    const checkOut = moment.tz(checkOutTime, TIMEZONE);
     if (checkOut.isValid()) {
       workHours = checkOut.diff(checkIn, "hours", true);
       workHours = Math.round(workHours * 100) / 100;
 
-      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS) {
-        status = "half-day"; // ⚠️ This overwrites "late"!
+      // Only set half-day if not already late
+      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS && !isLate) {
+        status = "half-day";
       }
     }
   }
 
-  console.log("Final status:", status, "isLate:", isLate, "lateBy:", lateBy);
-
   return { status, isLate, lateBy, workHours };
 };
-
 // Helper function to check if student is on approved leave
 const checkLeaveStatus = async (studentId, date) => {
   const targetDate = moment(date).startOf("day");
