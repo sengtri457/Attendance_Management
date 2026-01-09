@@ -182,16 +182,23 @@ export class MarkAttendanceComponent implements OnInit {
       next: (response) => {
         this.loading = false;
         this.success = true;
+
         // Reset form and search fields
         this.resetForm();
 
-        if (response.data.isLate) {
-          if (response.data.lateBy > 0) {
-            Swal.fire(`Student was ${response.data.lateBy} minutes late!`);
-          }
-        }
-        if (response.data.lateBy <= 0) {
-          Swal.fire('Student was on time!');
+        // Show appropriate message based on attendance status
+        if (response.data.isLate && response.data.lateBy > 0) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Late Arrival',
+            text: `Student was ${response.data.lateBy} minutes late!`,
+          });
+        } else {
+          Swal.fire({
+            icon: 'success',
+            title: 'On Time',
+            text: 'Student was on time!',
+          });
         }
       },
       error: (error) => {

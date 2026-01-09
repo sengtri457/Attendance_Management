@@ -13,7 +13,6 @@ const ATTENDANCE_CONFIG = {
   FULL_DAY_HOURS: 8, // 8 hours for full day
 };
 const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
-  // If no check-in → absent
   if (!checkInTime) {
     return {
       status: "absent",
@@ -25,7 +24,6 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
 
   const checkIn = moment(checkInTime);
 
-  // If check-in invalid
   if (!checkIn.isValid()) {
     return {
       status: "absent",
@@ -35,7 +33,6 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     };
   }
 
-  // Setup office start & grace
   const officeStart = moment(checkInTime).set({
     hour: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[0]),
     minute: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[1]),
@@ -47,6 +44,12 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     "minutes"
   );
 
+  // 🔍 DEBUG LOGS
+  console.log("Check-in time:", checkIn.format("YYYY-MM-DD HH:mm:ss"));
+  console.log("Office start:", officeStart.format("YYYY-MM-DD HH:mm:ss"));
+  console.log("Grace time:", graceTime.format("YYYY-MM-DD HH:mm:ss"));
+  console.log("Is after grace?", checkIn.isAfter(graceTime));
+
   let status = "present";
   let isLate = false;
   let lateBy = 0;
@@ -56,9 +59,9 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     isLate = true;
     lateBy = checkIn.diff(officeStart, "minutes");
     status = "late";
+    console.log("🔴 LATE! Minutes late:", lateBy);
   }
 
-  // Work hour calcs
   let workHours = 0;
   if (checkOutTime) {
     const checkOut = moment(checkOutTime);
@@ -66,13 +69,13 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
       workHours = checkOut.diff(checkIn, "hours", true);
       workHours = Math.round(workHours * 100) / 100;
 
-      // Only change status to half-day if NOT already late
-      // OR you could prioritize half-day over late - your business logic choice
-      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS && !isLate) {
-        status = "half-day";
+      if (workHours < ATTENDANCE_CONFIG.HALF_DAY_HOURS) {
+        status = "half-day"; // ⚠️ This overwrites "late"!
       }
     }
   }
+
+  console.log("Final status:", status, "isLate:", isLate, "lateBy:", lateBy);
 
   return { status, isLate, lateBy, workHours };
 };
