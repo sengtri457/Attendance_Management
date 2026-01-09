@@ -25,10 +25,7 @@
             My Profile
           </h5>
           <p class="card-text">View and manage your student information</p>
-          <button
-            [routerLink]="['/students', studentId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/students', studentId]" class="btn btn-primary">
             <i class="bi bi-eye me-2"></i>
             View Profile
           </button>
@@ -43,10 +40,7 @@
             My Attendance
           </h5>
           <p class="card-text">Check your attendance records</p>
-          <button
-            class="btn btn-primary"
-            [routerLink]="['/attendance/stats/', studentId]"
-          >
+          <button class="btn btn-primary" [routerLink]="['/attendance/stats/', studentId]">
             <i class="bi bi-calendar me-2"></i>
             View Attendance
           </button>
@@ -60,6 +54,39 @@
     <i class="bi bi-info-circle me-2"></i>
     Welcome, <strong>Teacher</strong>! You can manage students and attendance.
   </div>
+  <div class="row mt-4 mb-4">
+    <div class="col-12 col-lg-6 mb-3 mb-lg-0">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-bar-chart-fill me-2"></i>
+            User Distribution
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas #barCanvas style="height: 400px"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-doughnut-chart-fill me-2"></i>
+            Attendance Status
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
+            <canvas #doughnutCanvas style="height: 400px"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row g-4">
     <div class="col-md-4">
       <div class="card">
@@ -99,13 +126,50 @@
             My Profile
           </h5>
           <p class="card-text">View your teacher profile</p>
-          <button
-            [routerLink]="['/teachers', teacherId]"
-            class="btn btn-primary"
-          >
+          <button [routerLink]="['/teachers', teacherId]" class="btn btn-primary">
             <i class="bi bi-arrow-right me-2"></i>
             View Profile
           </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row mt-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-grid me-2"></i>
+            Quick Actions
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="d-flex gap-2 flex-wrap">
+            <button routerLink="/students/create" class="btn btn-primary">
+              <i class="bi bi-plus-circle me-2"></i>
+              Add Student
+            </button>
+            <button routerLink="/teachers/create" class="btn btn-success">
+              <i class="bi bi-plus-circle me-2"></i>
+              Add Teacher
+            </button>
+            <button routerLink="/subjects/create" class="btn btn-secondary">
+              <i class="bi bi-plus-circle me-2"></i>
+              Add Subjects
+            </button>
+            <button routerLink="/attendance/mark" class="btn btn-info">
+              <i class="bi bi-calendar-plus me-2"></i>
+              Mark Attendance
+            </button>
+            <button class="btn btn-warning" routerLink="/leave/review">
+              <i class="bi bi-file-earmark-text me-2"></i>
+              Review Leave Requests
+            </button>
+            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
+              <i class="bi bi-file-earmark-text me-2"></i>
+              View Blacklisted Students
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -179,10 +243,7 @@
               <h6 class="card-title">Teachers</h6>
               <h2 class="mb-0">{{teacher.length}}</h2>
             </div>
-            <i
-              class="bi bi-person-badge"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-person-badge" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button routerLink="/teachers" class="btn btn-sm mt-3 w-100 warning">
             View All
@@ -198,10 +259,7 @@
               <h6 class="card-title">Parents</h6>
               <h2 class="mb-0">{{parents.length}}</h2>
             </div>
-            <i
-              class="bi bi-people-fill"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-people-fill" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button class="btn primary btn-sm mt-3 w-100" routerLink="/parents">
             View All
@@ -217,10 +275,7 @@
               <h6 class="card-title">Attendance</h6>
               <h2 class="mb-0">{{attendance.length}}</h2>
             </div>
-            <i
-              class="bi bi-calendar-check"
-              style="font-size: 3rem; opacity: 0.3"
-            ></i>
+            <i class="bi bi-calendar-check" style="font-size: 3rem; opacity: 0.3"></i>
           </div>
           <button routerLink="/attendance" class="btn sec btn-sm mt-3 w-100">
             View Records
@@ -311,10 +366,7 @@
               <i class="bi bi-file-earmark-text me-2"></i>
               Review Leave Requests
             </button>
-            <button
-              [routerLink]="['/students/blacklist']"
-              class="btn btn-danger"
-            >
+            <button [routerLink]="['/students/blacklist']" class="btn btn-danger">
               <i class="bi bi-file-earmark-text me-2"></i>
               View Blacklisted Students
             </button>
