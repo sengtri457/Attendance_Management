@@ -4,7 +4,8 @@ const Subject = require("./src/models/Subject");
 const Teacher = require("./src/models/Teacher");
 
 // Hardcoded URI for convenience since we know it
-const MONGODB_URI = "mongodb+srv://sengtri457_db_user:mbUGc9zB6kb5wr1q@attendancestudent.olfaukl.mongodb.net/Attendance";
+const MONGODB_URI = process.env.MONGODB_URL_ATTENDANCE;
+
 
 const seedData = async () => {
     try {

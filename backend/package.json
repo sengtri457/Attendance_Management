@@ -10,7 +10,9 @@
     "moment-timezone": "^0.6.0",
     "mongoose": "^9.0.0",
     "morgan": "^1.10.1",
-    "nodemon": "^3.1.11"
+    "multer": "^2.0.2",
+    "nodemon": "^3.1.11",
+    "xlsx": "^0.18.5"
   },
   "name": "backend",
   "version": "1.0.0",
