@@ -1,0 +1,8 @@
+.table th,
+.table td {
+    vertical-align: middle;
+}
+
+.badge {
+    min-width: 24px;
+}

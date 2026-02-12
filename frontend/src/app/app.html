@@ -111,7 +111,7 @@
       </div>
 
       <div class="navbar-right">
-        @if(currentUser?.role !== 'Student') {
+        @if(currentUser?.role === 'Teacher' || currentUser?.role === 'Admin') {
         <button class="nav-icon-btn animate__animated" title="Notifications" data-bs-toggle="offcanvas"
           [class]="count.isclass ? 'animate__bounce' : 'animate__bounce'" data-bs-target="#offcanvasWithBothOptions"
           aria-controls="offcanvasWithBothOptions">

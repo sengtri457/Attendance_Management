@@ -2,7 +2,7 @@
   <div class="row align-items-center mb-4">
 
     <!-- Title -->
-    <div class="col-lg-10 col-md-8 col-12 mb-3 mb-lg-0">
+    <div class="col-lg-8 col-md-8 col-12 mb-3 mb-lg-0">
       <h1 class="h2 mb-0">
         <i class="bi bi-people-fill text-primary me-2"></i>
         Students
@@ -14,11 +14,12 @@
 
     <!-- Action button -->
     @if (currentUser?.role === 'Admin') {
-    <div class="col-lg-2 col-md-4 col-12 text-md-end text-start">
-      <button
-        routerLink="/students/create"
-        class="btn btn-primary w-100 w-md-auto"
-      >
+    <div class="col-lg-4 col-md-4 col-12 text-md-end text-start d-flex gap-2 justify-content-md-end">
+      <input type="file" id="fileInput" (change)="onFileSelected($event)" accept=".xlsx, .xls" style="display: none;">
+      <button (click)="triggerFileInput()" class="btn btn-success w-100 w-md-auto">
+        <i class="bi bi-file-earmark-excel me-2"></i> Import
+      </button>
+      <button routerLink="/students/create" class="btn btn-primary w-100 w-md-auto">
         <i class="bi bi-plus-circle me-2"></i>
         Add Student
       </button>

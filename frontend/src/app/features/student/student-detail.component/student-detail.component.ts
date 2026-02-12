@@ -28,6 +28,7 @@ export class StudentDetailComponent {
 
   page = 1;
   limit = 10;
+  stats: any = null;
   student: Student | null = null;
   parents: any[] = [];
   attendanceRecords: Attendance[] = [];
@@ -41,16 +42,12 @@ export class StudentDetailComponent {
       this.loadStudent(id);
       this.loadParents(id);
       this.loadAttendance(id);
+      this.loadStats(id);
 
       // Check if user can edit
       const currentUser = this.authService.getCurrentUser();
       this.canEdit =
         currentUser && ["Admin", "Teacher"].includes(currentUser.role);
-      // // If student tries to view another student's profile
-      // if (currentUser?.role === 'Student' && id !== studentId) {
-      //   this.router.navigate(['/students', studentId]);
-      //   // Redirects back to their own profile!
-      // }
     }
   }
 
@@ -58,6 +55,7 @@ export class StudentDetailComponent {
     this.studentService.getById(id).subscribe({
       next: (response) => {
         this.student = response.data;
+        console.log(this.student);
         this.loading = false;
       },
       error: (error) => {
@@ -71,7 +69,6 @@ export class StudentDetailComponent {
     this.studentService.getParents(id).subscribe({
       next: (response) => {
         this.parents = response.data;
-        console.log(this.parents);
       },
       error: (error) => {
         console.error("Error loading parents:", error);
@@ -79,10 +76,14 @@ export class StudentDetailComponent {
     });
   }
 
+
+  groupedAttendance: any[] = [];
+
   loadAttendance(id: string): void {
     this.attendanceService.getAll({ studentId: id }).subscribe({
       next: (response) => {
         this.attendanceRecords = response.data;
+        this.processGroupedAttendance();
         this.loadingAttendance = false;
       },
       error: (error) => {
@@ -92,11 +93,75 @@ export class StudentDetailComponent {
     });
   }
 
-  getPresentCount(): number {
-    return this.attendanceRecords.filter((r) => r.checkInTime).length;
+  processGroupedAttendance() {
+    const groups = new Map<string, any>();
+
+    this.attendanceRecords.forEach((att) => {
+      const dateKey = new Date(att.date).toDateString(); // Group by date string
+      if (!groups.has(dateKey)) {
+        groups.set(dateKey, {
+          date: att.date,
+          records: [],
+          status: "present", // Default
+          checkInTime: null,
+          checkOutTime: null,
+          isLate: false
+        });
+      }
+
+      const group = groups.get(dateKey);
+      group.records.push(att);
+    });
+
+    // Calculate daily status priority for each group
+    this.groupedAttendance = Array.from(groups.values()).map((group) => {
+      const statuses = group.records.map((r: any) => r.status);
+      
+      let dailyStatus = "present";
+      let isLate = false;
+      let checkInTime = null;
+
+      if (statuses.includes("absent")) {
+          dailyStatus = "absent";
+      } else if (statuses.includes("on-leave")) {
+          dailyStatus = "on-leave";
+      } else if (statuses.includes("late")) {
+          dailyStatus = "late";
+          isLate = true;
+      } else if (statuses.includes("half-day")) {
+          dailyStatus = "half-day";
+      }
+
+      // Find earliest check-in time for the display
+      const checkIns = group.records
+          .filter((r: any) => r.checkInTime)
+          .map((r: any) => new Date(r.checkInTime).getTime());
+      
+      if (checkIns.length > 0) {
+          checkInTime = new Date(Math.min(...checkIns));
+      }
+
+      group.status = dailyStatus;
+      group.isLate = isLate;
+      group.checkInTime = checkInTime;
+      
+      // Sort records by time if needed, or just keep them
+      return group;
+    });
+    
+    // Sort groups by date descending
+    this.groupedAttendance.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    console.log(this.groupedAttendance);
   }
 
-  getAbsentCount(): number {
-    return this.attendanceRecords.filter((r) => !r.checkInTime).length;
+  loadStats(id: string): void {
+    this.attendanceService.getStudentStats(id).subscribe({
+      next: (response) => {
+        this.stats = response.data;
+      },
+      error: (error) => {
+        console.error("Error loading stats:", error);
+      },
+    });
   }
 }

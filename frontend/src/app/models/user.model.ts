@@ -77,7 +77,7 @@ export interface Teacher {
     email: string;
     isActive?: boolean;
   };
-  name: string;
+  name?: string;
   phone?: string;
   subject: {
     subjectName: string;
@@ -134,7 +134,7 @@ export interface Attendance {
   isLate: boolean;
   lateBy: number; // Minutes
   workHours: number;
-  markedByTeacher: string | Teacher;
+  markedByTeacher: string | any;
   note?: string;
   leaveReference?: string | LeaveRequest;
   createdAt?: Date | string;

@@ -1,0 +1,98 @@
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Weekly Attendance Report</h2>
+        <div class="d-flex gap-2">
+            <button class="btn btn-success" (click)="exportExcel()" [disabled]="loading || groupedData.length === 0">
+                <i class="bi bi-file-earmark-excel me-2"></i> Export Excel
+            </button>
+            <button class="btn btn-danger" (click)="exportPDF()" [disabled]="loading || groupedData.length === 0">
+                <i class="bi bi-file-earmark-pdf me-2"></i> Export PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Start Date (Monday)</label>
+                    <input type="date" class="form-control" [(ngModel)]="startDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">End Date (Sunday)</label>
+                    <input type="date" class="form-control" [(ngModel)]="endDate">
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject (Optional)</label>
+                    <select class="form-select" [(ngModel)]="selectedSubject">
+                        <option value="">All Subjects</option>
+                        <option *ngFor="let sub of subjects" [value]="sub._id">{{ sub.subjectName }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary w-100" (click)="generateReport()" [disabled]="loading">
+                        <i class="bi bi-search me-2"></i> Generate Report
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Report Table -->
+    <div class="card border-0 shadow-sm" *ngIf="!loading && groupedData.length > 0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Student / ID</th>
+                        <th *ngFor="let day of weekDays" class="text-center" style="min-width: 60px;">
+                            {{ day | date:'EEE' }}<br>
+                            <small class="text-muted">{{ day | date:'dd/MM' }}</small>
+                        </th>
+                        <th class="text-center text-success">P</th>
+                        <th class="text-center text-danger">A</th>
+                        <th class="text-center text-warning">L</th>
+                        <th class="text-center text-info">E</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let group of groupedData">
+                        <td>
+                            <div class="fw-bold">{{ group.student.firstName }} {{ group.student.lastName }}</div>
+                            <small class="text-muted">{{ group.student.studentId }}</small>
+                        </td>
+                        <td *ngFor="let day of weekDays" class="text-center">
+                            <!-- Check if day exists in map using ISO string key -->
+                            <ng-container *ngIf="day | date:'yyyy-MM-dd' as dateKey">
+                                <span *ngIf="group.days[dateKey] as record"
+                                    [class]="'badge bg-' + (record.code === 'P' ? 'success' : record.code === 'A' ? 'danger' : record.code === 'L' ? 'warning' : 'info')">
+                                    {{ record.code }}
+                                </span>
+                                <span *ngIf="!group.days[dateKey]" class="text-muted small text-opacity-25">-</span>
+                            </ng-container>
+                        </td>
+                        <td class="text-center fw-bold text-success">{{ group.summary.P }}</td>
+                        <td class="text-center fw-bold text-danger">{{ group.summary.A }}</td>
+                        <td class="text-center fw-bold text-warning">{{ group.summary.L }}</td>
+                        <td class="text-center fw-bold text-info">{{ group.summary.E }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && groupedData.length === 0" class="text-center py-5 text-muted">
+        <i class="bi bi-clipboard-data fs-1 d-block mb-3 opacity-50"></i>
+        <p>No data found for the selected range.</p>
+    </div>
+</div>

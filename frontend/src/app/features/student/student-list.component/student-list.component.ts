@@ -210,4 +210,64 @@ export class StudentListComponent implements OnInit {
       }
     });
   }
+
+  triggerFileInput(): void {
+    const fileInput = document.getElementById("fileInput") as HTMLInputElement;
+    fileInput?.click();
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      Swal.fire({
+        title: "Importing...",
+        text: "Please wait while we process the file",
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        },
+      });
+
+      this.studentService.importStudents(file).subscribe({
+        next: (res) => {
+          let errorHtml = "";
+          if (res.results.errors && res.results.errors.length > 0) {
+            errorHtml =
+              '<div class="text-start mt-3" style="max-height: 200px; overflow-y: auto;"><h5>Errors:</h5><ul class="list-group">';
+            res.results.errors.forEach((err: any) => {
+              const identifier =
+                err.row.email || err.row.username || "Unknown Row";
+              errorHtml += `<li class="list-group-item list-group-item-danger small">
+                 <strong>${identifier}:</strong> ${err.error}
+               </li>`;
+            });
+            errorHtml += "</ul></div>";
+          }
+
+          Swal.fire({
+            icon: res.results.failed > 0 ? "warning" : "success",
+            title: "Import Completed",
+            html: `
+              <div class="mb-3">
+                <p>Total: <strong>${res.results.total}</strong></p>
+                <p class="text-success">Success: <strong>${res.results.success}</strong></p>
+                <p class="text-danger">Failed: <strong>${res.results.failed}</strong></p>
+              </div>
+              ${errorHtml}
+            `,
+            width: res.results.failed > 0 ? "600px" : "32em",
+          });
+          this.loadStudents();
+        },
+        error: (err) => {
+          console.error(err);
+          Swal.fire({
+            icon: "error",
+            title: "Import Failed",
+            text: err.error?.message || "Something went wrong",
+          });
+        },
+      });
+    }
+  }
 }

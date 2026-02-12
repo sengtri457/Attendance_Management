@@ -54,6 +54,13 @@ export const ATTENDANCE_ROUTES: Routes = [
       ),
   },
   {
+    path: 'weekly-report',
+    loadComponent: () =>
+      import('./weekly-report.component/weekly-report.component').then(
+        (m) => m.WeeklyReportComponent
+      ),
+  },
+  {
     path: ':id',
     loadComponent: () =>
       import(
