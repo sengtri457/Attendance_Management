@@ -1,0 +1,121 @@
+/* Animations */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Card Styling */
+.card {
+  transition: transform 0.2s;
+  overflow: hidden;
+}
+
+/* Table Styling */
+.table th {
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.table td {
+  vertical-align: middle;
+}
+
+/* Avatar */
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  font-size: 0.9rem;
+}
+
+/* Button Group Styling */
+.btn-group .btn {
+  width: 40px;
+  height: 36px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dee2e6;
+}
+
+.btn-group .btn:hover {
+  transform: translateY(-2px);
+  z-index: 1;
+}
+
+.btn-group .btn.btn-success {
+  background-color: #198754;
+  border-color: #198754;
+  color: white;
+}
+
+.btn-group .btn.btn-warning {
+  background-color: #ffc107;
+  border-color: #ffc107;
+  color: #000;
+}
+
+.btn-group .btn.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  color: white;
+}
+
+.btn-group .btn.btn-info {
+  background-color: #0dcaf0;
+  border-color: #0dcaf0;
+  color: white;
+}
+
+/* Text Utilities */
+.text-xs {
+  font-size: 0.75rem;
+}
+
+.tracking-wider {
+  letter-spacing: 0.05em;
+}
+
+
+/* Row Highlights */
+.bg-success-subtle-row {
+  background-color: rgba(25, 135, 84, 0.1) !important;
+  border-left: 4px solid #198754;
+}
+
+.bg-info-subtle-row {
+  background-color: rgba(13, 202, 240, 0.05) !important;
+  border-left: 4px solid #0dcaf0;
+}
+
+.transition-all {
+  transition: all 0.2s ease-in-out;
+}

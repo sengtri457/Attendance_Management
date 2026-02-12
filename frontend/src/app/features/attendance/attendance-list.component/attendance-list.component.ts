@@ -5,13 +5,13 @@ import {
   PaginationResponse,
 } from '../../../models/user.model';
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-attendance-list.component',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './attendance-list.component.html',
   styleUrl: './attendance-list.component.css',
 })

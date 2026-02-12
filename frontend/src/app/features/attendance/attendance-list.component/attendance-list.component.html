@@ -73,33 +73,37 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let record of attendanceRecords">
-              <td>{{ attendanceService.formatDate(record.date) }}</td>
-              <td>
-                {{record.student?.firstName}}
-                {{record.student?.lastName}}
-              </td>
-              @if(record.checkInTime != null){
-              <td>{{ attendanceService.formatTime(record.checkInTime) }}</td>
-              }@else{
-              <td class="text-danger">No CheckIn</td>
-              }
-              <td>{{ attendanceService.formatTime(record.checkOutTime) }}</td>
-              <td>
-                <span [class]="'badge bg-' + attendanceService.getStatusColor(record.status)">
-                  {{ record.status }}
-                </span>
-              </td>
-              <td>
-
-                <span *ngIf="record.isLate" class="text-warning">
-                  {{ record.lateBy }} min
-                </span>
-                <span *ngIf="!record.isLate" class="text-success">No Late</span>
-              </td>
-              <td>{{ record.workHours }} hrs</td>
-
-            </tr>
+            @for (record of attendanceRecords; track record) {
+              <tr>
+                <td>{{ attendanceService.formatDate(record.date) }}</td>
+                <td>
+                  {{record.student?.firstName}}
+                  {{record.student?.lastName}}
+                </td>
+                @if(record.checkInTime != null){
+                  <td>{{ attendanceService.formatTime(record.checkInTime) }}</td>
+                  }@else{
+                  <td class="text-danger">No CheckIn</td>
+                }
+                <td>{{ attendanceService.formatTime(record.checkOutTime) }}</td>
+                <td>
+                  <span [class]="'badge bg-' + attendanceService.getStatusColor(record.status)">
+                    {{ record.status }}
+                  </span>
+                </td>
+                <td>
+                  @if (record.isLate) {
+                    <span class="text-warning">
+                      {{ record.lateBy }} min
+                    </span>
+                  }
+                  @if (!record.isLate) {
+                    <span class="text-success">No Late</span>
+                  }
+                </td>
+                <td>{{ record.workHours }} hrs</td>
+              </tr>
+            }
           </tbody>
         </table>
       </div>

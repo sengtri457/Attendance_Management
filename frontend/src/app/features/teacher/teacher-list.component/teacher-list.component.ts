@@ -3,14 +3,14 @@ import { TeacherService } from '../../../services/teacherservice/teacher.service
 import { AuthService } from '../../../services/authservice/auth.service';
 import { Router, RouterModule } from '@angular/router';
 import { Teacher } from '../../../models/user.model';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-teacher-list.component',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './teacher-list.component.html',
   styleUrl: './teacher-list.component.css',
 })

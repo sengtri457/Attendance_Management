@@ -7,23 +7,33 @@
         <div class="card-header text-white py-4 border-0 bg-primary">
           <h2 class="mb-2 fw-semibold">
             <i class="bi" [ngClass]="isEditMode ? 'bi-pencil-square' : 'bi-file-plus'"></i>
-            <span *ngIf="!isEditMode">Create New Subject</span>
-            <span *ngIf="isEditMode">Edit Subject</span>
+            @if (!isEditMode) {
+              <span>Create New Subject</span>
+            }
+            @if (isEditMode) {
+              <span>Edit Subject</span>
+            }
           </h2>
           <p class="mb-0 opacity-90">
-            <span *ngIf="!isEditMode">Fill in the details below to add a new subject to the system</span>
-            <span *ngIf="isEditMode">Update the subject information below</span>
+            @if (!isEditMode) {
+              <span>Fill in the details below to add a new subject to the system</span>
+            }
+            @if (isEditMode) {
+              <span>Update the subject information below</span>
+            }
           </p>
         </div>
 
         <div class="card-body p-4">
 
           <!-- Error Alert -->
-          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            <strong>Error:</strong> {{ error }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-          </div>
+          @if (error) {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              <strong>Error:</strong> {{ error }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+          }
 
           <!-- Main Form -->
           <form [formGroup]="subjectForm" (ngSubmit)="onSubmit()">
@@ -46,186 +56,204 @@
                 <input type="text" id="subjectName" formControlName="subjectName" class="form-control"
                   placeholder="e.g., Advanced Mathematics"
                   [class.is-invalid]="f['subjectName'].invalid && f['subjectName'].touched" />
-                <div class="form-text">Enter the full name of the subject</div>
-                <div *ngIf="f['subjectName'].invalid && f['subjectName'].touched" class="invalid-feedback d-block">
-                  <i class="bi bi-exclamation-circle me-1"></i>
-                  Subject name is required
-                </div>
-              </div>
-
-              <!-- Subject Code and Credits Row -->
-              <div class="row">
-                <!-- Subject Code -->
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="subjectCode" class="form-label fw-medium">Subject Code</label>
-                    <input type="text" id="subjectCode" formControlName="subjectCode" class="form-control"
-                      placeholder="e.g., MATH301" />
-                    <div class="form-text">Optional course code</div>
-                  </div>
-                </div>
-
-                <!-- Credits -->
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="credit" class="form-label fw-medium">Credits</label>
-                    <input type="number" id="credit" formControlName="credit" class="form-control" placeholder="1-10"
-                      min="1" max="10" [class.is-invalid]="f['credit'].invalid && f['credit'].touched" />
-                    <div class="form-text">Value between 1 and 10</div>
-                    <div *ngIf="f['credit'].invalid && f['credit'].touched" class="invalid-feedback d-block">
+                  <div class="form-text">Enter the full name of the subject</div>
+                  @if (f['subjectName'].invalid && f['subjectName'].touched) {
+                    <div class="invalid-feedback d-block">
                       <i class="bi bi-exclamation-circle me-1"></i>
-                      Credits must be between 1 and 10
+                      Subject name is required
+                    </div>
+                  }
+                </div>
+
+                <!-- Subject Code and Credits Row -->
+                <div class="row">
+                  <!-- Subject Code -->
+                  <div class="col-md-6">
+                    <div class="mb-3">
+                      <label for="subjectCode" class="form-label fw-medium">Subject Code</label>
+                      <input type="text" id="subjectCode" formControlName="subjectCode" class="form-control"
+                        placeholder="e.g., MATH301" />
+                        <div class="form-text">Optional course code</div>
+                      </div>
+                    </div>
+
+                    <!-- Credits -->
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="credit" class="form-label fw-medium">Credits</label>
+                        <input type="number" id="credit" formControlName="credit" class="form-control" placeholder="1-10"
+                          min="1" max="10" [class.is-invalid]="f['credit'].invalid && f['credit'].touched" />
+                          <div class="form-text">Value between 1 and 10</div>
+                          @if (f['credit'].invalid && f['credit'].touched) {
+                            <div class="invalid-feedback d-block">
+                              <i class="bi bi-exclamation-circle me-1"></i>
+                              Credits must be between 1 and 10
+                            </div>
+                          }
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            </div>
 
-            <!-- Section 2: Schedule Information -->
-            <div class="mb-4">
-              <div class="d-flex align-items-center mb-3 border-start border-primary border-4 ps-3">
-                <h5 class="mb-0 fw-semibold text-dark">
-                  <i class="bi bi-clock text-primary me-2"></i>
-                  Schedule Information
-                </h5>
-              </div>
+                  <!-- Section 2: Schedule Information -->
+                  <div class="mb-4">
+                    <div class="d-flex align-items-center mb-3 border-start border-primary border-4 ps-3">
+                      <h5 class="mb-0 fw-semibold text-dark">
+                        <i class="bi bi-clock text-primary me-2"></i>
+                        Schedule Information
+                      </h5>
+                    </div>
 
-              <!-- Day of Week -->
-              <div class="mb-3">
-                <label for="dayOfWeek" class="form-label fw-medium">Day of Week</label>
-                <select id="dayOfWeek" formControlName="dayOfWeek" class="form-select">
-                  <option value="">-- Select a day --</option>
-                  <option *ngFor="let day of daysOfWeek" [value]="day">
-                    {{ day }}
-                  </option>
-                </select>
-                <div class="form-text">Choose the day when this subject is taught</div>
-              </div>
+                    <!-- Day of Week -->
+                    <div class="mb-3">
+                      <label for="dayOfWeek" class="form-label fw-medium">Day of Week</label>
+                      <select id="dayOfWeek" formControlName="dayOfWeek" class="form-select">
+                        <option value="">-- Select a day --</option>
+                        @for (day of daysOfWeek; track day) {
+                          <option [value]="day">
+                            {{ day }}
+                          </option>
+                        }
+                      </select>
+                      <div class="form-text">Choose the day when this subject is taught</div>
+                    </div>
 
-              <!-- Start Time and End Time Row -->
-              <div class="row">
-                <!-- Start Time -->
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="teachTime" class="form-label fw-medium">
-                      <i class="bi bi-clock me-1"></i>
-                      Start Time
-                    </label>
-                    <input type="datetime-local" id="teachTime" formControlName="teachTime" class="form-control" />
-                    <div class="form-text">When does the class start?</div>
+                    <!-- Start Time and End Time Row -->
+                    <div class="row">
+                      <!-- Start Time -->
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="teachTime" class="form-label fw-medium">
+                            <i class="bi bi-clock me-1"></i>
+                            Start Time
+                          </label>
+                          <input type="datetime-local" id="teachTime" formControlName="teachTime" class="form-control" />
+                          <div class="form-text">When does the class start?</div>
+                        </div>
+                      </div>
+
+                      <!-- End Time -->
+                      <div class="col-md-6">
+                        <div class="mb-3">
+                          <label for="endTime" class="form-label fw-medium">
+                            <i class="bi bi-clock me-1"></i>
+                            End Time
+                          </label>
+                          <input type="datetime-local" id="endTime" formControlName="endTime" class="form-control" />
+                          <div class="form-text">When does the class end?</div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                <!-- End Time -->
-                <div class="col-md-6">
-                  <div class="mb-3">
-                    <label for="endTime" class="form-label fw-medium">
-                      <i class="bi bi-clock me-1"></i>
-                      End Time
-                    </label>
-                    <input type="datetime-local" id="endTime" formControlName="endTime" class="form-control" />
-                    <div class="form-text">When does the class end?</div>
+                  <!-- Section 3: Additional Information -->
+                  <div class="mb-4">
+                    <div class="d-flex align-items-center mb-3 border-start border-primary border-4 ps-3">
+                      <h5 class="mb-0 fw-semibold text-dark">
+                        <i class="bi bi-info-circle text-primary me-2"></i>
+                        Additional Information
+                      </h5>
+                    </div>
+
+                    <!-- Teacher ID -->
+                    <div class="mb-3">
+                      <label for="teacherId" class="form-label fw-medium">
+                        <i class="bi bi-person-badge me-1"></i>
+                        Teacher
+                      </label>
+                      <select id="teacherId" formControlName="teacherId" class="form-select">
+                        <option value="">-- Select a teacher --</option>
+                        @for (teacher of teachers; track teacher) {
+                          <option [value]="teacher._id">
+                            {{ teacher.name }} ({{ teacher._id }})
+                          </option>
+                        }
+                      </select>
+                      <div class="form-text">Select the teacher assigned to this subject</div>
+                    </div>
+
+                    <!-- Description -->
+                    <div class="mb-3">
+                      <label for="description" class="form-label fw-medium">
+                        <i class="bi bi-card-text me-1"></i>
+                        Description
+                      </label>
+                      <textarea id="description" formControlName="description" class="form-control" rows="5"
+                      placeholder="Enter a detailed description of the subject, including topics covered, prerequisites, and learning objectives..."></textarea>
+                      <div class="form-text">
+                        Provide a comprehensive description of the subject (optional)
+                      </div>
+                    </div>
                   </div>
+
+                  <!-- Form Validation Summary -->
+                  @if (subjectForm.invalid && subjectForm.touched) {
+                    <div class="alert alert-warning" role="alert">
+                      <h6 class="alert-heading fw-semibold mb-2">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        Please fix the following errors:
+                      </h6>
+                      <ul class="mb-0 ps-4">
+                        @if (f['subjectName'].invalid && f['subjectName'].touched) {
+                          <li>
+                            Subject name is required
+                          </li>
+                        }
+                        @if (f['credit'].invalid && f['credit'].touched) {
+                          <li>
+                            Credits must be between 1 and 10
+                          </li>
+                        }
+                      </ul>
+                    </div>
+                  }
+
+                  <!-- Form Actions / Buttons -->
+                  <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-4">
+                    <button type="button" class="btn btn-secondary px-4" (click)="cancel()" [disabled]="loading">
+                      <i class="bi bi-x-lg me-1"></i>
+                      Cancel
+                    </button>
+
+                    <button type="submit" class="btn btn-primary px-4" [disabled]="loading || subjectForm.invalid"
+                      style="border: none;">
+                      @if (!loading) {
+                        <span>
+                          <i class="bi" [ngClass]="isEditMode ? 'bi-save' : 'bi-plus-lg'" style="margin-right: 0.5rem;"></i>
+                          {{ isEditMode ? 'Update Subject' : 'Create Subject' }}
+                        </span>
+                      }
+                      @if (loading) {
+                        <span>
+                          <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Saving...
+                        </span>
+                      }
+                    </button>
+                  </div>
+
+                </form>
+
+              </div>
+
+              <!-- Help Section Footer -->
+              <div class="card-footer bg-light border-0">
+                <div class="alert alert-info mb-0 border-start border-info border-4" role="alert">
+                  <h6 class="alert-heading fw-semibold mb-2">
+                    <i class="bi bi-lightbulb me-2"></i>
+                    Helpful Tips
+                  </h6>
+                  <ul class="mb-0 ps-4 small">
+                    <li class="mb-1">Fields marked with <span class="text-danger">*</span> are required</li>
+                    <li class="mb-1">Subject code should be unique for each subject</li>
+                    <li class="mb-1">Make sure the end time is after the start time</li>
+                    <li class="mb-0">You can always edit the subject information later</li>
+                  </ul>
                 </div>
               </div>
+
             </div>
 
-            <!-- Section 3: Additional Information -->
-            <div class="mb-4">
-              <div class="d-flex align-items-center mb-3 border-start border-primary border-4 ps-3">
-                <h5 class="mb-0 fw-semibold text-dark">
-                  <i class="bi bi-info-circle text-primary me-2"></i>
-                  Additional Information
-                </h5>
-              </div>
-
-              <!-- Teacher ID -->
-              <div class="mb-3">
-                <label for="teacherId" class="form-label fw-medium">
-                  <i class="bi bi-person-badge me-1"></i>
-                  Teacher
-                </label>
-                <select id="teacherId" formControlName="teacherId" class="form-select">
-                  <option value="">-- Select a teacher --</option>
-                  <option *ngFor="let teacher of teachers" [value]="teacher._id">
-                    {{ teacher.name }} ({{ teacher._id }})
-                  </option>
-                </select>
-                <div class="form-text">Select the teacher assigned to this subject</div>
-              </div>
-
-              <!-- Description -->
-              <div class="mb-3">
-                <label for="description" class="form-label fw-medium">
-                  <i class="bi bi-card-text me-1"></i>
-                  Description
-                </label>
-                <textarea id="description" formControlName="description" class="form-control" rows="5"
-                  placeholder="Enter a detailed description of the subject, including topics covered, prerequisites, and learning objectives..."></textarea>
-                <div class="form-text">
-                  Provide a comprehensive description of the subject (optional)
-                </div>
-              </div>
-            </div>
-
-            <!-- Form Validation Summary -->
-            <div *ngIf="subjectForm.invalid && subjectForm.touched" class="alert alert-warning" role="alert">
-              <h6 class="alert-heading fw-semibold mb-2">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                Please fix the following errors:
-              </h6>
-              <ul class="mb-0 ps-4">
-                <li *ngIf="f['subjectName'].invalid && f['subjectName'].touched">
-                  Subject name is required
-                </li>
-                <li *ngIf="f['credit'].invalid && f['credit'].touched">
-                  Credits must be between 1 and 10
-                </li>
-              </ul>
-            </div>
-
-            <!-- Form Actions / Buttons -->
-            <div class="d-flex justify-content-end gap-2 pt-3 border-top mt-4">
-              <button type="button" class="btn btn-secondary px-4" (click)="cancel()" [disabled]="loading">
-                <i class="bi bi-x-lg me-1"></i>
-                Cancel
-              </button>
-
-              <button type="submit" class="btn btn-primary px-4" [disabled]="loading || subjectForm.invalid"
-                style="border: none;">
-                <span *ngIf="!loading">
-                  <i class="bi" [ngClass]="isEditMode ? 'bi-save' : 'bi-plus-lg'" style="margin-right: 0.5rem;"></i>
-                  {{ isEditMode ? 'Update Subject' : 'Create Subject' }}
-                </span>
-                <span *ngIf="loading">
-                  <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Saving...
-                </span>
-              </button>
-            </div>
-
-          </form>
-
-        </div>
-
-        <!-- Help Section Footer -->
-        <div class="card-footer bg-light border-0">
-          <div class="alert alert-info mb-0 border-start border-info border-4" role="alert">
-            <h6 class="alert-heading fw-semibold mb-2">
-              <i class="bi bi-lightbulb me-2"></i>
-              Helpful Tips
-            </h6>
-            <ul class="mb-0 ps-4 small">
-              <li class="mb-1">Fields marked with <span class="text-danger">*</span> are required</li>
-              <li class="mb-1">Subject code should be unique for each subject</li>
-              <li class="mb-1">Make sure the end time is after the start time</li>
-              <li class="mb-0">You can always edit the subject information later</li>
-            </ul>
           </div>
         </div>
-
       </div>
-
-    </div>
-  </div>
-</div>

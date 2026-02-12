@@ -270,8 +270,34 @@
         display: none !important;
     }
 
+
     .card {
         box-shadow: none !important;
         border: 1px solid #dee2e6 !important;
     }
+}
+
+/* Grouped Table Styles */
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.group-row {
+    transition: background-color 0.2s ease;
+}
+
+.group-row:hover {
+    background-color: #f1f3f5 !important;
+}
+
+.detail-row>td {
+    padding: 0;
+    border-top: none;
+    background-color: #f8f9fa;
+    animation: slideDown 0.3s ease-out;
+}
+
+.detail-row .card {
+    box-shadow: none !important;
+    background: transparent;
 }

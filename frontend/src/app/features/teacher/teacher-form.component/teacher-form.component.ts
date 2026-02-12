@@ -10,7 +10,7 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { TeacherService } from "../../../services/teacherservice/teacher.service";
 import { UserService } from "../../../services/userservice/user.service";
 import { RoleService } from "../../../services/rolservices/role.service";
-import { CommonModule } from "@angular/common";
+
 import { SubjectService } from "../../../services/subjectservice/subject.service";
 
 interface Subject {
@@ -23,7 +23,7 @@ interface Subject {
 
 @Component({
   selector: "app-teacher-form.component",
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./teacher-form.component.html",
   styleUrl: "./teacher-form.component.css",
 })

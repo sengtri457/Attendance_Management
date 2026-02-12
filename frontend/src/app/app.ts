@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router, RouterModule, RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { AuthService } from './services/authservice/auth.service';
 import { StudentService } from './services/studentservices/student.service';
@@ -28,7 +28,7 @@ interface QuickActionsManager {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, CommonModule, FormsModule, RouterModule],
+  imports: [RouterOutlet, FormsModule, RouterModule],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

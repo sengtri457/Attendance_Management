@@ -10,13 +10,13 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { ParentService } from "../../../services/parentservice/parent.service";
 import { UserService } from "../../../services/userservice/user.service";
 import { RoleService } from "../../../services/rolservices/role.service";
-import { CommonModule } from "@angular/common";
+
 import { StudentService } from "../../../services/studentservices/student.service";
 import { Student } from "../../../models/user.model";
 
 @Component({
   selector: "app-parent-form.component",
-  imports: [CommonModule, FormsModule, RouterModule, ReactiveFormsModule],
+  imports: [FormsModule, RouterModule, ReactiveFormsModule],
   templateUrl: "./parent-form.component.html",
   styleUrl: "./parent-form.component.css",
 })

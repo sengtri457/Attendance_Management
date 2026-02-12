@@ -8,13 +8,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+
 import { Router, RouterLink } from '@angular/router';
 import { CountService } from '../../../service/count.service';
 
 @Component({
   selector: 'app-leave-request-form.component',
-  imports: [CommonModule, FormsModule, ReactiveFormsModule],
+  imports: [FormsModule, ReactiveFormsModule],
   templateUrl: './leave-request-form.component.html',
   styleUrl: './leave-request-form.component.css',
 })

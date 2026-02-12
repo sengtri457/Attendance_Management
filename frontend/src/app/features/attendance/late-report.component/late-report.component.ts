@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
 import { LateReportItem } from '../../../models/user.model';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-late-report.component',
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule],
   templateUrl: './late-report.component.html',
   styleUrl: './late-report.component.css',
 })

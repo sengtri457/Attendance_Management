@@ -59,6 +59,9 @@ export class AttendanceService {
     if (filters?.limit) {
       params = params.set('limit', filters.limit.toString());
     }
+    if (filters?.subjectId) {
+      params = params.set('subjectId', filters.subjectId);
+    }
 
     return this.http.get<PaginationResponse<Attendance>>(this.apiUrl, {
       params,
@@ -66,16 +69,9 @@ export class AttendanceService {
   }
 
   /**
-   * Mark attendance with automatic late detection
+   * Mark attendance with automatic late detection or manual status
    */
-  mark(attendance: {
-    studentId: string;
-    date: string;
-    checkInTime: string;
-    checkOutTime?: string;
-    markedByTeacherId: string;
-    note?: string;
-  }): Observable<{ success: boolean; message: string; data: Attendance }> {
+  mark(attendance: MarkAttendanceRequest): Observable<{ success: boolean; message: string; data: Attendance }> {
     return this.http.post<{
       success: boolean;
       message: string;

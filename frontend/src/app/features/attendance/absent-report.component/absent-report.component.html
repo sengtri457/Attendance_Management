@@ -44,281 +44,304 @@
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="loading">
-      <div class="spinner"></div>
-      <p>Loading absentee report...</p>
-    </div>
+    @if (loading) {
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Loading absentee report...</p>
+      </div>
+    }
 
     <!-- Error State -->
-    <div *ngIf="errorMessage && !loading" class="alert alert-error">
-      <span class="alert-icon">⚠️</span>
-      {{ errorMessage }}
-    </div>
+    @if (errorMessage && !loading) {
+      <div class="alert alert-error">
+        <span class="alert-icon">⚠️</span>
+        {{ errorMessage }}
+      </div>
+    }
 
     <!-- Stats Summary -->
-    <div *ngIf="!loading && absentReport.length > 0" class="stats-summary">
-      <div class="stat-card critical">
-        <div class="stat-icon">🚨</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ criticalAbsences }}</div>
-          <div class="stat-label">Critical (5+ days)</div>
+    @if (!loading && absentReport.length > 0) {
+      <div class="stats-summary">
+        <div class="stat-card critical">
+          <div class="stat-icon">🚨</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ criticalAbsences }}</div>
+            <div class="stat-label">Critical (5+ days)</div>
+          </div>
+        </div>
+        <div class="stat-card warning">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ moderateAbsences }}</div>
+            <div class="stat-label">Moderate (3-4 days)</div>
+          </div>
+        </div>
+        <div class="stat-card info">
+          <div class="stat-icon">ℹ️</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ minorAbsences }}</div>
+            <div class="stat-label">Minor (1-2 days)</div>
+          </div>
+        </div>
+        <div class="stat-card total">
+          <div class="stat-icon">📊</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ totalAbsenceDays }}</div>
+            <div class="stat-label">Total Absence Days</div>
+          </div>
+        </div>
+        <div class="stat-card average">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ averageAbsences }}</div>
+            <div class="stat-label">Avg per Student</div>
+          </div>
+        </div>
+        <div class="stat-card students">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <div class="stat-value">{{ filteredReport.length }}</div>
+            <div class="stat-label">Total Students</div>
+          </div>
         </div>
       </div>
-      <div class="stat-card warning">
-        <div class="stat-icon">⚠️</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ moderateAbsences }}</div>
-          <div class="stat-label">Moderate (3-4 days)</div>
-        </div>
-      </div>
-      <div class="stat-card info">
-        <div class="stat-icon">ℹ️</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ minorAbsences }}</div>
-          <div class="stat-label">Minor (1-2 days)</div>
-        </div>
-      </div>
-      <div class="stat-card total">
-        <div class="stat-icon">📊</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ totalAbsenceDays }}</div>
-          <div class="stat-label">Total Absence Days</div>
-        </div>
-      </div>
-      <div class="stat-card average">
-        <div class="stat-icon">📈</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ averageAbsences }}</div>
-          <div class="stat-label">Avg per Student</div>
-        </div>
-      </div>
-      <div class="stat-card students">
-        <div class="stat-icon">👥</div>
-        <div class="stat-content">
-          <div class="stat-value">{{ filteredReport.length }}</div>
-          <div class="stat-label">Total Students</div>
-        </div>
-      </div>
-    </div>
+    }
 
     <!-- Report Table -->
-    <div *ngIf="!loading" class="table-container">
-      <div class="table-header">
-        <h3>Absence Details</h3>
-        <div class="view-toggle">
-          <button [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'">
-            Summary
-          </button>
-          <button [class.active]="viewMode === 'detailed'" (click)="viewMode = 'detailed'">
-            Detailed
-          </button>
-        </div>
-      </div>
-
-      <!-- Summary View -->
-      <table *ngIf="viewMode === 'summary'">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th (click)="sortBy('studentId')" class="sortable">
-              Student ID
-              <span class="sort-icon">{{ getSortIcon('studentId') }}</span>
-            </th>
-            <th (click)="sortBy('name')" class="sortable">
-              Name
-              <span class="sort-icon">{{ getSortIcon('name') }}</span>
-            </th>
-            <th (click)="sortBy('absentCount')" class="sortable">
-              Absent Days
-              <span class="sort-icon">{{ getSortIcon('absentCount') }}</span>
-            </th>
-
-            <th>Last Absent</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let item of filteredReport; let i = index">
-            <td>{{ i + 1 }}</td>
-            <td>
-              <span class="student-id">{{ item.studentId }}</span>
-            </td>
-            <td>
-              <div class="student-info">
-                <strong>{{ item.student.firstName }} {{ item.student.lastName }}</strong>
-              </div>
-            </td>
-            <td>
-              <span class="badge" [ngClass]="getAbsenceBadgeClass(item.absentCount)">
-                {{ item.absentCount }} days
-              </span>
-            </td>
-
-            <td>
-              <span class="date">{{ formatDate(item.lastAbsentDate) }}</span>
-            </td>
-            <td>
-              <span class="status-badge" [ngClass]="getStatusClass(item.absentCount)">
-                {{ getStatusText(item.absentCount) }}
-              </span>
-            </td>
-            <td>
-              <button class="btn-icon" (click)="viewDetails(item)" title="View Details">
-                👁️
-              </button>
-              <button class="btn-icon" (click)="contactStudent(item)" title="Contact">
-                📧
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="filteredReport.length === 0">
-            <td colspan="9" class="no-data">
-              <div class="empty-state">
-                <div class="empty-icon">📊</div>
-                <p>No absences found for the selected period</p>
-                <small>This is good news! All students have good attendance.</small>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <!-- Detailed View -->
-      <div *ngIf="viewMode === 'detailed'" class="detailed-view">
-        <div *ngFor="let item of filteredReport; let i = index" class="student-card">
-          <div class="student-card-header">
-            <div class="student-main-info">
-              <h4>{{ item.student.firstName }} {{ item.student.lastName }}</h4>
-              <span class="student-id-badge">{{ item.studentId }}</span>
-              <span class="status-badge" [ngClass]="getStatusClass(item.absentCount)">
-                {{ getStatusText(item.absentCount) }}
-              </span>
-            </div>
-            <div class="student-actions">
-              <button class="btn-icon" (click)="contactStudent(item)" title="Contact">
-                📧 Contact
-              </button>
-            </div>
+    @if (!loading) {
+      <div class="table-container">
+        <div class="table-header">
+          <h3>Absence Details</h3>
+          <div class="view-toggle">
+            <button [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'">
+              Summary
+            </button>
+            <button [class.active]="viewMode === 'detailed'" (click)="viewMode = 'detailed'">
+              Detailed
+            </button>
           </div>
-
-          <div class="student-card-body">
-            <div class="info-grid">
-              <div class="info-item">
-                <label>Name</label>
-                <span>{{ item.student.firstName }} {{ item.student.lastName }}</span>
-              </div>
-              <div class="info-item">
-                <label>Total Absent Days</label>
-                <span class="highlight-value">{{ item.absentCount }}</span>
-              </div>
-              <div class="info-item">
-                <label>lastAbsentDate</label>
-                <span class="info-item">
-                  {{ item.lastAbsentDate | date:'mediumDate' }}
-                </span>
-              </div>
-              <div class="info-item">
-                <label>Last Absent Date</label>
-                <span> {{ item.lastAbsentDate | date:'mediumDate' }}</span>
-              </div>
-            </div>
-
-            <!-- Absence Dates -->
-            <div class="absence-dates">
-              <label>Absence Dates:</label>
-              <div class="dates-grid">
-                <span *ngFor="let date of item.absentDates" class="date-chip" [class.recent]="isRecentDate(date)">
-                  {{ formatDate(date) }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Progress Bar -->
-            <div class="absence-progress">
-              <div class="progress-header">
-                <span>Attendance Rate</span>
-                <span class="progress-value">{{ calculateAttendanceRate(item) }}%</span>
-              </div>
-              <div class="progress-bar">
-                <div class="progress-fill" [style.width.%]="calculateAttendanceRate(item)"
-                  [ngClass]="getProgressClass(calculateAttendanceRate(item))">
+        </div>
+        <!-- Summary View -->
+        @if (viewMode === 'summary') {
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th (click)="sortBy('studentId')" class="sortable">
+                  Student ID
+                  <span class="sort-icon">{{ getSortIcon('studentId') }}</span>
+                </th>
+                <th (click)="sortBy('name')" class="sortable">
+                  Name
+                  <span class="sort-icon">{{ getSortIcon('name') }}</span>
+                </th>
+                <th (click)="sortBy('absentCount')" class="sortable">
+                  Absent Days
+                  <span class="sort-icon">{{ getSortIcon('absentCount') }}</span>
+                </th>
+                <th>Last Absent</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of filteredReport; track item; let i = $index) {
+                <tr>
+                  <td>{{ i + 1 }}</td>
+                  <td>
+                    <span class="student-id">{{ item.studentId }}</span>
+                  </td>
+                  <td>
+                    <div class="student-info">
+                      <strong>{{ item.student.firstName }} {{ item.student.lastName }}</strong>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge" [ngClass]="getAbsenceBadgeClass(item.absentCount)">
+                      {{ item.absentCount }} days
+                    </span>
+                  </td>
+                  <td>
+                    <span class="date">{{ formatDate(item.lastAbsentDate) }}</span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [ngClass]="getStatusClass(item.absentCount)">
+                      {{ getStatusText(item.absentCount) }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn-icon" (click)="viewDetails(item)" title="View Details">
+                      👁️
+                    </button>
+                    <button class="btn-icon" (click)="contactStudent(item)" title="Contact">
+                      📧
+                    </button>
+                  </td>
+                </tr>
+              }
+              @if (filteredReport.length === 0) {
+                <tr>
+                  <td colspan="9" class="no-data">
+                    <div class="empty-state">
+                      <div class="empty-icon">📊</div>
+                      <p>No absences found for the selected period</p>
+                      <small>This is good news! All students have good attendance.</small>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+        <!-- Detailed View -->
+        @if (viewMode === 'detailed') {
+          <div class="detailed-view">
+            @for (item of filteredReport; track item; let i = $index) {
+              <div class="student-card">
+                <div class="student-card-header">
+                  <div class="student-main-info">
+                    <h4>{{ item.student.firstName }} {{ item.student.lastName }}</h4>
+                    <span class="student-id-badge">{{ item.studentId }}</span>
+                    <span class="status-badge" [ngClass]="getStatusClass(item.absentCount)">
+                      {{ getStatusText(item.absentCount) }}
+                    </span>
+                  </div>
+                  <div class="student-actions">
+                    <button class="btn-icon" (click)="contactStudent(item)" title="Contact">
+                      📧 Contact
+                    </button>
+                  </div>
+                </div>
+                <div class="student-card-body">
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <label>Name</label>
+                      <span>{{ item.student.firstName }} {{ item.student.lastName }}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>Total Absent Days</label>
+                      <span class="highlight-value">{{ item.absentCount }}</span>
+                    </div>
+                    <div class="info-item">
+                      <label>lastAbsentDate</label>
+                      <span class="info-item">
+                        {{ item.lastAbsentDate | date:'mediumDate' }}
+                      </span>
+                    </div>
+                    <div class="info-item">
+                      <label>Last Absent Date</label>
+                      <span> {{ item.lastAbsentDate | date:'mediumDate' }}</span>
+                    </div>
+                  </div>
+                  <!-- Absence Dates -->
+                  <div class="absence-dates">
+                    <label>Absence Dates:</label>
+                    <div class="dates-grid">
+                      @for (date of item.absentDates; track date) {
+                        <span class="date-chip" [class.recent]="isRecentDate(date)">
+                          {{ formatDate(date) }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <!-- Progress Bar -->
+                  <div class="absence-progress">
+                    <div class="progress-header">
+                      <span>Attendance Rate</span>
+                      <span class="progress-value">{{ calculateAttendanceRate(item) }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                      <div class="progress-fill" [style.width.%]="calculateAttendanceRate(item)"
+                        [ngClass]="getProgressClass(calculateAttendanceRate(item))">
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
+            }
           </div>
-        </div>
+        }
       </div>
-    </div>
+    }
 
     <!-- Pagination -->
-    <div *ngIf="!loading && filteredReport.length > 0" class="pagination">
-      <div class="pagination-info">
-        Showing {{ filteredReport.length }} of {{ totalCount }} students with absences
+    @if (!loading && filteredReport.length > 0) {
+      <div class="pagination">
+        <div class="pagination-info">
+          Showing {{ filteredReport.length }} of {{ totalCount }} students with absences
+        </div>
       </div>
-    </div>
+    }
   </div>
 
   <!-- Detail Modal -->
-  <div *ngIf="selectedStudent" class="modal-overlay" (click)="closeModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Absence Details - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</h3>
-        <button class="btn-close" (click)="closeModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="detail-section">
-          <h4>Student Information</h4>
-          <div class="detail-grid">
-            <div><strong>Student ID:</strong> {{ selectedStudent.studentId }}</div>
-            <div><strong>Email:</strong> {{ selectedStudent.email }}</div>
-            <div><strong>Total Absences:</strong> {{ selectedStudent.absentCount }} days</div>
-            <div><strong>Consecutive:</strong> {{ selectedStudent.consecutiveAbsences }} days</div>
-          </div>
+  @if (selectedStudent) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Absence Details - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</h3>
+          <button class="btn-close" (click)="closeModal()">×</button>
         </div>
-
-        <div class="detail-section">
-          <h4>Absence Timeline</h4>
-          <div class="timeline">
-            <div *ngFor="let date of selectedStudent.absentDates" class="timeline-item">
-              <div class="timeline-dot"></div>
-              <div class="timeline-content">
-                <strong>{{ formatDate(date) }}</strong>
-                <span class="timeline-day">{{ getDayOfWeek(date) }}</span>
-              </div>
+        <div class="modal-body">
+          <div class="detail-section">
+            <h4>Student Information</h4>
+            <div class="detail-grid">
+              <div><strong>Student ID:</strong> {{ selectedStudent.studentId }}</div>
+              <div><strong>Email:</strong> {{ selectedStudent.email }}</div>
+              <div><strong>Total Absences:</strong> {{ selectedStudent.absentCount }} days</div>
+              <div><strong>Consecutive:</strong> {{ selectedStudent.consecutiveAbsences }} days</div>
             </div>
           </div>
+          <div class="detail-section">
+            <h4>Absence Timeline</h4>
+            <div class="timeline">
+              @for (date of selectedStudent.absentDates; track date) {
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">
+                    <strong>{{ formatDate(date) }}</strong>
+                    <span class="timeline-day">{{ getDayOfWeek(date) }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+          <div class="detail-section">
+            <h4>Recommendations</h4>
+            <ul class="recommendations">
+              @if (selectedStudent.consecutiveAbsences >= 3) {
+                <li>
+                  🚨 <strong>Urgent:</strong> {{ selectedStudent.consecutiveAbsences }} consecutive absences detected.
+                  Immediate follow-up required.
+                </li>
+              }
+              @if (selectedStudent.absentCount >= 5) {
+                <li>
+                  ⚠️ <strong>Action Required:</strong> Student has {{ selectedStudent.absentCount }} absences. Contact
+                  parents/guardians.
+                </li>
+              }
+              @if (selectedStudent.absentCount >= 3 && selectedStudent.absentCount < 5) {
+                <li>
+                  ℹ️ <strong>Monitor:</strong> Keep track of attendance pattern. Consider reaching out.
+                </li>
+              }
+              <li>
+                📧 Send attendance notification to student and parents
+              </li>
+              <li>
+                📞 Schedule a meeting to discuss attendance concerns
+              </li>
+            </ul>
+          </div>
         </div>
-
-        <div class="detail-section">
-          <h4>Recommendations</h4>
-          <ul class="recommendations">
-            <li *ngIf="selectedStudent.consecutiveAbsences >= 3">
-              🚨 <strong>Urgent:</strong> {{ selectedStudent.consecutiveAbsences }} consecutive absences detected.
-              Immediate follow-up required.
-            </li>
-            <li *ngIf="selectedStudent.absentCount >= 5">
-              ⚠️ <strong>Action Required:</strong> Student has {{ selectedStudent.absentCount }} absences. Contact
-              parents/guardians.
-            </li>
-            <li *ngIf="selectedStudent.absentCount >= 3 && selectedStudent.absentCount < 5">
-              ℹ️ <strong>Monitor:</strong> Keep track of attendance pattern. Consider reaching out.
-            </li>
-            <li>
-              📧 Send attendance notification to student and parents
-            </li>
-            <li>
-              📞 Schedule a meeting to discuss attendance concerns
-            </li>
-          </ul>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="closeModal()">Close</button>
+          <button class="btn btn-primary" (click)="contactStudent(selectedStudent)">
+            📧 Send Email
+          </button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn btn-secondary" (click)="closeModal()">Close</button>
-        <button class="btn btn-primary" (click)="contactStudent(selectedStudent)">
-          📧 Send Email
-        </button>
       </div>
     </div>
-  </div>
+  }
 </div>

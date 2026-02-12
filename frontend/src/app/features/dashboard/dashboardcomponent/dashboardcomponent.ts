@@ -9,7 +9,7 @@ import {
 import { AuthService } from "../../../services/authservice/auth.service";
 import { Router, RouterLink, RouterModule } from "@angular/router";
 import { FormsModule } from "@angular/forms";
-import { CommonModule } from "@angular/common";
+
 import { StudentService } from "../../../services/studentservices/student.service";
 import {
   Attendance,
@@ -31,7 +31,7 @@ Chart.register(...registerables);
 @Component({
   selector: "app-dashboardcomponent",
   standalone: true,
-  imports: [FormsModule, RouterModule, CommonModule, RouterLink],
+  imports: [FormsModule, RouterModule, RouterLink],
   templateUrl: "./dashboardcomponent.html",
   styleUrl: "./dashboardcomponent.css",
 })

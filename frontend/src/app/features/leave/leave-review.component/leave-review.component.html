@@ -54,7 +54,7 @@
             class="form-select"
             [(ngModel)]="selectedStatus"
             (change)="onStatusFilterChange()"
-          >
+            >
             <option value="all">All Requests</option>
             <option value="pending">Pending</option>
             <option value="approved">Approved</option>
@@ -65,146 +65,160 @@
     </div>
     <div class="card-body">
       <!-- Loading -->
-      <div *ngIf="loading" class="text-center py-5">
-        <div class="spinner-border text-primary" role="status">
-          <span class="visually-hidden">Loading...</span>
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading leave requests...</p>
         </div>
-        <p class="mt-3 text-muted">Loading leave requests...</p>
-      </div>
+      }
 
       <!-- Leave Requests Table -->
-      <div *ngIf="!loading && filteredRequests.length > 0" class="table-responsive">
-        <table class="table table-hover align-middle">
-          <thead class="table-light">
-            <tr>
-              <th>Student</th>
-              <th>From Date</th>
-              <th>To Date</th>
-              <th>Reason</th>
-              <th>Status</th>
-              <th>Requested</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let request of filteredRequests">
-              <td>
-                <strong>{{ request.student.firstName }} {{ request.student.lastName }}</strong>
-              </td>
-              <td>{{ request.fromDate | date: 'MMM dd, yyyy' }}</td>
-              <td>{{ request.toDate | date: 'MMM dd, yyyy' }}</td>
-              <td>
-                <span
-                  class="text-truncate d-inline-block"
-                  style="max-width: 250px;"
-                  [title]="request.reason"
-                >
-                  {{ request.reason }}
-                </span>
-              </td>
-              <td>
-                <span class="badge rounded-pill" [ngClass]="'bg-' + getStatusClass(request.status)">
-                  <i class="bi me-1" [ngClass]="getStatusIcon(request.status)"></i>
-                  {{ request.status | titlecase }}
-                </span>
-              </td>
-              <td>
-                <small>{{ request.requestedAt | date: 'MMM dd, yyyy' }}</small>
-              </td>
-              <td>
-                <div class="btn-group" *ngIf="request.status === 'pending'">
-                  <button
-                    class="btn btn-sm btn-success"
-                    (click)="openReviewModal(request, 'approved')"
-                    title="Approve"
-                  >
-                    <i class="bi bi-check-lg"></i>
-                  </button>
-                  <button
-                    class="btn btn-sm btn-danger"
-                    (click)="openReviewModal(request, 'rejected')"
-                    title="Reject"
-                  >
-                    <i class="bi bi-x-lg"></i>
-                  </button>
-                </div>
-                <span *ngIf="request.status !== 'pending'" class="text-muted">
-                  <small>
-                    <i class="bi bi-person-check me-1"></i>
-                    {{ request.reviewedBy?.username || 'N/A' }}
-                  </small>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      @if (!loading && filteredRequests.length > 0) {
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Student</th>
+                <th>From Date</th>
+                <th>To Date</th>
+                <th>Reason</th>
+                <th>Status</th>
+                <th>Requested</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (request of filteredRequests; track request) {
+                <tr>
+                  <td>
+                    <strong>{{ request.student.firstName }} {{ request.student.lastName }}</strong>
+                  </td>
+                  <td>{{ request.fromDate | date: 'MMM dd, yyyy' }}</td>
+                  <td>{{ request.toDate | date: 'MMM dd, yyyy' }}</td>
+                  <td>
+                    <span
+                      class="text-truncate d-inline-block"
+                      style="max-width: 250px;"
+                      [title]="request.reason"
+                      >
+                      {{ request.reason }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="badge rounded-pill" [ngClass]="'bg-' + getStatusClass(request.status)">
+                      <i class="bi me-1" [ngClass]="getStatusIcon(request.status)"></i>
+                      {{ request.status | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <small>{{ request.requestedAt | date: 'MMM dd, yyyy' }}</small>
+                  </td>
+                  <td>
+                    @if (request.status === 'pending') {
+                      <div class="btn-group">
+                        <button
+                          class="btn btn-sm btn-success"
+                          (click)="openReviewModal(request, 'approved')"
+                          title="Approve"
+                          >
+                          <i class="bi bi-check-lg"></i>
+                        </button>
+                        <button
+                          class="btn btn-sm btn-danger"
+                          (click)="openReviewModal(request, 'rejected')"
+                          title="Reject"
+                          >
+                          <i class="bi bi-x-lg"></i>
+                        </button>
+                      </div>
+                    }
+                    @if (request.status !== 'pending') {
+                      <span class="text-muted">
+                        <small>
+                          <i class="bi bi-person-check me-1"></i>
+                          {{ request.reviewedBy?.username || 'N/A' }}
+                        </small>
+                      </span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
 
       <!-- No Requests -->
-      <div *ngIf="!loading && filteredRequests.length === 0" class="text-center py-5">
-        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-        <h5 class="mt-3 text-muted">No Leave Requests</h5>
-        <p class="text-muted">
-          {{ selectedStatus === 'all' ? 'No leave requests found.' : 'No ' + selectedStatus + ' requests found.' }}
-        </p>
-      </div>
+      @if (!loading && filteredRequests.length === 0) {
+        <div class="text-center py-5">
+          <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+          <h5 class="mt-3 text-muted">No Leave Requests</h5>
+          <p class="text-muted">
+            {{ selectedStatus === 'all' ? 'No leave requests found.' : 'No ' + selectedStatus + ' requests found.' }}
+          </p>
+        </div>
+      }
     </div>
   </div>
 </div>
 
 <!-- Review Confirmation Modal -->
-<div *ngIf="showReviewModal && selectedRequest">
-  <div class="modal-backdrop fade show"></div>
-  <div class="modal fade show d-block" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header" [ngClass]="reviewAction === 'approved' ? 'bg-success text-white' : 'bg-danger text-white'">
-          <h5 class="modal-title">
-            <i class="bi me-2" [ngClass]="reviewAction === 'approved' ? 'bi-check-circle' : 'bi-x-circle'"></i>
-            {{ reviewAction === 'approved' ? 'Approve' : 'Reject' }} Leave Request
-          </h5>
-          <button type="button" class="btn-close btn-close-white" (click)="closeReviewModal()" [disabled]="processing"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <strong>Student:</strong>
-            {{ selectedRequest.student.firstName }} {{ selectedRequest.student.lastName }}
+@if (showReviewModal && selectedRequest) {
+  <div>
+    <div class="modal-backdrop fade show"></div>
+    <div class="modal fade show d-block" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header" [ngClass]="reviewAction === 'approved' ? 'bg-success text-white' : 'bg-danger text-white'">
+            <h5 class="modal-title">
+              <i class="bi me-2" [ngClass]="reviewAction === 'approved' ? 'bi-check-circle' : 'bi-x-circle'"></i>
+              {{ reviewAction === 'approved' ? 'Approve' : 'Reject' }} Leave Request
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeReviewModal()" [disabled]="processing"></button>
           </div>
-          <div class="mb-3">
-            <strong>Duration:</strong>
-            {{ selectedRequest.fromDate | date: 'MMM dd, yyyy' }} -
-            {{ selectedRequest.toDate | date: 'MMM dd, yyyy' }}
+          <div class="modal-body">
+            <div class="mb-3">
+              <strong>Student:</strong>
+              {{ selectedRequest.student.firstName }} {{ selectedRequest.student.lastName }}
+            </div>
+            <div class="mb-3">
+              <strong>Duration:</strong>
+              {{ selectedRequest.fromDate | date: 'MMM dd, yyyy' }} -
+              {{ selectedRequest.toDate | date: 'MMM dd, yyyy' }}
+            </div>
+            <div class="mb-3">
+              <strong>Reason:</strong>
+              <p class="text-muted">{{ selectedRequest.reason }}</p>
+            </div>
+            <div class="alert" [ngClass]="reviewAction === 'approved' ? 'alert-success' : 'alert-danger'">
+              <i class="bi me-2" [ngClass]="reviewAction === 'approved' ? 'bi-info-circle' : 'bi-exclamation-triangle'"></i>
+              Are you sure you want to <strong>{{ reviewAction }}</strong> this leave request?
+            </div>
           </div>
-          <div class="mb-3">
-            <strong>Reason:</strong>
-            <p class="text-muted">{{ selectedRequest.reason }}</p>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeReviewModal()"
+              [disabled]="processing"
+              >
+              Cancel
+            </button>
+            <button
+              type="button"
+              class="btn"
+              [ngClass]="reviewAction === 'approved' ? 'btn-success' : 'btn-danger'"
+              (click)="confirmReview()"
+              [disabled]="processing"
+              >
+              <i class="bi me-2" [ngClass]="processing ? 'bi-arrow-repeat spin' : (reviewAction === 'approved' ? 'bi-check-lg' : 'bi-x-lg')"></i>
+              {{ processing ? 'Processing...' : (reviewAction === 'approved' ? 'Approve' : 'Reject') }}
+            </button>
           </div>
-          <div class="alert" [ngClass]="reviewAction === 'approved' ? 'alert-success' : 'alert-danger'">
-            <i class="bi me-2" [ngClass]="reviewAction === 'approved' ? 'bi-info-circle' : 'bi-exclamation-triangle'"></i>
-            Are you sure you want to <strong>{{ reviewAction }}</strong> this leave request?
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            (click)="closeReviewModal()"
-            [disabled]="processing"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="btn"
-            [ngClass]="reviewAction === 'approved' ? 'btn-success' : 'btn-danger'"
-            (click)="confirmReview()"
-            [disabled]="processing"
-          >
-            <i class="bi me-2" [ngClass]="processing ? 'bi-arrow-repeat spin' : (reviewAction === 'approved' ? 'bi-check-lg' : 'bi-x-lg')"></i>
-            {{ processing ? 'Processing...' : (reviewAction === 'approved' ? 'Approve' : 'Reject') }}
-          </button>
         </div>
       </div>
     </div>
   </div>
-</div>
+}

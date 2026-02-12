@@ -1,173 +1,122 @@
-<div class="container py-4">
-  <div class="row justify-content-center">
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-primary text-white py-3">
-          <h4 class="mb-0">
-            <i class="bi bi-plus-circle me-2"></i>
-            Mark Attendance
-          </h4>
+<div class="container-fluid p-4">
+  <!-- Header Section -->
+  <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
+    <div>
+      <h2 class="fw-bold text-dark mb-1">Mark Attendance</h2>
+      <p class="text-muted mb-0">Daily Schedule View</p>
+    </div>
+    <button class="btn btn-outline-secondary" routerLink="/attendance">
+      <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Controls Section -->
+  <div class="card shadow-sm border-0 mb-4 rounded-4 fade-in-up" style="animation-delay: 0.1s">
+    <div class="card-body p-4">
+      <div class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Date</label>
+          <input type="date" class="form-control form-control-lg border-0 bg-light" [ngModel]="selectedDate"
+            (change)="onDateChange($event)">
         </div>
-        <div class="card-body p-4">
-          <!-- Success Alert -->
-          <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>
-            Attendance marked successfully!
-            <button type="button" class="btn-close" (click)="success = false"></button>
-          </div>
-
-          <!-- Error Alert -->
-          <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-            {{ error }}
-            <button type="button" class="btn-close" (click)="error = ''"></button>
-          </div>
-
-          <form [formGroup]="attendanceForm" (ngSubmit)="onSubmit()">
-            <div class="row g-3">
-              <!-- Student Search -->
-              <div class="col-md-6">
-                <label class="form-label">Student *</label>
-                <div class="search-wrapper">
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="studentSearchTerm"
-                    [ngModelOptions]="{standalone: true}"
-                    (input)="onStudentSearchChange($event)"
-                    (focus)="showStudentDropdown = true"
-                    placeholder="Search student by name or ID..."
-                    [disabled]="loadingStudents"
-                  />
-
-                  <div class="dropdown-menu show" *ngIf="showStudentDropdown && filteredStudents.length > 0">
-                    <button
-                      type="button"
-                      class="dropdown-item"
-                      *ngFor="let student of filteredStudents"
-                      (click)="selectStudent(student)"
-                    >
-                      <div class="d-flex flex-column">
-                        <strong>{{ student.firstName }} {{ student.lastName }}</strong>
-                        <small class="text-muted">ID: {{ student._id }}</small>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div class="no-results" *ngIf="showStudentDropdown && filteredStudents.length === 0 && studentSearchTerm">
-                    <small class="text-muted">No students found</small>
-                  </div>
-
-                  <div *ngIf="loadingStudents" class="loading-text">
-                    <small class="text-muted">Loading students...</small>
-                  </div>
-                </div>
-
-                <div *ngIf="selectedStudent" class="selected-info mt-2">
-                  <i class="bi bi-check-circle-fill text-success me-1"></i>
-                  <strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong>
-                </div>
-
-                <div *ngIf="attendanceForm.get('studentId')?.invalid && attendanceForm.get('studentId')?.touched"
-                     class="text-danger small mt-1">
-                  Student ID is required
-                </div>
-              </div>
-
-              <!-- Date -->
-              <div class="col-md-6">
-                <label class="form-label">Date *</label>
-                <input type="date" class="form-control" formControlName="date">
-              </div>
-
-              <!-- Check-in Time -->
-              <div class="col-md-6">
-                <label class="form-label">Check-in Time *</label>
-                <input type="datetime-local" class="form-control" formControlName="checkInTime">
-              </div>
-
-              <!-- Check-out Time -->
-              <div class="col-md-6">
-                <label class="form-label">Check-out Time</label>
-                <input type="datetime-local" class="form-control" formControlName="checkOutTime">
-              </div>
-
-              <!-- Teacher Search -->
-              <div class="col-md-12">
-                <label class="form-label">Marked By (Teacher) *</label>
-                <div class="search-wrapper">
-                  <input
-                    type="text"
-                    class="form-control"
-                    [(ngModel)]="teacherSearchTerm"
-                    [ngModelOptions]="{standalone: true}"
-                    (input)="onTeacherSearchChange($event)"
-                    (focus)="showTeacherDropdown = true"
-                    placeholder="Search teacher by name or ID..."
-                    [disabled]="loadingTeachers"
-                  />
-
-                  <div class="dropdown-menu show" *ngIf="showTeacherDropdown && filteredTeachers.length > 0">
-                    <button
-                      type="button"
-                      class="dropdown-item"
-                      *ngFor="let teacher of filteredTeachers"
-                      (click)="selectTeacher(teacher)"
-                    >
-                      <div class="d-flex flex-column">
-                        <strong>{{ teacher.name }}</strong>
-                        <small class="text-muted">ID: {{ teacher._id }}</small>
-                      </div>
-                    </button>
-                  </div>
-
-                  <div class="no-results" *ngIf="showTeacherDropdown && filteredTeachers.length === 0 && teacherSearchTerm">
-                    <small class="text-muted">No teachers found</small>
-                  </div>
-
-                  <div *ngIf="loadingTeachers" class="loading-text">
-                    <small class="text-muted">Loading teachers...</small>
-                  </div>
-                </div>
-
-                <div *ngIf="selectedTeacher" class="selected-info mt-2">
-                  <i class="bi bi-check-circle-fill text-success me-1"></i>
-                  <strong>{{ selectedTeacher.name }}</strong>
-                </div>
-              </div>
-
-              <!-- Note -->
-              <div class="col-md-12">
-                <label class="form-label">Note</label>
-                <textarea class="form-control" rows="3" formControlName="note"
-                          placeholder="Add any notes (optional)"></textarea>
-              </div>
-
-              <!-- Buttons -->
-              <div class="col-12">
-                <div class="d-flex gap-2">
-                  <button type="submit" class="btn btn-primary" [disabled]="loading || attendanceForm.invalid">
-                    <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
-                    <i *ngIf="!loading" class="bi bi-check-circle me-2"></i>
-                    {{ loading ? 'Submitting...' : 'Mark Attendance' }}
-                  </button>
-                  <button type="button" class="btn btn-outline-secondary"
-                          (click)="resetForm()" [disabled]="loading">
-                    <i class="bi bi-x-circle me-2"></i>
-                    Reset
-                  </button>
-                  <button
-                      (click)="backToDashboard()"
-                      type="button" class="btn btn-outline-primary">
-                    <i class="bi bi-arrow-left me-2"></i>
-                    Back to Dashboard
-                  </button>
-                </div>
-              </div>
-            </div>
-          </form>
+        <div class="col-md-4">
+          <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Marked By</label>
+          <select class="form-select form-select-lg border-0 bg-light" [(ngModel)]="selectedTeacherId">
+            <option *ngFor="let teacher of teachers" [value]="teacher._id">
+              {{ teacher.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-4 text-end">
+          <button class="btn btn-primary btn-lg w-100" (click)="loadData()" [disabled]="loadingData">
+            <span *ngIf="loadingData" class="spinner-border spinner-border-sm me-2"></span>
+            {{ loadingData ? 'Loading...' : 'Refresh Data' }}
+          </button>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Empty State if No Subjects -->
+  <div *ngIf="!loadingData && subjects.length === 0" class="text-center py-5 fade-in-up">
+    <div class="display-1 text-muted mb-3"><i class="bi bi-calendar-x"></i></div>
+    <h3 class="text-muted">No subjects scheduled for this date.</h3>
+    <p class="text-secondary">Please check the schedule or select another date.</p>
+  </div>
+
+  <!-- Attendance Grid -->
+  <div class="card shadow-sm border-0 rounded-4 overflow-hidden fade-in-up" style="animation-delay: 0.2s"
+    *ngIf="subjects.length > 0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="bg-light">
+          <tr>
+            <th class="ps-4 py-3 text-uppercase text-xs fw-bold text-muted tracking-wider" style="width: 250px;">Student
+            </th>
+            <th *ngFor="let subject of subjects"
+              class="text-center py-3 text-uppercase text-xs fw-bold text-muted tracking-wider">
+              <div class="d-flex flex-column">
+                <span class="text-dark fw-bold">{{ subject.subjectName }}</span>
+                <span class="text-xs text-muted fw-normal">{{ subject.teachTime | date:'shortTime' }} -
+                  {{ subject.endTime | date:'shortTime' }}</span>
+              </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let student of students" class="border-light"
+            [class.bg-success-subtle-row]="getStudentProgress(student._id) === 'full'"
+            [class.bg-info-subtle-row]="getStudentProgress(student._id) === 'partial'">
+            <td class="ps-4 py-3">
+              <div class="d-flex align-items-center">
+                <div class="position-relative">
+                  <div
+                    class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold">
+                    {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                  </div>
+                  <!-- Checkmark for full attendance -->
+                  <span *ngIf="getStudentProgress(student._id) === 'full'"
+                    class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-success border border-white p-1">
+                    <span class="visually-hidden">Complete</span>
+                  </span>
+                </div>
+                <div>
+                  <div class="fw-bold text-dark d-flex align-items-center">
+                    {{ student.firstName }} {{ student.lastName }}
+                    <i *ngIf="getStudentProgress(student._id) === 'full'"
+                      class="bi bi-check-circle-fill text-success ms-2 fs-6"></i>
+                  </div>
+                  <div class="small text-muted">{{ student.studentId }}</div>
+                </div>
+              </div>
+            </td>
+            <td *ngFor="let subject of subjects" class="text-center py-3">
+              <div class="btn-group shadow-sm rounded-pill" role="group">
+                <button type="button" class="btn btn-sm rounded-start-pill fw-bold transition-all"
+                  [class.btn-success]="getStatus(student._id, subject._id) === 'present'"
+                  [class.btn-light]="getStatus(student._id, subject._id) !== 'present'"
+                  [class.text-muted]="getStatus(student._id, subject._id) !== 'present'"
+                  (click)="mark(student._id, subject._id, 'present')" title="Present">P</button>
+                <button type="button" class="btn btn-sm fw-bold transition-all"
+                  [class.btn-warning]="getStatus(student._id, subject._id) === 'late'"
+                  [class.btn-light]="getStatus(student._id, subject._id) !== 'late'"
+                  [class.text-muted]="getStatus(student._id, subject._id) !== 'late'"
+                  (click)="mark(student._id, subject._id, 'late')" title="Late">L</button>
+                <button type="button" class="btn btn-sm fw-bold transition-all"
+                  [class.btn-danger]="getStatus(student._id, subject._id) === 'absent'"
+                  [class.btn-light]="getStatus(student._id, subject._id) !== 'absent'"
+                  [class.text-muted]="getStatus(student._id, subject._id) !== 'absent'"
+                  (click)="mark(student._id, subject._id, 'absent')" title="Absent">A</button>
+                <button type="button" class="btn btn-sm rounded-end-pill fw-bold transition-all"
+                  [class.btn-info]="getStatus(student._id, subject._id) === 'excused'"
+                  [class.btn-light]="getStatus(student._id, subject._id) !== 'excused'"
+                  [class.text-muted]="getStatus(student._id, subject._id) !== 'excused'"
+                  (click)="mark(student._id, subject._id, 'excused')" title="Excused">E</button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>

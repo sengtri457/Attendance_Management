@@ -1,4 +1,4 @@
-import { CommonModule } from "@angular/common";
+
 import { Component, inject } from "@angular/core";
 import {
   FormBuilder,
@@ -14,7 +14,7 @@ import { RoleService } from "../../../services/rolservices/role.service";
 
 @Component({
   selector: "app-student-form.component",
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule],
+  imports: [FormsModule, ReactiveFormsModule, RouterModule],
   templateUrl: "./student-form.component.html",
   styleUrl: "./student-form.component.css",
 })

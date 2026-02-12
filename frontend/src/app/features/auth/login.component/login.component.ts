@@ -6,14 +6,14 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { AuthService } from '../../../services/authservice/auth.service';
 import { CountService } from '../../../service/count.service';
 import { StudentService } from '../../../services/studentservices/student.service';
 
 @Component({
   selector: 'app-login.component',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
 })

@@ -111,10 +111,12 @@ export interface LeaveRequest {
 export interface MarkAttendanceRequest {
   studentId: string;
   date: string;
-  checkInTime: string;
+  checkInTime?: string;
   checkOutTime?: string;
   markedByTeacherId: string;
   note?: string;
+  subjectId?: string;
+  status?: "present" | "absent" | "late" | "half-day" | "on-leave" | "excused";
 }
 export interface LeaveStatusResponse {
   success: boolean;
@@ -124,10 +126,11 @@ export interface LeaveStatusResponse {
 export interface Attendance {
   _id: string;
   student: any | Student;
+  subject?: any | Subject; // Added subject
   date: Date | string;
   checkInTime: Date | string | null;
   checkOutTime: Date | string | null;
-  status: "present" | "absent" | "late" | "half-day" | "on-leave";
+  status: "present" | "absent" | "late" | "half-day" | "on-leave" | "excused";
   isLate: boolean;
   lateBy: number; // Minutes
   workHours: number;
@@ -194,6 +197,7 @@ export interface AttendanceFilters {
   isLate?: boolean;
   page?: number;
   limit?: number;
+  subjectId?: string;
 }
 
 export interface PaginationResponse<T> {

@@ -49,14 +49,17 @@
 
 
   <!-- Loading Spinner -->
-  <div *ngIf="loading" class="text-center py-5">
+  @if (loading) {
+  <div class="text-center py-5">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
   </div>
+  }
 
   <!-- Summary Cards -->
-  <div *ngIf="!loading" class="row g-4 mb-4">
+  @if (!loading) {
+  <div class="row g-4 mb-4">
     <!-- Total Present -->
     <div class="col-md-6 col-lg-3">
       <div class="card border-0 shadow-sm h-100">
@@ -77,7 +80,6 @@
         </div>
       </div>
     </div>
-
     <!-- Late Arrivals -->
     <div class="col-md-6 col-lg-3">
       <div class="card border-0 shadow-sm h-100">
@@ -98,7 +100,6 @@
         </div>
       </div>
     </div>
-
     <!-- Absent -->
     <div class="col-md-6 col-lg-3">
       <div class="card border-0 shadow-sm h-100">
@@ -119,7 +120,6 @@
         </div>
       </div>
     </div>
-
     <!-- On Leave -->
     <div class="col-md-6 col-lg-3">
       <div class="card border-0 shadow-sm h-100">
@@ -141,6 +141,7 @@
       </div>
     </div>
   </div>
+  }
 
   <!-- Quick Actions -->
   <div class="row g-4 mb-4 animate__animated animate__backInUp animate__delay-0.7s">
@@ -195,158 +196,187 @@
         <table class="table table-hover mb-0">
           <thead class="table-light">
             <tr>
-              <th>Student</th>
-              <th>Check-in Time</th>
-              <th>Status</th>
-              <th>Late By</th>
-              <th>Study Hours</th>
-              <th>Actions</th>
+              <th scope="col" class="ps-3">Student</th>
+              <th scope="col">Status Summary</th>
+              <th scope="col">Daily Status</th>
+              <th scope="col" class="text-end pe-4">Details</th>
             </tr>
           </thead>
           <tbody>
-            <!-- Loop through attendance records -->
-            <ng-container *ngFor="let attendance of todayAttendance.slice(0, 10)">
-              <!-- Normal View Row -->
-              <tr *ngIf="!isEditing(attendance._id)" class="view-row">
-                <td>
-                  <div class="d-flex align-items-center">
-                    <div class="avatar-circle me-2">
-                      {{ (attendance.student.firstName || '').charAt(0) }}
-                    </div>
-                    <div>
-                      <div class="fw-medium">
-                        {{ (attendance.student.firstName || '') }}
-                        {{ (attendance.student.lastName || '') }}
-                      </div>
-                      <small class="text-muted">
-                        {{ (attendance.student.studentId || '') }}
-                      </small>
-                    </div>
+            <!-- Grouped Attendance Rows -->
+            @for (group of groupedAttendance; track group.student._id) {
+            <!-- Summary Row -->
+            <tr class="group-row cursor-pointer" (click)="toggleExpand(group.student._id)" style="cursor: pointer;">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div
+                    class="avatar-circle me-3 bg-light text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle"
+                    style="width: 40px; height: 40px;">
+                    {{ (group.student?.firstName || '').charAt(0) }}{{ (group.student?.lastName || '').charAt(0) }}
                   </div>
-                </td>
-                <td>{{ attendanceService.formatTime(attendance.checkInTime) }}</td>
-                <td>
-                  <span [class]="'badge bg-' + attendanceService.getStatusColor(attendance.status)">
-                    <i [class]="'bi bi-' + attendanceService.getStatusIcon(attendance.status) + ' me-1'"></i>
-                    {{ attendance.status | uppercase }}
-                  </span>
-                </td>
-                <td>
-                  @if(attendance.isLate) {
-                  <span class="text-warning">
-                    {{ attendance.lateBy || 0 }} min
-                  </span>
-                  } @else {
-                  <span class="text-muted">On time</span>
-                  }
-                </td>
-                <td>
-                  @if(attendance.workHours > 0) {
-                  <span>
-                    {{ attendance.workHours | number:'1.1-2' }} hrs
-                  </span>
-                  } @else {
-                  <span class="text-muted">
-                    0 hrs
-                  </span>
-                  }
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn btn-sm btn-outline-primary me-1" (click)="startEdit(attendance)"
-                      title="Edit attendance">
-                      <i class="bi bi-pencil"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" (click)="confirmDelete(attendance)"
-                      title="Delete attendance">
-                      <i class="bi bi-trash"></i>
-                    </button>
+                  <div>
+                    <div class="fw-bold text-dark">
+                      {{ group.student?.firstName }} {{ group.student?.lastName }}
+                    </div>
+                    <small class="text-muted">
+                      ID: {{ group.student?.studentId }}
+                    </small>
                   </div>
-                </td>
-              </tr>
+                </div>
+              </td>
 
-              <!-- Edit Row (Expanded Form) -->
-              <tr *ngIf="isEditing(attendance._id)" class="edit-row">
-                <td colspan="6" class="p-0">
-                  <div class="edit-form-container p-2">
-                    <!-- Form Header with Student Info -->
-                    <div class="edit-form-header">
-                      <div class="d-flex align-items-center">
-                        <div class="avatar-circle me-3">
-                          {{ (attendance.student.firstName || '').charAt(0) }}
-                        </div>
-                        <div>
-                          <strong class="d-block">
-                            {{ (attendance.student.firstName || '') }}
-                            {{ (attendance.student.lastName || '') }}
-                          </strong>
-                          <small class="text-muted">
-                            ID: {{ (attendance.student.studentId || '') }}
-                          </small>
-                        </div>
-                      </div>
-                    </div>
+              <!-- Status Counts -->
+              <td>
+                <div class="d-flex gap-2">
+                  <span *ngIf="group.counts.present > 0"
+                    class="badge bg-success-subtle text-success border border-success-subtle">
+                    P: {{ group.counts.present }}
+                  </span>
+                  <span *ngIf="group.counts.late > 0"
+                    class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    L: {{ group.counts.late }}
+                  </span>
+                  <span *ngIf="group.counts.absent > 0"
+                    class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                    A: {{ group.counts.absent }}
+                  </span>
+                  <span *ngIf="group.counts.excused > 0"
+                    class="badge bg-info-subtle text-info border border-info-subtle">
+                    E: {{ group.counts.excused }}
+                  </span>
+                  <span *ngIf="group.counts.onLeave > 0"
+                    class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    OL: {{ group.counts.onLeave }}
+                  </span>
+                </div>
+              </td>
 
-                    <!-- Form Body -->
-                    <div class="edit-form-body">
-                      <div class="row g-3">
-                        <div class="col-md-4">
-                          <label class="form-label small fw-semibold">Check In Time</label>
-                          <input type="time" [(ngModel)]="editForm.checkInTime" class="form-control form-control-sm" />
-                        </div>
+              <!-- Daily Status -->
+              <td>
+                <span [class]="'badge bg-' + attendanceService.getStatusColor(group.dailyStatus)">
+                  <i [class]="'bi bi-' + attendanceService.getStatusIcon(group.dailyStatus) + ' me-1'"></i>
+                  {{ group.dailyStatus | uppercase }}
+                </span>
+              </td>
 
-                        <div class="col-md-4">
-                          <label class="form-label small fw-semibold">Check Out Time</label>
-                          <input type="time" [(ngModel)]="editForm.checkOutTime" class="form-control form-control-sm" />
-                        </div>
+              <!-- Expand Icon -->
+              <td class="text-end pe-4">
+                <i class="bi text-muted" [class.bi-chevron-down]="!isExpanded(group.student._id)"
+                  [class.bi-chevron-up]="isExpanded(group.student._id)"></i>
+              </td>
+            </tr>
 
-
-                        <div class="col-12">
-                          <label class="form-label small fw-semibold">Note</label>
-                          <textarea [(ngModel)]="editForm.note" class="form-control form-control-sm" rows="2"
-                            placeholder="Add any notes..."></textarea>
-                        </div>
-                      </div>
-                    </div>
-
-                    <!-- Form Footer with Actions -->
-                    <div class="edit-form-footer">
-                      <button class="btn btn-sm btn-secondary me-2" (click)="cancelEdit()">
-                        <i class="bi bi-x-circle me-1"></i>
-                        Cancel
-                      </button>
-                      <button class="btn btn-sm btn-primary" (click)="saveEdit(attendance._id)" [disabled]="loading">
-                        <i class="bi bi-check-circle me-1"></i>
-                        <span *ngIf="!loading">Save Changes</span>
-                        <span *ngIf="loading">
-                          <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                          Saving...
-                        </span>
-                      </button>
-                    </div>
+            <!-- Detailed Expansion Row -->
+            @if (isExpanded(group.student._id)) {
+            <tr class="detail-row bg-light">
+              <td colspan="6" class="p-3">
+                <div class="card border-0 shadow-sm">
+                  <div class="card-header bg-white border-bottom-0">
+                    <h6 class="mb-0 text-muted">Subject Details</h6>
                   </div>
-                </td>
-              </tr>
-            </ng-container>
+                  <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                      <thead class="text-muted small text-uppercase">
+                        <tr>
+                          <th class="ps-3">Subject</th>
+                          <th>Time</th>
+                          <th>Status</th>
+                          <th>Late By</th>
+                          <th>Note</th>
+                          <th class="text-end pe-3">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (att of group.records; track att._id) {
+                        <tr>
+                          <td class="ps-3 fw-medium">{{ att.subject?.subjectName || 'No Subject' }}</td>
+                          <td class="small text-muted">{{ attendanceService.formatTime(att.checkInTime) }}</td>
+                          <td>
+                            <span [class]="'badge bg-' + attendanceService.getStatusColor(att.status)">
+                              {{ att.status | uppercase }}
+                            </span>
+                          </td>
+                          <td class="small">
+                            <span *ngIf="att.isLate" class="text-warning">{{ att.lateBy }} min</span>
+                            <span *ngIf="!att.isLate" class="text-muted">-</span>
+                          </td>
+                          <td class="small text-muted text-truncate" style="max-width: 150px;">
+                            {{ att.note || '-' }}
+                          </td>
+                          <td class="text-end pe-3">
+                            <button class="btn btn-sm btn-link text-primary p-0 me-2"
+                              (click)="startEdit(att); $event.stopPropagation()">
+                              <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-link text-danger p-0"
+                              (click)="confirmDelete(att); $event.stopPropagation()">
+                              <i class="bi bi-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                        <!-- Inline Edit Form for specific record -->
+                        @if (isEditing(att._id)) {
+                        <tr>
+                          <td colspan="6" class="p-0">
+                            <div class="p-3 bg-white border-top border-bottom">
+                              <div class="row g-2 align-items-end">
+                                <div class="col-md-3">
+                                  <label class="form-label small mb-1">Check In</label>
+                                  <input type="time" [(ngModel)]="editForm.checkInTime"
+                                    class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-3">
+                                  <label class="form-label small mb-1">Check Out</label>
+                                  <input type="time" [(ngModel)]="editForm.checkOutTime"
+                                    class="form-control form-control-sm">
+                                </div>
+                                <div class="col-md-4">
+                                  <label class="form-label small mb-1">Note</label>
+                                  <input type="text" [(ngModel)]="editForm.note" class="form-control form-control-sm"
+                                    placeholder="Note...">
+                                </div>
+                                <div class="col-md-2 d-flex gap-1">
+                                  <button class="btn btn-primary btn-sm w-100" (click)="saveEdit(att._id)">Save</button>
+                                  <button class="btn btn-outline-secondary btn-sm"
+                                    (click)="cancelEdit()">Cancel</button>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                        }
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            }
+            }
 
             <!-- Empty State -->
-            <tr *ngIf="todayAttendance.length === 0">
+            @if (groupedAttendance.length === 0) {
+            <tr>
               <td colspan="6" class="text-center py-5 text-muted">
                 <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
                 <p class="mb-0">No attendance records yet today</p>
               </td>
             </tr>
+            }
           </tbody>
         </table>
       </div>
     </div>
 
     <!-- View All Link -->
-    <div class="card-footer bg-white text-center" *ngIf="todayAttendance.length > 10">
+    @if (todayAttendance.length > 10) {
+    <div class="card-footer bg-white text-center">
       <button class="btn btn-sm btn-outline-primary" routerLink="list">
         <i class="bi bi-list-ul me-2"></i>
         View All {{ todayAttendance.length }} Records
       </button>
     </div>
+    }
   </div>
 </div>

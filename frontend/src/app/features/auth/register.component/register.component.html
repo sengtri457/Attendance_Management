@@ -1,185 +1,212 @@
 <div class="registration-wrapper">
-    <div class="container">
-        <div class="row justify-content-center min-vh-100 align-items-center py-5">
-            <div class="col-md-8 col-lg-6 col-xl-5">
-                <div class="glass-card">
-                    <div class="card-body">
-                        <!-- Logo/Icon -->
-                        <div class="text-center mb-4">
-                            <div class="brand-logo">
-                                <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="Student Icon">
-                            </div>
-                            <h2 class="form-title">Student Registration</h2>
-                            <p class="form-subtitle">Create your account to get started</p>
+  <div class="container">
+    <div class="row justify-content-center min-vh-100 align-items-center py-5">
+      <div class="col-md-8 col-lg-6 col-xl-5">
+        <div class="glass-card">
+          <div class="card-body">
+            <!-- Logo/Icon -->
+            <div class="text-center mb-4">
+              <div class="brand-logo">
+                <img src="https://cdn-icons-png.flaticon.com/512/3589/3589030.png" alt="Student Icon">
+              </div>
+              <h2 class="form-title">Student Registration</h2>
+              <p class="form-subtitle">Create your account to get started</p>
+            </div>
+
+            <!-- Loading State -->
+            @if (loading) {
+              <div class="text-center py-5">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="loading-text mt-3">Loading registration form...</p>
+              </div>
+            }
+
+            <!-- Success Message -->
+            @if (successMessage) {
+              <div class="custom-alert alert-success" role="alert">
+                <i class="bi bi-check-circle-fill me-2"></i>
+                <span>{{ successMessage }}</span>
+                <button type="button" class="alert-close" (click)="successMessage = ''" aria-label="Close">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            }
+
+            <!-- Error Message -->
+            @if (errorMessage) {
+              <div class="custom-alert alert-error" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <span>{{ errorMessage }}</span>
+                <button type="button" class="alert-close" (click)="errorMessage = ''" aria-label="Close">
+                  <i class="bi bi-x"></i>
+                </button>
+              </div>
+            }
+
+            @if (!loading) {
+              <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+                <!-- Personal Information -->
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="firstName" class="custom-label">
+                      <i class="bi bi-person me-1"></i> First Name <span class="required">*</span>
+                    </label>
+                    <input type="text" class="custom-input" id="firstName" formControlName="firstName"
+                      [class.is-invalid]="isFieldInvalid('firstName')" placeholder="John" />
+                      @if (isFieldInvalid('firstName')) {
+                        <div class="error-message">
+                          First name is required
                         </div>
-
-                        <!-- Loading State -->
-                        <div *ngIf="loading" class="text-center py-5">
-                            <div class="spinner-border text-primary" role="status">
-                                <span class="visually-hidden">Loading...</span>
+                      }
+                    </div>
+                    <div class="col-md-6">
+                      <label for="lastName" class="custom-label">
+                        <i class="bi bi-person me-1"></i> Last Name <span class="required">*</span>
+                      </label>
+                      <input type="text" class="custom-input" id="lastName" formControlName="lastName"
+                        [class.is-invalid]="isFieldInvalid('lastName')" placeholder="Doe" />
+                        @if (isFieldInvalid('lastName')) {
+                          <div class="error-message">
+                            Last name is required
+                          </div>
+                        }
+                      </div>
+                    </div>
+                    <!-- Username Field -->
+                    <div class="mt-3">
+                      <label for="username" class="custom-label">
+                        <i class="bi bi-at me-1"></i> Username <span class="required">*</span>
+                      </label>
+                      <input type="text" class="custom-input" id="username" formControlName="username"
+                        [class.is-invalid]="isFieldInvalid('username')" placeholder="johndoe" />
+                        @if (isFieldInvalid('username')) {
+                          <div class="error-message">
+                            Username is required
+                          </div>
+                        }
+                      </div>
+                      <!-- Email Field -->
+                      <div class="mt-3">
+                        <label for="email" class="custom-label">
+                          <i class="bi bi-envelope me-1"></i> Email <span class="required">*</span>
+                        </label>
+                        <input type="email" class="custom-input" id="email" formControlName="email"
+                          [class.is-invalid]="isFieldInvalid('email')" placeholder="john.doe@example.com" />
+                          @if (isFieldInvalid('email')) {
+                            <div class="error-message">
+                              @if (f['email'].errors?.['required']) {
+                                <span>Email is required</span>
+                              }
+                              @if (f['email'].errors?.['email']) {
+                                <span>Please enter a valid email</span>
+                              }
                             </div>
-                            <p class="loading-text mt-3">Loading registration form...</p>
+                          }
                         </div>
-
-                        <!-- Success Message -->
-                        <div *ngIf="successMessage" class="custom-alert alert-success" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i>
-                            <span>{{ successMessage }}</span>
-                            <button type="button" class="alert-close" (click)="successMessage = ''" aria-label="Close">
-                                <i class="bi bi-x"></i>
-                            </button>
+                        <!-- Date of Birth and Gender Fields -->
+                        <div class="row g-3 mt-0">
+                          <div class="col-md-6">
+                            <label for="dob" class="custom-label">
+                              <i class="bi bi-calendar-event me-1"></i> Date of Birth
+                            </label>
+                            <input type="date" class="custom-input" id="dob" formControlName="dob" />
+                          </div>
+                          <div class="col-md-6">
+                            <label for="gender" class="custom-label">
+                              <i class="bi bi-gender-ambiguous me-1"></i> Gender
+                            </label>
+                            <select class="custom-input" id="gender" formControlName="gender">
+                              <option value="">Select gender</option>
+                              <option value="male">Male</option>
+                              <option value="female">Female</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
                         </div>
-
-                        <!-- Error Message -->
-                        <div *ngIf="errorMessage" class="custom-alert alert-error" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                            <span>{{ errorMessage }}</span>
-                            <button type="button" class="alert-close" (click)="errorMessage = ''" aria-label="Close">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        </div>
-
-                        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
-
-                            <!-- Personal Information -->
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label for="firstName" class="custom-label">
-                                        <i class="bi bi-person me-1"></i> First Name <span class="required">*</span>
-                                    </label>
-                                    <input type="text" class="custom-input" id="firstName" formControlName="firstName"
-                                        [class.is-invalid]="isFieldInvalid('firstName')" placeholder="John" />
-                                    <div class="error-message" *ngIf="isFieldInvalid('firstName')">
-                                        First name is required
-                                    </div>
+                        <!-- Phone Field -->
+                        <div class="mt-3">
+                          <label for="phone" class="custom-label">
+                            <i class="bi bi-telephone me-1"></i> Phone
+                          </label>
+                          <input type="tel" class="custom-input" id="phone" formControlName="phone"
+                            placeholder="+1 (555) 123-4567" />
+                          </div>
+                          <!-- Password Field -->
+                          <div class="mt-3">
+                            <label for="password" class="custom-label">
+                              <i class="bi bi-lock me-1"></i> Password <span class="required">*</span>
+                            </label>
+                            <input type="password" class="custom-input" id="password" formControlName="password"
+                              [class.is-invalid]="isFieldInvalid('password')"
+                              placeholder="Minimum 6 characters" />
+                              @if (isFieldInvalid('password')) {
+                                <div class="error-message">
+                                  @if (f['password'].errors?.['required']) {
+                                    <span>Password is required</span>
+                                  }
+                                  @if (f['password'].errors?.['minlength']) {
+                                    <span>Password must be at least 6
+                                    characters</span>
+                                  }
                                 </div>
-
-                                <div class="col-md-6">
-                                    <label for="lastName" class="custom-label">
-                                        <i class="bi bi-person me-1"></i> Last Name <span class="required">*</span>
-                                    </label>
-                                    <input type="text" class="custom-input" id="lastName" formControlName="lastName"
-                                        [class.is-invalid]="isFieldInvalid('lastName')" placeholder="Doe" />
-                                    <div class="error-message" *ngIf="isFieldInvalid('lastName')">
-                                        Last name is required
-                                    </div>
-                                </div>
+                              }
                             </div>
-
-                            <!-- Username Field -->
-                            <div class="mt-3">
-                                <label for="username" class="custom-label">
-                                    <i class="bi bi-at me-1"></i> Username <span class="required">*</span>
-                                </label>
-                                <input type="text" class="custom-input" id="username" formControlName="username"
-                                    [class.is-invalid]="isFieldInvalid('username')" placeholder="johndoe" />
-                                <div class="error-message" *ngIf="isFieldInvalid('username')">
-                                    Username is required
-                                </div>
-                            </div>
-
-                            <!-- Email Field -->
-                            <div class="mt-3">
-                                <label for="email" class="custom-label">
-                                    <i class="bi bi-envelope me-1"></i> Email <span class="required">*</span>
-                                </label>
-                                <input type="email" class="custom-input" id="email" formControlName="email"
-                                    [class.is-invalid]="isFieldInvalid('email')" placeholder="john.doe@example.com" />
-                                <div class="error-message" *ngIf="isFieldInvalid('email')">
-                                    <span *ngIf="f['email'].errors?.['required']">Email is required</span>
-                                    <span *ngIf="f['email'].errors?.['email']">Please enter a valid email</span>
-                                </div>
-                            </div>
-
-                            <!-- Date of Birth and Gender Fields -->
-                            <div class="row g-3 mt-0">
-                                <div class="col-md-6">
-                                    <label for="dob" class="custom-label">
-                                        <i class="bi bi-calendar-event me-1"></i> Date of Birth
-                                    </label>
-                                    <input type="date" class="custom-input" id="dob" formControlName="dob" />
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="gender" class="custom-label">
-                                        <i class="bi bi-gender-ambiguous me-1"></i> Gender
-                                    </label>
-                                    <select class="custom-input" id="gender" formControlName="gender">
-                                        <option value="">Select gender</option>
-                                        <option value="male">Male</option>
-                                        <option value="female">Female</option>
-                                        <option value="other">Other</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <!-- Phone Field -->
-                            <div class="mt-3">
-                                <label for="phone" class="custom-label">
-                                    <i class="bi bi-telephone me-1"></i> Phone
-                                </label>
-                                <input type="tel" class="custom-input" id="phone" formControlName="phone"
-                                    placeholder="+1 (555) 123-4567" />
-                            </div>
-
-                            <!-- Password Field -->
-                            <div class="mt-3">
-                                <label for="password" class="custom-label">
-                                    <i class="bi bi-lock me-1"></i> Password <span class="required">*</span>
-                                </label>
-                                <input type="password" class="custom-input" id="password" formControlName="password"
-                                    [class.is-invalid]="isFieldInvalid('password')"
-                                    placeholder="Minimum 6 characters" />
-                                <div class="error-message" *ngIf="isFieldInvalid('password')">
-                                    <span *ngIf="f['password'].errors?.['required']">Password is required</span>
-                                    <span *ngIf="f['password'].errors?.['minlength']">Password must be at least 6
-                                        characters</span>
-                                </div>
-                            </div>
-
                             <!-- Confirm Password Field -->
                             <div class="mt-3">
-                                <label for="confirmPassword" class="custom-label">
-                                    <i class="bi bi-lock-fill me-1"></i> Confirm Password <span
-                                        class="required">*</span>
-                                </label>
-                                <input type="password" class="custom-input" id="confirmPassword"
-                                    formControlName="confirmPassword"
-                                    [class.is-invalid]="isFieldInvalid('confirmPassword') || (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched)"
-                                    placeholder="Re-enter password" />
-                                <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
-                                    Please confirm your password
+                              <label for="confirmPassword" class="custom-label">
+                                <i class="bi bi-lock-fill me-1"></i> Confirm Password <span
+                              class="required">*</span>
+                            </label>
+                            <input type="password" class="custom-input" id="confirmPassword"
+                              formControlName="confirmPassword"
+                              [class.is-invalid]="isFieldInvalid('confirmPassword') || (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched)"
+                              placeholder="Re-enter password" />
+                              @if (isFieldInvalid('confirmPassword')) {
+                                <div class="error-message">
+                                  Please confirm your password
                                 </div>
+                              }
+                              @if (registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched) {
                                 <div class="error-message"
-                                    *ngIf="registerForm.errors?.['passwordMismatch'] && f['confirmPassword'].touched">
-                                    Passwords do not match
+                                  >
+                                  Passwords do not match
                                 </div>
+                              }
                             </div>
-
                             <!-- Submit Button -->
                             <div class="mt-4">
-                                <button type="submit" class="custom-btn" [disabled]="submitting || loading">
-                                    <span *ngIf="!submitting">
-                                        <i class="bi bi-person-plus me-2"></i>Create Account
-                                    </span>
-                                    <span *ngIf="submitting">
-                                        <span class="spinner-border spinner-border-sm me-2" role="status"
-                                            aria-hidden="true"></span>
-                                        Creating account...
-                                    </span>
-                                </button>
+                              <button type="submit" class="custom-btn" [disabled]="submitting || loading">
+                                @if (!submitting) {
+                                  <span>
+                                    <i class="bi bi-person-plus me-2"></i>Create Account
+                                  </span>
+                                }
+                                @if (submitting) {
+                                  <span>
+                                    <span class="spinner-border spinner-border-sm me-2" role="status"
+                                    aria-hidden="true"></span>
+                                    Creating account...
+                                  </span>
+                                }
+                              </button>
                             </div>
-                        </form>
+                          </form>
+                        }
 
                         <!-- Login Link -->
-                        <div class="text-center mt-4" *ngIf="!loading">
+                        @if (!loading) {
+                          <div class="text-center mt-4">
                             <p class="login-link">
-                                Already have an account?
-                                <a routerLink="/auth/login" class="link">Sign in</a>
+                              Already have an account?
+                              <a routerLink="/auth/login" class="link">Sign in</a>
                             </p>
-                        </div>
+                          </div>
+                        }
+                      </div>
                     </div>
+                  </div>
                 </div>
+              </div>
             </div>
-        </div>
-    </div>
-</div>

@@ -34,246 +34,245 @@
             class="form-control form-control-lg"
             [(ngModel)]="dateFrom"
             [max]="dateTo || null"
-          />
-        </div>
-        <div class="col-md-5">
-          <label class="form-label fw-semibold">
-            <i class="bi bi-calendar-check me-1"></i>To Date
-          </label>
-          <input
-            type="date"
-            class="form-control form-control-lg"
-            [(ngModel)]="dateTo"
-            [min]="dateFrom || null"
-          />
-        </div>
-        <div class="col-md-2">
-          <button
-            class="btn btn-primary btn-md w-100"
-            (click)="loadStats()"
-            [disabled]="loading"
-          >
-            <i class="bi" [ngClass]="loading ? 'bi-arrow-repeat spin' : 'bi-search'"></i>
-            {{ loading ? "Loading..." : "Apply Filter" }}
-          </button>
-        </div>
-      </div>
-      <div class="mt-3">
-        <button
-          class="btn btn-outline-secondary btn-sm me-2"
-          (click)="dateFrom=''; dateTo=''; loadStats()"
-        >
-          <i class="bi bi-x-circle me-1"></i>Clear Filters
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Loading State -->
-  <div *ngIf="loading" class="text-center py-5">
-    <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-      <span class="visually-hidden">Loading...</span>
-    </div>
-    <p class="mt-3 text-muted">Loading statistics...</p>
-  </div>
-
-  <!-- Stats Content -->
-  <div *ngIf="stats && !loading">
-    <!-- Key Metrics Row -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body text-center">
-            <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <i class="bi bi-calendar3 text-primary fs-3"></i>
+            />
+          </div>
+          <div class="col-md-5">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-calendar-check me-1"></i>To Date
+            </label>
+            <input
+              type="date"
+              class="form-control form-control-lg"
+              [(ngModel)]="dateTo"
+              [min]="dateFrom || null"
+              />
             </div>
-            <h3 class="fw-bold mb-1">{{ stats.totalDays }}</h3>
-            <p class="text-muted mb-0">Total Days</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100 border-start border-success border-4">
-          <div class="card-body text-center">
-            <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <i class="bi bi-check-circle text-success fs-3"></i>
-            </div>
-            <h3 class="fw-bold text-success mb-1">{{ stats.presentDays }}</h3>
-            <p class="text-muted mb-0">Present Days</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100 border-start border-danger border-4">
-          <div class="card-body text-center">
-            <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <i class="bi bi-x-circle text-danger fs-3"></i>
-            </div>
-            <h3 class="fw-bold text-danger mb-1">{{ stats.absentDays }}</h3>
-            <p class="text-muted mb-0">Absent Days</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-3 col-md-6">
-        <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
-          <div class="card-body text-center">
-            <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-              <i class="bi bi-clock-history text-warning fs-3"></i>
-            </div>
-            <h3 class="fw-bold text-warning mb-1">{{ stats.lateDays }}</h3>
-            <p class="text-muted mb-0">Late Days</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Attendance Details -->
-    <div class="row g-4 mb-4">
-      <div class="col-lg-8">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0">
-              <i class="bi bi-bar-chart-line me-2"></i>Attendance Breakdown
-            </h5>
-          </div>
-          <div class="card-body">
-            <div class="row g-3">
-              <div class="col-md-6">
-                <div class="d-flex align-items-center p-3 bg-light rounded">
-                  <div class="flex-shrink-0">
-                    <i class="bi bi-calendar-minus text-info fs-2"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0 text-muted">Half Days</h6>
-                    <h4 class="mb-0 fw-bold">{{ stats.halfDays }}</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="d-flex align-items-center p-3 bg-light rounded">
-                  <div class="flex-shrink-0">
-                    <i class="bi bi-briefcase text-secondary fs-2"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0 text-muted">On Leave</h6>
-                    <h4 class="mb-0 fw-bold">{{ stats.onLeaveDays }}</h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="d-flex align-items-center p-3 bg-light rounded">
-                  <div class="flex-shrink-0">
-                    <i class="bi bi-hourglass-split text-danger fs-2"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0 text-muted">Total Late Minutes</h6>
-                    <h4 class="mb-0 fw-bold">{{ stats.totalLateMinutes }} <small class="fs-6">min</small></h4>
-                  </div>
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="d-flex align-items-center p-3 bg-light rounded">
-                  <div class="flex-shrink-0">
-                    <i class="bi bi-clock text-warning fs-2"></i>
-                  </div>
-                  <div class="flex-grow-1 ms-3">
-                    <h6 class="mb-0 text-muted">Avg Late Minutes</h6>
-                    <h4 class="mb-0 fw-bold">{{ stats.avgLateMinutes }} <small class="fs-6">min</small></h4>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-header bg-white border-bottom">
-            <h5 class="mb-0">
-              <i class="bi bi-speedometer2 me-2"></i>Performance Rates
-            </h5>
-          </div>
-          <div class="card-body">
-            <!-- Attendance Rate -->
-            <div class="mb-4">
-              <div class="d-flex justify-content-between mb-2">
-                <span class="fw-semibold">Attendance Rate</span>
-                <span class="badge bg-primary rounded-pill">{{ stats.attendanceRate }}%</span>
-              </div>
-              <div class="progress" style="height: 25px;">
-                <div
-                  class="progress-bar bg-primary"
-                  role="progressbar"
-                  [style.width.%]="stats.attendanceRate"
-                  [attr.aria-valuenow]="stats.attendanceRate"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
+            <div class="col-md-2">
+              <button
+                class="btn btn-primary btn-md w-100"
+                (click)="loadStats()"
+                [disabled]="loading"
                 >
-                  {{ stats.attendanceRate }}%
+                <i class="bi" [ngClass]="loading ? 'bi-arrow-repeat spin' : 'bi-search'"></i>
+                {{ loading ? "Loading..." : "Apply Filter" }}
+              </button>
+            </div>
+          </div>
+          <div class="mt-3">
+            <button
+              class="btn btn-outline-secondary btn-sm me-2"
+              (click)="dateFrom=''; dateTo=''; loadStats()"
+              >
+              <i class="bi bi-x-circle me-1"></i>Clear Filters
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      @if (loading) {
+        <div class="text-center py-5">
+          <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-3 text-muted">Loading statistics...</p>
+        </div>
+      }
+
+      <!-- Stats Content -->
+      @if (stats && !loading) {
+        <div>
+          <!-- Key Metrics Row -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-3 col-md-6">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body text-center">
+                  <div class="rounded-circle bg-primary bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-calendar3 text-primary fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold mb-1">{{ stats.totalDays }}</h3>
+                  <p class="text-muted mb-0">Total Days</p>
                 </div>
               </div>
             </div>
-
-            <!-- Punctuality Rate -->
-            <div>
-              <div class="d-flex justify-content-between mb-2">
-                <span class="fw-semibold">Punctuality Rate</span>
-                <span class="badge bg-success rounded-pill">{{ stats.punctualityRate }}%</span>
+            <div class="col-lg-3 col-md-6">
+              <div class="card border-0 shadow-sm h-100 border-start border-success border-4">
+                <div class="card-body text-center">
+                  <div class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-check-circle text-success fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold text-success mb-1">{{ stats.presentDays }}</h3>
+                  <p class="text-muted mb-0">Present Days</p>
+                </div>
               </div>
-              <div class="progress" style="height: 25px;">
-                <div
-                  class="progress-bar bg-success"
-                  role="progressbar"
-                  [style.width.%]="stats.punctualityRate"
-                  [attr.aria-valuenow]="stats.punctualityRate"
-                  aria-valuemin="0"
-                  aria-valuemax="100"
-                >
-                  {{ stats.punctualityRate }}%
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="card border-0 shadow-sm h-100 border-start border-danger border-4">
+                <div class="card-body text-center">
+                  <div class="rounded-circle bg-danger bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-x-circle text-danger fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold text-danger mb-1">{{ stats.absentDays }}</h3>
+                  <p class="text-muted mb-0">Absent Days</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+              <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
+                <div class="card-body text-center">
+                  <div class="rounded-circle bg-warning bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-clock-history text-warning fs-3"></i>
+                  </div>
+                  <h3 class="fw-bold text-warning mb-1">{{ stats.lateDays }}</h3>
+                  <p class="text-muted mb-0">Late Days</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Attendance Details -->
+          <div class="row g-4 mb-4">
+            <div class="col-lg-8">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0">
+                    <i class="bi bi-bar-chart-line me-2"></i>Attendance Breakdown
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center p-3 bg-light rounded">
+                        <div class="flex-shrink-0">
+                          <i class="bi bi-calendar-minus text-info fs-2"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0 text-muted">Half Days</h6>
+                          <h4 class="mb-0 fw-bold">{{ stats.halfDays }}</h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center p-3 bg-light rounded">
+                        <div class="flex-shrink-0">
+                          <i class="bi bi-briefcase text-secondary fs-2"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0 text-muted">On Leave</h6>
+                          <h4 class="mb-0 fw-bold">{{ stats.onLeaveDays }}</h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center p-3 bg-light rounded">
+                        <div class="flex-shrink-0">
+                          <i class="bi bi-hourglass-split text-danger fs-2"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0 text-muted">Total Late Minutes</h6>
+                          <h4 class="mb-0 fw-bold">{{ stats.totalLateMinutes }} <small class="fs-6">min</small></h4>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="d-flex align-items-center p-3 bg-light rounded">
+                        <div class="flex-shrink-0">
+                          <i class="bi bi-clock text-warning fs-2"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                          <h6 class="mb-0 text-muted">Avg Late Minutes</h6>
+                          <h4 class="mb-0 fw-bold">{{ stats.avgLateMinutes }} <small class="fs-6">min</small></h4>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-white border-bottom">
+                  <h5 class="mb-0">
+                    <i class="bi bi-speedometer2 me-2"></i>Performance Rates
+                  </h5>
+                </div>
+                <div class="card-body">
+                  <!-- Attendance Rate -->
+                  <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="fw-semibold">Attendance Rate</span>
+                      <span class="badge bg-primary rounded-pill">{{ stats.attendanceRate }}%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                      <div
+                        class="progress-bar bg-primary"
+                        role="progressbar"
+                        [style.width.%]="stats.attendanceRate"
+                        [attr.aria-valuenow]="stats.attendanceRate"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        >
+                        {{ stats.attendanceRate }}%
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Punctuality Rate -->
+                  <div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <span class="fw-semibold">Punctuality Rate</span>
+                      <span class="badge bg-success rounded-pill">{{ stats.punctualityRate }}%</span>
+                    </div>
+                    <div class="progress" style="height: 25px;">
+                      <div
+                        class="progress-bar bg-success"
+                        role="progressbar"
+                        [style.width.%]="stats.punctualityRate"
+                        [attr.aria-valuenow]="stats.punctualityRate"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                        >
+                        {{ stats.punctualityRate }}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Work Hours Summary -->
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-bottom">
+              <h5 class="mb-0">
+                <i class="bi bi-clock-fill me-2"></i>Work Hours Summary
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row text-center">
+                <div class="col-md-6">
+                  <div class="p-4 bg-light rounded">
+                    <i class="bi bi-hourglass-bottom text-primary fs-1 mb-3 d-block"></i>
+                    <h2 class="fw-bold text-primary mb-2">{{ stats.totalWorkHours }} <small class="fs-5">hrs</small></h2>
+                    <p class="text-muted mb-0">Total Work Hours</p>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="p-4 bg-light rounded">
+                    <i class="bi bi-graph-up text-success fs-1 mb-3 d-block"></i>
+                    <h2 class="fw-bold text-success mb-2">{{ stats.avgWorkHours }} <small class="fs-5">hrs</small></h2>
+                    <p class="text-muted mb-0">Average Work Hours per Day</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      }
 
-    <!-- Work Hours Summary -->
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white border-bottom">
-        <h5 class="mb-0">
-          <i class="bi bi-clock-fill me-2"></i>Work Hours Summary
-        </h5>
-      </div>
-      <div class="card-body">
-        <div class="row text-center">
-          <div class="col-md-6">
-            <div class="p-4 bg-light rounded">
-              <i class="bi bi-hourglass-bottom text-primary fs-1 mb-3 d-block"></i>
-              <h2 class="fw-bold text-primary mb-2">{{ stats.totalWorkHours }} <small class="fs-5">hrs</small></h2>
-              <p class="text-muted mb-0">Total Work Hours</p>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="p-4 bg-light rounded">
-              <i class="bi bi-graph-up text-success fs-1 mb-3 d-block"></i>
-              <h2 class="fw-bold text-success mb-2">{{ stats.avgWorkHours }} <small class="fs-5">hrs</small></h2>
-              <p class="text-muted mb-0">Average Work Hours per Day</p>
-            </div>
-          </div>
+      <!-- No Data State -->
+      @if (!stats && !loading) {
+        <div class="text-center py-5">
+          <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+          <h4 class="mt-3 text-muted">No Data Available</h4>
+          <p class="text-muted">There are no attendance records for this student in the selected date range.</p>
         </div>
-      </div>
+      }
     </div>
-  </div>
-
-  <!-- No Data State -->
-  <div *ngIf="!stats && !loading" class="text-center py-5">
-    <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-    <h4 class="mt-3 text-muted">No Data Available</h4>
-    <p class="text-muted">There are no attendance records for this student in the selected date range.</p>
-  </div>
-</div>

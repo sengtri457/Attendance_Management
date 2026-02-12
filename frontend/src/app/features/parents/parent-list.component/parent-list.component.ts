@@ -2,14 +2,14 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ParentService } from '../../../services/parentservice/parent.service';
 import { AuthService } from '../../../services/authservice/auth.service';
 import { Router, RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import Swal from 'sweetalert2';
 @Component({
   selector: 'app-parent-list.component',
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [FormsModule, RouterModule],
   templateUrl: './parent-list.component.html',
   styleUrl: './parent-list.component.css',
 })

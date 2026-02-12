@@ -69,14 +69,17 @@ export class AttendanceDashboardComponent implements OnInit {
     });
   }
 
+  groupedAttendance: any[] = [];
+  expandedStudentIds: Set<string> = new Set();
+
   loadTodayAttendance(): void {
     this.loading = true;
     this.attendanceService.getTodayAttendance().subscribe({
       next: (response) => {
         this.summary = response.summary;
         this.todayAttendance = response.data;
-        console.log(this.todayAttendance);
-        console.log("Today's attendance:", this.todayAttendance);
+        this.processGroupedAttendance();
+        console.log("Grouped attendance:", this.groupedAttendance);
         this.loading = false;
       },
       error: (error) => {
@@ -84,6 +87,57 @@ export class AttendanceDashboardComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  processGroupedAttendance() {
+    const groups = new Map<string, any>();
+
+    this.todayAttendance.forEach((att) => {
+      const studentId = att.student?._id || "unknown";
+      if (!groups.has(studentId)) {
+        groups.set(studentId, {
+          student: att.student,
+          records: [],
+          counts: { present: 0, late: 0, absent: 0, excused: 0, onLeave: 0, halfDay: 0 },
+          dailyStatus: "present", 
+        });
+      }
+
+      const group = groups.get(studentId);
+      group.records.push(att);
+
+      // Count statuses
+      const status = att.status;
+      if (status === "present") group.counts.present++;
+      else if (status === "late") group.counts.late++;
+      else if (status === "absent") group.counts.absent++;
+      else if (status === "excused") group.counts.excused++;
+      else if (status === "on-leave") group.counts.onLeave++;
+      else if (status === "half-day") group.counts.halfDay++;
+    });
+
+    // Calculate daily status priority
+    this.groupedAttendance = Array.from(groups.values()).map((group) => {
+      const statuses = group.records.map((r: any) => r.status);
+      if (statuses.includes("absent")) group.dailyStatus = "absent";
+      else if (statuses.includes("on-leave")) group.dailyStatus = "on-leave";
+      else if (statuses.includes("late")) group.dailyStatus = "late";
+      else if (statuses.includes("half-day")) group.dailyStatus = "half-day";
+      else group.dailyStatus = "present";
+      return group;
+    });
+  }
+
+  toggleExpand(studentId: string) {
+    if (this.expandedStudentIds.has(studentId)) {
+      this.expandedStudentIds.delete(studentId);
+    } else {
+      this.expandedStudentIds.add(studentId);
+    }
+  }
+
+  isExpanded(studentId: string): boolean {
+    return this.expandedStudentIds.has(studentId);
   }
 
   getAttendanceRate(): number {

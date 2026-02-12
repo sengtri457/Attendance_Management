@@ -1,210 +1,183 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import {
-  FormBuilder,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
-  Validators,
 } from '@angular/forms';
 import Swal from 'sweetalert2';
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
-import { CommonModule } from '@angular/common';
 import { StudentService } from '../../../services/studentservices/student.service';
+import { SubjectService } from '../../../services/subjectservice/subject.service';
 import { TeacherService } from '../../../services/teacherservice/teacher.service';
-import { Student, Teacher } from '../../../models/user.model';
+import { Student, Teacher, Subject, Attendance, MarkAttendanceRequest } from '../../../models/user.model';
 import { Router, RouterModule } from '@angular/router';
+
 @Component({
-  selector: 'app-mark-attendance.component',
-  imports: [ReactiveFormsModule, CommonModule, FormsModule, RouterModule],
+  selector: 'app-mark-attendance',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule],
   templateUrl: './mark-attendance.component.html',
   styleUrl: './mark-attendance.component.css',
 })
 export class MarkAttendanceComponent implements OnInit {
-  attendanceForm: FormGroup;
   loading = false;
-  success = false;
-  error = '';
-  loadingStudents = false;
-  loadingTeachers = false;
+  loadingData = false;
+  
+  // Data
   students: Student[] = [];
+  subjects: Subject[] = [];
+  attendanceMap: Map<string, string> = new Map(); // Key: `${studentId}_${subjectId}`, Value: status
+  
+  // Filters
+  selectedDate: string = new Date().toISOString().split('T')[0];
+  
+  // Teachers
   teachers: Teacher[] = [];
-
-  // Search functionality
-  studentSearchTerm = '';
-  teacherSearchTerm = '';
-  filteredStudents: Student[] = [];
-  filteredTeachers: Teacher[] = [];
-  showStudentDropdown = false;
-  showTeacherDropdown = false;
-  selectedStudent: Student | null = null;
-  selectedTeacher: Teacher | null = null;
+  selectedTeacherId: string = '';
 
   constructor(
-    private fb: FormBuilder,
     private attendanceService: AttendanceService,
     private studentService: StudentService,
+    private subjectService: SubjectService,
     private teacherService: TeacherService,
     private router: Router
-  ) {
-    this.attendanceForm = this.fb.group({
-      studentId: ['', Validators.required],
-      date: [new Date().toISOString().split('T')[0], Validators.required],
-      checkInTime: [new Date().toISOString().slice(0, 16), Validators.required],
-      checkOutTime: [''],
-      markedByTeacherId: ['', Validators.required],
-      note: [''],
-    });
-  }
+  ) {}
 
   ngOnInit(): void {
-    this.loadStudents();
     this.loadTeachers();
-  }
-
-  backToDashboard() {
-    this.router.navigateByUrl('/attendance');
-  }
-
-  loadStudents(): void {
-    this.loadingStudents = true;
-    this.studentService.getAll().subscribe({
-      next: (response) => {
-        this.students = response.data || response;
-        this.filteredStudents = this.students;
-        this.loadingStudents = false;
-      },
-      error: (error) => {
-        console.error('Failed to load students:', error);
-        this.loadingStudents = false;
-      },
-    });
+    this.loadData();
   }
 
   loadTeachers(): void {
-    this.loadingTeachers = true;
     this.teacherService.getAll().subscribe({
       next: (response) => {
         this.teachers = response.data || response;
-        this.filteredTeachers = this.teachers;
-        this.loadingTeachers = false;
-      },
-      error: (error) => {
-        console.error('Failed to load teachers:', error);
-        this.loadingTeachers = false;
-      },
-    });
-  }
-
-  // Student search methods
-  onStudentSearchChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.studentSearchTerm = input.value;
-    this.filterStudents();
-    this.showStudentDropdown = true;
-  }
-
-  filterStudents(): void {
-    const term = this.studentSearchTerm.toLowerCase();
-    this.filteredStudents = this.students.filter((student) => {
-      const fullName = `${student.firstName} ${student.lastName}`.toLowerCase();
-      return (
-        fullName.includes(term) ||
-        student._id.toString().includes(term) ||
-        (student.user.email && student.user.email.toLowerCase().includes(term))
-      );
-    });
-  }
-
-  selectStudent(student: Student): void {
-    this.selectedStudent = student;
-    this.studentSearchTerm = `${student.firstName} ${student.lastName}`;
-    this.attendanceForm.patchValue({ studentId: student._id });
-    this.showStudentDropdown = false;
-  }
-
-  // Teacher search methods
-  onTeacherSearchChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.teacherSearchTerm = input.value;
-    this.filterTeachers();
-    this.showTeacherDropdown = true;
-  }
-
-  filterTeachers(): void {
-    const term = this.teacherSearchTerm.toLowerCase();
-    this.filteredTeachers = this.teachers.filter(
-      (teacher) =>
-        teacher.name.toLowerCase().includes(term) ||
-        teacher._id.toString().includes(term) ||
-        (teacher.user.email && teacher.user.email.toLowerCase().includes(term))
-    );
-  }
-
-  selectTeacher(teacher: Teacher): void {
-    this.selectedTeacher = teacher;
-    this.teacherSearchTerm = teacher.name;
-    this.attendanceForm.patchValue({ markedByTeacherId: teacher._id });
-    this.showTeacherDropdown = false;
-  }
-
-  resetForm(): void {
-    this.attendanceForm.reset({
-      date: new Date().toISOString().split('T')[0],
-      checkInTime: new Date().toISOString().slice(0, 16),
-    });
-    this.studentSearchTerm = '';
-    this.teacherSearchTerm = '';
-    this.selectedStudent = null;
-    this.selectedTeacher = null;
-    this.showStudentDropdown = false;
-    this.showTeacherDropdown = false;
-  }
-
-  onSubmit(): void {
-    if (this.attendanceForm.invalid) {
-      return;
-    }
-    this.loading = true;
-    this.success = false;
-    this.error = '';
-    const formValue = this.attendanceForm.value;
-    const data = {
-      studentId: formValue.studentId,
-      date: formValue.date,
-      checkInTime: new Date(formValue.checkInTime).toISOString(),
-      checkOutTime: formValue.checkOutTime
-        ? new Date(formValue.checkOutTime).toISOString()
-        : undefined,
-      markedByTeacherId: formValue.markedByTeacherId,
-      note: formValue.note,
-    };
-    this.attendanceService.mark(data).subscribe({
-      next: (response) => {
-        this.loading = false;
-        this.success = true;
-
-        // Reset form and search fields
-        this.resetForm();
-
-        // Show appropriate message based on attendance status
-        if (response.data.isLate && response.data.lateBy > 0) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Late Arrival',
-            text: `Student was ${response.data.lateBy} minutes late!`,
-          });
-        } else {
-          Swal.fire({
-            icon: 'success',
-            title: 'On Time',
-            text: 'Student was on time!',
-          });
+        if (this.teachers.length > 0) {
+            this.selectedTeacherId = this.teachers[0]._id; // Default to first teacher
         }
       },
       error: (error) => {
-        this.loading = false;
-        this.error = error.error?.message || 'Failed to mark attendance';
+        console.error('Failed to load teachers:', error);
       },
     });
   }
+
+  loadData(): void {
+    this.loadingData = true;
+    this.attendanceMap.clear();
+
+    const students$ = this.studentService.getAll();
+    const subjects$ = this.subjectService.getSubjectSchedule(this.selectedDate); 
+    const attendance$ = this.attendanceService.getAll({
+      dateFrom: this.selectedDate, 
+      dateTo: this.selectedDate 
+    });
+
+    students$.subscribe({
+      next: (res) => {
+         this.students = res.data || res;
+         
+         subjects$.subscribe({
+             next: (subRes) => {
+                 this.subjects = subRes.data || [];
+                 
+                 attendance$.subscribe({
+                     next: (attRes) => {
+                         const attendances = attRes.data || [];
+                         this.processAttendance(attendances);
+                         this.loadingData = false;
+                     },
+                     error: (err) => {
+                         console.error('Error loading attendance', err);
+                         this.loadingData = false;
+                     }
+                 });
+             },
+             error: (err) => {
+                 console.error('Error loading subjects', err);
+                 this.loadingData = false;
+             }
+         });
+      },
+      error: (err) => {
+          console.error('Error loading students', err);
+          this.loadingData = false;
+      }
+    });
+  }
+  
+  processAttendance(attendances: Attendance[]) {
+      attendances.forEach(att => {
+          if (att.student && att.subject) {
+              const sId = typeof att.student === 'string' ? att.student : att.student._id;
+              const subId = typeof att.subject === 'string' ? att.subject : att.subject._id;
+              const key = `${sId}_${subId}`;
+              this.attendanceMap.set(key, att.status);
+          }
+      });
+  }
+
+  onDateChange(event: any): void {
+      this.selectedDate = event.target.value;
+      this.loadData();
+  }
+
+  getStatus(studentId: string, subjectId: string): string {
+      return this.attendanceMap.get(`${studentId}_${subjectId}`) || '';
+  }
+
+  getStudentProgress(studentId: string): 'none' | 'partial' | 'full' {
+      if (this.subjects.length === 0) return 'none';
+      
+      let markedCount = 0;
+      this.subjects.forEach(sub => {
+          if (this.attendanceMap.has(`${studentId}_${sub._id}`)) {
+              markedCount++;
+          }
+      });
+
+      if (markedCount === 0) return 'none';
+      if (markedCount === this.subjects.length) return 'full';
+      return 'partial';
+  }
+
+  mark(studentId: string, subjectId: string, status: "present" | "absent" | "late" | "excused") {
+      if (!this.selectedTeacherId) {
+          Swal.fire('Error', 'Please select a teacher first', 'error');
+          return;
+      }
+      
+      const key = `${studentId}_${subjectId}`;
+      const oldStatus = this.attendanceMap.get(key);
+      
+      // Toggle off if clicking same status? (Optional, user didn't ask but good UX)
+      // User said "click like btn have P,L,A and E". Usually implies selection.
+      
+      this.attendanceMap.set(key, status);
+
+      const request: MarkAttendanceRequest = {
+          studentId,
+          subjectId,
+          date: this.selectedDate,
+          status: status,
+          markedByTeacherId: this.selectedTeacherId,
+      };
+
+      this.attendanceService.mark(request).subscribe({
+          next: () => {
+              // Success
+          },
+          error: (err) => {
+              if (oldStatus) this.attendanceMap.set(key, oldStatus);
+              else this.attendanceMap.delete(key);
+              
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: 'Failed to mark attendance'
+              });
+          }
+      });
+  }
 }
+
