@@ -6,7 +6,8 @@ const Teacher = require("../models/Teacher");
 
 exports.getAllSubjects = async (req, res) => {
     try {
-        const subjects = await Subject.find();
+        const subjects = await Subject.find().populate("teacherId", "name phone") // Populate teacher info.populate("classGroup", "name") // Populate legacy class group.populate("classGroups", "name"); // Populate new class groups array
+
         if (! subjects) {
             return res.status(404).json({success: false, message: "Subjects not found"});
         }
@@ -42,44 +43,62 @@ exports.createSubject = async (req, res) => {
             teacherId,
             credit,
             dayOfWeek,
-            subjectCode
+            subjectCode,
+            classGroup,
+            classGroups,
+            sessions
         } = req.body;
 
-        // Check if teacher exists
-        const teacher = await Teacher.find();
-        if (! teacher) {
-            return res.status(404).json({success: false, message: "Teacher not found"});
+        // Check if teacher exists if provided
+        if (teacherId) {
+            const teacher = await Teacher.findById(teacherId);
+            if (! teacher) {
+                return res.status(404).json({success: false, message: "Teacher not found"});
+            }
         }
 
-        // Validate time range
-        if (teachTime && endTime && new Date(teachTime) >= new Date(endTime)) {
-            return res.status(400).json({success: false, message: "End time must be after teach time"});
-        }
-
-        const subject = new Subject({
+        const subjectData = {
             subjectName,
-            teachTime,
-            endTime,
-            teacherId: teacherId,
             credit,
-            dayOfWeek,
-            subjectCode
-        });
+            subjectCode,
+            classGroups: classGroups ? [...new Set(classGroups)] : [],
+            sessions
+        };
+
+        // Handle legacy fields - only add if they have values
+        if (teachTime) 
+            subjectData.teachTime = teachTime;
+        
+
+
+        if (endTime) 
+            subjectData.endTime = endTime;
+        
+
+
+        if (dayOfWeek) 
+            subjectData.dayOfWeek = dayOfWeek;
+        
+
+
+        if (teacherId) 
+            subjectData.teacherId = teacherId;
+        
+
+
+        if (classGroup) 
+            subjectData.classGroup = classGroup;
+        
+
+
+        const subject = new Subject(subjectData);
 
         await subject.save();
 
-        // const subjectResponse = await Subject.findById(subject._id).populate(
-        // "teacher",
-        // "name phone",
-        // );
-
-        res.status(201).json({
-            success: true, message: "Subject created successfully",
-            // data: subjectResponse,
-        });
+        res.status(201).json({success: true, message: "Subject created successfully", data: subject});
     } catch (error) {
         console.error("Error creating subject:", error);
-        res.status(500).json({success: false, message: "Failed to create subject"});
+        res.status(500).json({success: false, message: "Failed to create subject", error: error.message});
     }
 };
 exports.updateSubject = async (req, res) => {
@@ -91,7 +110,10 @@ exports.updateSubject = async (req, res) => {
             endTime,
             credit,
             dayOfWeek,
-            subjectCode
+            subjectCode,
+            classGroup,
+            classGroups,
+            sessions
         } = req.body;
 
         // First, find the existing subject
@@ -105,21 +127,47 @@ exports.updateSubject = async (req, res) => {
         if (subjectName) 
             updateData.subjectName = subjectName;
         
+
+
         if (teachTime) 
             updateData.teachTime = teachTime;
         
+
+
         if (endTime) 
             updateData.endTime = endTime;
         
+
+
         if (credit !== undefined) 
             updateData.credit = credit;
         
+
+
         if (dayOfWeek) 
             updateData.dayOfWeek = dayOfWeek;
         
+
+
         if (subjectCode) 
             updateData.subjectCode = subjectCode;
         
+
+
+        if (classGroup) 
+            updateData.classGroup = classGroup;
+        
+
+
+        if (classGroups) { // Deduplicate class groups to avoid storing same group multiple times
+            updateData.classGroups = [...new Set(classGroups)];
+        }
+
+
+        if (sessions) 
+            updateData.sessions = sessions;
+        
+
 
         // If teacher is being updated, verify teacher exists
         if (teacherId) {
@@ -153,7 +201,6 @@ exports.updateSubject = async (req, res) => {
         });
     }
 };
-
 exports.deleteSubject = async (req, res) => {
     try {
         const subject = await Subject.findByIdAndDelete(req.params.id);
@@ -168,7 +215,6 @@ exports.deleteSubject = async (req, res) => {
         res.status(500).json({success: false, message: "Failed to delete subject"});
     }
 };
-
 exports.getSubjectsByTeacher = async (req, res) => {
     try {
         const subjects = await Subject.find({teacherId: req.params.teacherId}).sort({teachTime: 1});
@@ -179,7 +225,6 @@ exports.getSubjectsByTeacher = async (req, res) => {
         res.status(500).json({success: false, message: "Failed to fetch subjects"});
     }
 };
-
 exports.getSubjectSchedule = async (req, res) => {
     try {
         const {date} = req.query;
@@ -188,19 +233,78 @@ exports.getSubjectSchedule = async (req, res) => {
 
         // If date is provided, filter subjects for that day
         if (date) {
-            const startOfDay = new Date(date);
-            startOfDay.setHours(0, 0, 0, 0);
+            const queryDate = new Date(date);
+            const days = [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            ];
+            const dayName = days[queryDate.getDay()];
+            // e.g. "Monday"
 
-            const endOfDay = new Date(date);
-            endOfDay.setHours(23, 59, 59, 999);
-
-            query.teachTime = {
-                $gte: startOfDay,
-                $lte: endOfDay
-            };
+            // Filter for subjects that meet on this day
+            // EITHER legacy way: dayOfWeek == dayName
+            // OR new way: sessions array contains an entry with day == dayName
+            query.$or = [
+                {
+                    dayOfWeek: dayName
+                }, {
+                    "sessions.dayOfWeek": dayName
+                }
+            ];
         }
 
-        const subjects = await Subject.find(query).populate("teacherId", "name phone").sort({teachTime: 1});
+        const subjects = await Subject.find(query).populate("teacherId", "name phone").populate("classGroup", "name").populate("classGroups", "name").lean();
+        // Use lean() to allow modification
+
+        // If filtering by date, we need to transform the data to show the correct time for that day
+        // because "teachTime" might be legacy or null for multi-session subjects
+        if (date) {
+            const queryDate = new Date(date);
+            const days = [
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday"
+            ];
+            const dayName = days[queryDate.getDay()];
+
+            subjects.forEach(sub => { // Check if it's a multi-session subject
+                if (sub.sessions && sub.sessions.length > 0) {
+                    const session = sub.sessions.find(s => s.dayOfWeek === dayName);
+                    if (session) {
+                        // Construct a date object for the session time
+                        // session.startTime is "HH:mm"
+                        const [startHour, startMin] = session.startTime.split(':');
+                        const [endHour, endMin] = session.endTime.split(':');
+
+                        // Create Date objects for this specific day
+                        const sTime = new Date(queryDate);
+                        sTime.setHours(parseInt(startHour), parseInt(startMin), 0);
+
+                        const eTime = new Date(queryDate);
+                        eTime.setHours(parseInt(endHour), parseInt(endMin), 0);
+
+                        // Override the display properties
+                        sub.teachTime = sTime;
+                        sub.endTime = eTime;
+                        sub.room = session.room; // Add room if available
+                    }
+                }
+            });
+
+            // Re-sort based on the potentially updated teachTime
+            subjects.sort((a, b) => new Date(a.teachTime) - new Date(b.teachTime));
+        } else { // Fallback sort if no date provided
+            subjects.sort((a, b) => new Date(a.teachTime) - new Date(b.teachTime));
+        }
 
         res.json({success: true, data: subjects, count: subjects.length});
     } catch (error) {

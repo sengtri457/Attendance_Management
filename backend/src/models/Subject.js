@@ -1,55 +1,92 @@
 const mongoose = require("mongoose");
 
-const subjectSchema = new mongoose.Schema(
-  {
+const subjectSchema = new mongoose.Schema({
     subjectName: {
-      type: String,
-      required: true,
-      trim: true,
+        type: String,
+        required: true,
+        trim: true
     },
     teachTime: {
-      type: Date,
+        type: Date
     },
     endTime: {
-      type: Date,
+        type: Date
     },
     description: {
-      type: String,
-      trim: true,
+        type: String,
+        trim: true
     },
     teacherId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Teacher",
-      required: false,
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Teacher",
+        required: false
     },
     dayOfWeek: {
-      type: String,
-      enum: [
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday",
-        "Sunday",
-      ],
-      required: false,
+        type: String,
+        enum: [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday",
+        ],
+        required: false
     },
     credit: {
-      type: Number,
-      required: false,
-      min: 1,
-      max: 10,
+        type: Number,
+        required: false,
+        min: 1,
+        max: 10
     },
     subjectCode: {
-      type: String,
-      required: false,
-      trim: true,
+        type: String,
+        required: false,
+        trim: true
     },
-  },
-  {
-    timestamps: true,
-  },
-);
+    classGroup: { // Kept for backward compatibility
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "ClassGroup",
+        required: false
+    },
+    classGroups: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "ClassGroup"
+        }
+    ],
+    sessions: [
+        {
+            dayOfWeek: {
+                type: String,
+                enum: [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday",
+                    "Sunday"
+                ],
+                required: true
+            },
+            startTime: {
+                type: String,
+                required: true
+            }, // Format HH:mm
+            endTime: {
+                type: String,
+                required: true
+            }, // Format HH:mm
+            room: {
+                type: String,
+                required: false
+            }
+        }
+    ]
+}, {
+    timestamps: true
+},);
 
 module.exports = mongoose.model("Subject", subjectSchema);

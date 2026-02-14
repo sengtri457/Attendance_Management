@@ -2,6 +2,7 @@ const Student = require("../models/Student");
 const ParentStudent = require("../models/ParentStudent");
 const User = require("../models/User");
 const Role = require("../models/Role");
+const ClassGroup = require("../models/ClassGroup");
 const xlsx = require("xlsx");
 const bcrypt = require("bcryptjs");
 
@@ -12,7 +13,8 @@ exports.getAllStudents = async (req, res) => {
             limit = 10,
             search = "",
             sortBy = "createdAt",
-            sortOrder = "desc"
+            sortOrder = "desc",
+            classGroupId
         } = req.query;
 
         // Convert to numbers
@@ -24,6 +26,10 @@ exports.getAllStudents = async (req, res) => {
         const searchQuery = {
             isBlacklisted: false
         };
+
+        if (classGroupId) {
+            searchQuery.classGroup = classGroupId;
+        }
 
         // Add search conditions if search term exists
         if (search) {
@@ -58,7 +64,7 @@ exports.getAllStudents = async (req, res) => {
 
         // Execute query with pagination
         const [students, totalCount] = await Promise.all([
-            Student.find(searchQuery).populate("user", "username email").populate("parentStudent", "name phone").sort(sortOptions).skip(skip).limit(limitNum).lean(), // Use lean() for better performance
+            Student.find(searchQuery).populate("user", "username email").populate("parentStudent", "name phone").populate("classGroup", "name").sort(sortOptions).skip(skip).limit(limitNum).lean(), // Use lean() for better performance
             Student.countDocuments(searchQuery),
         ]);
 
@@ -87,7 +93,7 @@ exports.getAllStudents = async (req, res) => {
 
 exports.getStudentById = async (req, res) => {
     try {
-        const student = await Student.findById(req.params.id).populate("user", "username email isActive").populate("parentStudent", "name phone");
+        const student = await Student.findById(req.params.id).populate("user", "username email isActive").populate("parentStudent", "name phone").populate("classGroup", "name academicYear");
 
         if (! student) {
             return res.status(404).json({success: false, message: "Student not found"});
@@ -110,7 +116,8 @@ exports.createStudent = async (req, res) => {
             gender,
             phone,
             photo,
-            parentId
+            parentId,
+            classGroup
         } = req.body;
 
         const student = new Student({
@@ -120,7 +127,8 @@ exports.createStudent = async (req, res) => {
             dob,
             gender,
             phone,
-            photo
+            photo,
+            classGroup
         });
 
         await student.save();
@@ -151,7 +159,8 @@ exports.updateStudent = async (req, res) => {
             dob,
             gender,
             phone,
-            photo
+            photo,
+            classGroup
         } = req.body;
 
         const student = await Student.findByIdAndUpdate(req.params.id, {
@@ -160,7 +169,8 @@ exports.updateStudent = async (req, res) => {
             dob,
             gender,
             phone,
-            photo
+            photo,
+            classGroup
         }, {
             new: true
         },);
@@ -308,6 +318,20 @@ exports.importStudents = async (req, res) => {
                 // Assuming string date or JS date for now.
                 const dob = row.dob ? new Date(row.dob) : new Date();
 
+                // Find Class Group if provided
+                let classGroupId = null;
+                const className = row.class || row.className || row.classGroup || row.Class || row["Class Group"];
+                if (className) {
+                    const classGroupDoc = await ClassGroup.findOne({
+                        name: {
+                            $regex: new RegExp(`^${className}$`, 'i')
+                        }
+                    });
+                    if (classGroupDoc) {
+                        classGroupId = classGroupDoc._id;
+                    }
+                }
+
                 const student = new Student({
                     user: user._id,
                     studentId: row.studentId || `STU${
@@ -319,7 +343,8 @@ exports.importStudents = async (req, res) => {
                     lastName: row.lastName,
                     dob: dob,
                     gender: row.gender || "Other",
-                    phone: row.phone || ""
+                    phone: row.phone || "",
+                    classGroup: classGroupId
                 });
                 await student.save();
 
