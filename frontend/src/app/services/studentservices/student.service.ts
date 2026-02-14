@@ -27,6 +27,7 @@ export interface StudentQueryParams {
   search?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
+  classGroupId?: string;
 }
 
 @Injectable({
@@ -55,6 +56,9 @@ export class StudentService {
       }
       if (params.sortOrder) {
         httpParams = httpParams.set("sortOrder", params.sortOrder);
+      }
+      if (params.classGroupId) {
+        httpParams = httpParams.set("classGroupId", params.classGroupId);
       }
     }
 

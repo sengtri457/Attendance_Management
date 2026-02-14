@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { AttendanceService } from '../../../services/attendanceservice/attendance.service';
 import { StudentService } from '../../../services/studentservices/student.service';
 import { SubjectService } from '../../../services/subjectservice/subject.service';
+import { ClassGroupService } from '../../../services/class-groupservice/class-group.service';
+import { ClassGroup } from '../../../models/class-group.model';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -20,20 +22,25 @@ export class WeeklyReportComponent implements OnInit {
   private attendanceService = inject(AttendanceService);
   private studentService = inject(StudentService);
   private subjectService = inject(SubjectService);
+  private classGroupService = inject(ClassGroupService);
 
   students: any[] = [];
+
   subjects: any[] = [];
+  classGroups: ClassGroup[] = [];
   groupedData: any[] = [];
   weekDays: Date[] = [];
 
   startDate: string = '';
   endDate: string = '';
   selectedSubject: string = '';
+  selectedClassGroupId: string = '';
   loading = false;
 
   ngOnInit() {
     this.setDefaultDates();
     this.loadSubjects();
+    this.loadClassGroups();
     this.generateReport();
   }
 
@@ -57,13 +64,23 @@ export class WeeklyReportComponent implements OnInit {
     });
   }
 
+  loadClassGroups() {
+    this.classGroupService.getAllClassGroups().subscribe({
+      next: (res: any) => this.classGroups = res.data || [],
+      error: (err: any) => console.error(err)
+    });
+  }
+
   generateReport() {
     if (!this.startDate || !this.endDate) return;
     this.loading = true;
     this.updateWeekDays();
 
     // Fetch all students (max 1000 for scalability within reason)
-    this.studentService.getAll({ limit: 1000 }).subscribe({
+    this.studentService.getAll({ 
+        limit: 1000, 
+        classGroupId: this.selectedClassGroupId 
+    }).subscribe({
       next: (resSt: any) => {
         const allStudents = resSt.data || [];
 
@@ -117,11 +134,14 @@ export class WeeklyReportComponent implements OnInit {
 
     // Populate attendance
     attendance.forEach(att => {
+      if (!att.student) return;
       // Ensure student exists
       const studentId = typeof att.student === 'object' ? att.student._id : att.student;
       
       let stuData = studentMap.get(studentId);
       
+      // Handle cases where student exists in attendance but wasn't in the initial student list (e.g. inactive or different class)
+      // For now, we only process if student exists in the map
       if (stuData) {
         const dateStr = new Date(att.date).toLocaleDateString('en-CA');
         

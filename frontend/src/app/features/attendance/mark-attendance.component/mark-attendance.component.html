@@ -14,12 +14,22 @@
   <div class="card shadow-sm border-0 mb-4 rounded-4 fade-in-up" style="animation-delay: 0.1s">
     <div class="card-body p-4">
       <div class="row g-3 align-items-end">
-        <div class="col-md-4">
+        <div class="col-md-3">
           <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Date</label>
           <input type="date" class="form-control form-control-lg border-0 bg-light" [ngModel]="selectedDate"
             (change)="onDateChange($event)">
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+          <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Class Group</label>
+          <select class="form-select form-select-lg border-0 bg-light" [(ngModel)]="selectedClassGroupId"
+            (change)="loadData()">
+            <option value="">All Classes</option>
+            <option *ngFor="let group of classGroups" [value]="group._id">
+              {{ group.name }}
+            </option>
+          </select>
+        </div>
+        <div class="col-md-3">
           <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Marked By</label>
           <select class="form-select form-select-lg border-0 bg-light" [(ngModel)]="selectedTeacherId">
             <option *ngFor="let teacher of teachers" [value]="teacher._id">
@@ -27,7 +37,7 @@
             </option>
           </select>
         </div>
-        <div class="col-md-4 text-end">
+        <div class="col-md-3 text-end">
           <button class="btn btn-primary btn-lg w-100" (click)="loadData()" [disabled]="loadingData">
             <span *ngIf="loadingData" class="spinner-border spinner-border-sm me-2"></span>
             {{ loadingData ? 'Loading...' : 'Refresh Data' }}

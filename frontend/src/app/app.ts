@@ -7,6 +7,7 @@ import { StudentService } from './services/studentservices/student.service';
 import { LeaveRequestService } from './services/leaveRequestservice/leave-request.service';
 import { LeaveRequest } from './models/user.model';
 import { CountService } from './service/count.service';
+import { ThemeService } from './services/theme.service';
 import 'animate.css';
 interface QuickAction {
   id: string;
@@ -37,6 +38,7 @@ export class App implements OnInit {
   authService = inject(AuthService);
   studentService = inject(StudentService);
   count = inject(CountService);
+  themeService = inject(ThemeService);
   private leaveRequestService = inject(LeaveRequestService);
   leaveRequests: LeaveRequest[] = [];
 
@@ -68,6 +70,8 @@ export class App implements OnInit {
     this.leaveRequestService.getLeaveRequests().subscribe({
       next: (response) => {
         this.leaveRequests = response.data;
+        console.log(this.leaveRequests
+        )
         this.count.getCount(
           this.leaveRequests.filter((f) => {
             return f.status === 'pending';

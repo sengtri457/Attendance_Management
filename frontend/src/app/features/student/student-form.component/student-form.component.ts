@@ -11,6 +11,8 @@ import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { StudentService } from "../../../services/studentservices/student.service";
 import { UserService } from "../../../services/userservice/user.service";
 import { RoleService } from "../../../services/rolservices/role.service";
+import { ClassGroupService } from "../../../services/class-groupservice/class-group.service";
+import { ClassGroup } from "../../../models/class-group.model";
 
 @Component({
   selector: "app-student-form.component",
@@ -25,6 +27,7 @@ export class StudentFormComponent {
   private studentService = inject(StudentService);
   private userService = inject(UserService);
   private roleService = inject(RoleService);
+  private classGroupService = inject(ClassGroupService);
 
   studentForm!: FormGroup;
   isEditMode = false;
@@ -33,13 +36,16 @@ export class StudentFormComponent {
   submitting = false;
   errorMessage = "";
   studentRoleId = "";
+  classGroups: ClassGroup[] = [];
 
   ngOnInit(): void {
     this.studentId = this.route.snapshot.paramMap.get("id");
     this.isEditMode = !!this.studentId;
 
     this.initForm();
+    this.initForm();
     this.loadStudentRole();
+    this.loadClassGroups();
 
     if (this.isEditMode && this.studentId) {
       this.loadStudent(this.studentId);
@@ -55,6 +61,7 @@ export class StudentFormComponent {
         gender: [""],
         phone: [""],
         photo: [""],
+        classGroup: [null],
       });
     } else {
       this.studentForm = this.fb.group({
@@ -67,6 +74,7 @@ export class StudentFormComponent {
         gender: [""],
         phone: [""],
         photo: [""],
+        classGroup: [null],
       });
     }
   }
@@ -101,6 +109,7 @@ export class StudentFormComponent {
           gender: student.gender || "",
           phone: student.phone || "",
           photo: student.photo || "",
+          classGroup: student.classGroup || null,
         });
         this.loading = false;
       },
@@ -177,5 +186,13 @@ export class StudentFormComponent {
           });
       }
     }
+  }
+  loadClassGroups(): void {
+    this.classGroupService.getAllClassGroups().subscribe({
+      next: (res) => {
+        this.classGroups = res.data;
+      },
+      error: (err) => console.error("Error loading class groups", err),
+    });
   }
 }

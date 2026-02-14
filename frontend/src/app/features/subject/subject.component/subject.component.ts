@@ -56,6 +56,7 @@ export class SubjectComponent implements OnInit {
       next: (response) => {
         if (response.success && response.data) {
           this.subjects = response.data;
+          console.log(this.subjects);
         }
         this.loading = false;
       },

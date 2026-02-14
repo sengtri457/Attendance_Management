@@ -64,6 +64,7 @@ export interface Student {
   photo?: string;
   isBlacklisted: boolean;
   selected?: boolean;
+  classGroup?: any;
 }
 
 // ===================================
@@ -284,14 +285,22 @@ export enum DayOfWeek {
 export interface Subject {
   _id: string;
   subjectName: string;
-  teachTime: Date | string;
-  endTime: Date | string;
+  teachTime: Date | string; // Legacy/Primary
+  endTime: Date | string;   // Legacy/Primary
   teacher?: Teacher;
   createdAt?: Date;
   updatedAt?: Date;
   description?: string;
-  teacherId?: string;
+  teacherId?: any;
   credit?: number;
-  dayOfWeek: number;
+  dayOfWeek: string;       // Legacy/Primary
   subjectCode?: string;
+  classGroup?: any;        // Legacy/Primary
+  classGroups?: any[];     // New
+  sessions?: {             // New
+      dayOfWeek: string;
+      startTime: string;
+      endTime: string;
+      room?: string;
+  }[];
 }

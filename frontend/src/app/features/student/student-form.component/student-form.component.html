@@ -1,188 +1,161 @@
 <div class="container-fluid py-4">
-      <div class="row justify-content-center">
-        <div class="col-lg-8">
-          <div class="mb-4">
-            <button routerLink="/students" class="btn btn-link text-decoration-none p-0 mb-2">
-              <i class="bi bi-arrow-left me-2"></i>Back to Students
-            </button>
-            <h1 class="h2 mb-0">{{ isEditMode ? 'Edit Student' : 'Add New Student' }}</h1>
-          </div>
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="mb-4">
+        <button routerLink="/students" class="btn btn-link text-decoration-none p-0 mb-2">
+          <i class="bi bi-arrow-left me-2"></i>Back to Students
+        </button>
+        <h1 class="h2 mb-0">{{ isEditMode ? 'Edit Student' : 'Add New Student' }}</h1>
+      </div>
 
-          @if (errorMessage) {
-            <div class="alert alert-danger alert-dismissible fade show">
-              <i class="bi bi-exclamation-triangle me-2"></i>
-              {{ errorMessage }}
-              <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
-            </div>
-          }
+      @if (errorMessage) {
+      <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+      </div>
+      }
 
-          @if (loading) {
-            <div class="text-center py-5">
-              <div class="spinner-border text-primary"></div>
-            </div>
-          } @else {
-            <div class="card">
-              <div class="card-body">
-                <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
-                  <!-- User Account Section -->
-                  @if (!isEditMode) {
-                    <h5 class="mb-3">
-                      <i class="bi bi-person-badge me-2"></i>
-                      Account Information
-                    </h5>
+      @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary"></div>
+      </div>
+      } @else {
+      <div class="card">
+        <div class="card-body">
+          <form [formGroup]="studentForm" (ngSubmit)="onSubmit()">
+            <!-- User Account Section -->
+            @if (!isEditMode) {
+            <h5 class="mb-3">
+              <i class="bi bi-person-badge me-2"></i>
+              Account Information
+            </h5>
 
-                    <div class="row mb-3">
-                      <div class="col-md-6">
-                        <label class="form-label">Username *</label>
-                        <input
-                          type="text"
-                          formControlName="username"
-                          class="form-control"
-                          [class.is-invalid]="isFieldInvalid('username')"
-                          placeholder="Enter username"
-                        />
-                        @if (isFieldInvalid('username')) {
-                          <div class="invalid-feedback">Username is required</div>
-                        }
-                      </div>
-                      <div class="col-md-6">
-                        <label class="form-label">Email *</label>
-                        <input
-                          type="email"
-                          formControlName="email"
-                          class="form-control"
-                          [class.is-invalid]="isFieldInvalid('email')"
-                          placeholder="Enter email"
-                        />
-                        @if (isFieldInvalid('email')) {
-                          <div class="invalid-feedback">Valid email is required</div>
-                        }
-                      </div>
-                    </div>
-
-                    <div class="mb-4">
-                      <label class="form-label">Password *</label>
-                      <input
-                        type="password"
-                        formControlName="password"
-                        class="form-control"
-                        [class.is-invalid]="isFieldInvalid('password')"
-                        placeholder="Enter password"
-                      />
-                      @if (isFieldInvalid('password')) {
-                        <div class="invalid-feedback">Password is required (min 6 characters)</div>
-                      }
-                    </div>
-
-                    <hr>
-                  }
-
-                  <!-- Personal Information -->
-                  <h5 class="mb-3">
-                    <i class="bi bi-person me-2"></i>
-                    Personal Information
-                  </h5>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label">First Name *</label>
-                      <input
-                        type="text"
-                        formControlName="firstName"
-                        class="form-control"
-                        [class.is-invalid]="isFieldInvalid('firstName')"
-                        placeholder="Enter first name"
-                      />
-                      @if (isFieldInvalid('firstName')) {
-                        <div class="invalid-feedback">First name is required</div>
-                      }
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Last Name *</label>
-                      <input
-                        type="text"
-                        formControlName="lastName"
-                        class="form-control"
-                        [class.is-invalid]="isFieldInvalid('lastName')"
-                        placeholder="Enter last name"
-                      />
-                      @if (isFieldInvalid('lastName')) {
-                        <div class="invalid-feedback">Last name is required</div>
-                      }
-                    </div>
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Date of Birth</label>
-                      <input
-                        type="date"
-                        formControlName="dob"
-                        class="form-control"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Gender</label>
-                      <select formControlName="gender" class="form-select">
-                        <option value="">Select gender</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-
-                  </div>
-
-                  <div class="row mb-3">
-                    <div class="col-md-6">
-                      <label class="form-label">Phone</label>
-                      <input
-                        type="tel"
-                        formControlName="phone"
-                        class="form-control"
-                        placeholder="+1234567890"
-                      />
-                    </div>
-                    <div class="col-md-6">
-                      <label class="form-label">Photo URL</label>
-                      <input
-                        type="text"
-                        formControlName="photo"
-                        class="form-control"
-                        placeholder="https://example.com/photo.jpg"
-                      />
-                    </div>
-                  </div>
-
-                  <!-- Form Actions -->
-                  <hr>
-                  <div class="d-flex justify-content-end gap-2">
-                    <button
-                      type="button"
-                      routerLink="/students"
-                      class="btn btn-secondary"
-                    >
-                      <i class="bi bi-x-circle me-2"></i>
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      [disabled]="studentForm.invalid || submitting"
-                      class="btn btn-primary"
-                    >
-                      @if (submitting) {
-                        <span class="spinner-border spinner-border-sm me-2"></span>
-                        Saving...
-                      } @else {
-                        <i class="bi bi-check-circle me-2"></i>
-                        {{ isEditMode ? 'Update' : 'Create' }} Student
-                      }
-                    </button>
-                  </div>
-                </form>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Username *</label>
+                <input type="text" formControlName="username" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('username')" placeholder="Enter username" />
+                @if (isFieldInvalid('username')) {
+                <div class="invalid-feedback">Username is required</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Email *</label>
+                <input type="email" formControlName="email" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('email')" placeholder="Enter email" />
+                @if (isFieldInvalid('email')) {
+                <div class="invalid-feedback">Valid email is required</div>
+                }
               </div>
             </div>
-          }
+
+            <div class="mb-4">
+              <label class="form-label">Password *</label>
+              <input type="password" formControlName="password" class="form-control"
+                [class.is-invalid]="isFieldInvalid('password')" placeholder="Enter password" />
+              @if (isFieldInvalid('password')) {
+              <div class="invalid-feedback">Password is required (min 6 characters)</div>
+              }
+            </div>
+
+            <hr>
+            }
+
+            <!-- Personal Information -->
+            <h5 class="mb-3">
+              <i class="bi bi-person me-2"></i>
+              Personal Information
+            </h5>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name *</label>
+                <input type="text" formControlName="firstName" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('firstName')" placeholder="Enter first name" />
+                @if (isFieldInvalid('firstName')) {
+                <div class="invalid-feedback">First name is required</div>
+                }
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name *</label>
+                <input type="text" formControlName="lastName" class="form-control"
+                  [class.is-invalid]="isFieldInvalid('lastName')" placeholder="Enter last name" />
+                @if (isFieldInvalid('lastName')) {
+                <div class="invalid-feedback">Last name is required</div>
+                }
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Date of Birth</label>
+                <input type="date" formControlName="dob" class="form-control" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Gender</label>
+                <select formControlName="gender" class="form-select">
+                  <option value="">Select gender</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Phone</label>
+                <input type="tel" formControlName="phone" class="form-control" placeholder="+1234567890" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Photo URL</label>
+                <input type="text" formControlName="photo" class="form-control"
+                  placeholder="https://example.com/photo.jpg" />
+              </div>
+            </div>
+
+            <!-- Academic Information -->
+            <h5 class="mb-3 mt-4">
+              <i class="bi bi-mortarboard me-2"></i>
+              Academic Information
+            </h5>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Class Group / Section</label>
+                <select formControlName="classGroup" class="form-select">
+                  <option [ngValue]="null">Select Class Group</option>
+                  @for (group of classGroups; track group._id) {
+                  <option [value]="group._id">
+                    {{ group.name }} ({{ group.academicYear }})
+                  </option>
+                  }
+                </select>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <hr>
+            <div class="d-flex justify-content-end gap-2">
+              <button type="button" routerLink="/students" class="btn btn-secondary">
+                <i class="bi bi-x-circle me-2"></i>
+                Cancel
+              </button>
+              <button type="submit" [disabled]="studentForm.invalid || submitting" class="btn btn-primary">
+                @if (submitting) {
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Saving...
+                } @else {
+                <i class="bi bi-check-circle me-2"></i>
+                {{ isEditMode ? 'Update' : 'Create' }} Student
+                }
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+      }
     </div>
+  </div>
+</div>

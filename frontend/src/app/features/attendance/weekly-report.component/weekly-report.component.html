@@ -16,24 +16,31 @@
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body">
             <div class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label class="form-label">Start Date (Monday)</label>
+                <div class="col-md-2">
+                    <label class="form-label">Start Date</label>
                     <input type="date" class="form-control" [(ngModel)]="startDate">
                 </div>
-                <div class="col-md-3">
-                    <label class="form-label">End Date (Sunday)</label>
+                <div class="col-md-2">
+                    <label class="form-label">End Date</label>
                     <input type="date" class="form-control" [(ngModel)]="endDate">
                 </div>
                 <div class="col-md-3">
-                    <label class="form-label">Subject (Optional)</label>
+                    <label class="form-label">Class Group</label>
+                    <select class="form-select" [(ngModel)]="selectedClassGroupId">
+                        <option value="">All Classes</option>
+                        <option *ngFor="let group of classGroups" [value]="group._id">{{ group.name }}</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Subject</label>
                     <select class="form-select" [(ngModel)]="selectedSubject">
                         <option value="">All Subjects</option>
                         <option *ngFor="let sub of subjects" [value]="sub._id">{{ sub.subjectName }}</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <button class="btn btn-primary w-100" (click)="generateReport()" [disabled]="loading">
-                        <i class="bi bi-search me-2"></i> Generate Report
+                        <i class="bi bi-search me-2"></i> Search
                     </button>
                 </div>
             </div>
@@ -67,8 +74,8 @@
                 <tbody>
                     <tr *ngFor="let group of groupedData">
                         <td>
-                            <div class="fw-bold">{{ group.student.firstName }} {{ group.student.lastName }}</div>
-                            <small class="text-muted">{{ group.student.studentId }}</small>
+                            <div class="fw-bold">{{ group.student?.firstName }} {{ group.student?.lastName }}</div>
+                            <small class="text-muted">{{ group.student?.studentId }}</small>
                         </td>
                         <td *ngFor="let day of weekDays" class="text-center">
                             <!-- Check if day exists in map using ISO string key -->

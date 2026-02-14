@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import {
+  FormArray,
   FormBuilder,
   FormGroup,
   FormsModule,
@@ -11,6 +12,8 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { DayOfWeek, Teacher } from "../../../models/user.model";
 import { CommonModule } from "@angular/common";
 import { TeacherService } from "../../../services/teacherservice/teacher.service";
+import { ClassGroupService } from "../../../services/class-groupservice/class-group.service";
+import { ClassGroup } from "../../../models/class-group.model";
 
 @Component({
   selector: "app-subject-form.component",
@@ -27,22 +30,28 @@ export class SubjectFormComponent implements OnInit {
   error = "";
   daysOfWeek = Object.values(DayOfWeek);
   teachers: Teacher[] = [];
+  classGroups: ClassGroup[] = [];
 
   constructor(
     private fb: FormBuilder,
     private subjectService: SubjectService,
     private teacherService: TeacherService,
+    private classGroupService: ClassGroupService,
     private route: ActivatedRoute,
     private router: Router,
   ) {
     this.subjectForm = this.fb.group({
       subjectName: ["", Validators.required],
       subjectCode: [""],
+      // Legacy fields - keeping for now or we can migrate
       teachTime: [""],
       endTime: [""],
       dayOfWeek: [""],
       credit: ["", [Validators.min(1), Validators.max(10)]],
       teacherId: [""],
+      classGroup: [null], // Legacy single select
+      classGroups: [[]],  // New multi-select
+      sessions: this.fb.array([]), // New sessions
       description: [""],
     });
   }
@@ -50,6 +59,7 @@ export class SubjectFormComponent implements OnInit {
   ngOnInit(): void {
     // Load teachers first
     this.loadTeachers();
+    this.loadClassGroups();
 
     // Check if we're in edit mode
     this.subjectId = this.route.snapshot.paramMap.get("id") || undefined;
@@ -79,6 +89,15 @@ export class SubjectFormComponent implements OnInit {
     });
   }
 
+  loadClassGroups(): void {
+    this.classGroupService.getAllClassGroups().subscribe({
+      next: (res) => {
+        this.classGroups = res.data;
+      },
+      error: (err) => console.error("Error loading class groups", err),
+    });
+  }
+
   loadSubject(id: string): void {
     this.loading = true;
     this.subjectService.getSubjectById(id).subscribe({
@@ -99,6 +118,25 @@ export class SubjectFormComponent implements OnInit {
           }
 
           this.subjectForm.patchValue(formData);
+          
+          // Patch classGroups
+          if (formData.classGroups) {
+             this.subjectForm.patchValue({ classGroups: formData.classGroups });
+          }
+
+          // Patch sessions
+          if (formData.sessions && Array.isArray(formData.sessions)) {
+              const sessionsFormArray = this.subjectForm.get('sessions') as FormArray;
+              sessionsFormArray.clear();
+              formData.sessions.forEach((session: any) => {
+                  sessionsFormArray.push(this.fb.group({
+                      dayOfWeek: [session.dayOfWeek, Validators.required],
+                      startTime: [session.startTime, Validators.required],
+                      endTime: [session.endTime, Validators.required],
+                      room: [session.room]
+                  }));
+              });
+          }
         }
         this.loading = false;
       },
@@ -117,6 +155,25 @@ export class SubjectFormComponent implements OnInit {
     const hours = String(date.getHours()).padStart(2, "0");
     const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+  }
+
+  // Session Management
+  get sessions() {
+      return this.subjectForm.get('sessions') as FormArray;
+  }
+
+  addSession() {
+      const sessionGroup = this.fb.group({
+          dayOfWeek: ['', Validators.required],
+          startTime: ['', Validators.required],
+          endTime: ['', Validators.required],
+          room: ['']
+      });
+      this.sessions.push(sessionGroup);
+  }
+
+  removeSession(index: number) {
+      this.sessions.removeAt(index);
   }
 
   getTeacherName(teacher: Teacher): string {
@@ -139,10 +196,22 @@ export class SubjectFormComponent implements OnInit {
 
     this.loading = true;
     this.error = "";
-    const formData = this.subjectForm.value;
+    
+    // Get form value
+    const formValue = this.subjectForm.value;
+
+    // Create a clean payload to send to backend
+    // Explicitly ensure classGroups is an array and clear legacy classGroup field
+    const payload = {
+      ...formValue,
+      classGroups: Array.isArray(formValue.classGroups) ? formValue.classGroups : [],
+      classGroup: null // Ensure legacy field doesn't interfere
+    };
+
+    console.log('Submitting subject payload:', payload);
 
     if (this.isEditMode && this.subjectId) {
-      this.subjectService.updateSubject(this.subjectId, formData).subscribe({
+      this.subjectService.updateSubject(this.subjectId, payload).subscribe({
         next: (response) => {
           if (response.success) {
             this.router.navigate(["/subjects"]);
@@ -156,7 +225,7 @@ export class SubjectFormComponent implements OnInit {
         },
       });
     } else {
-      this.subjectService.createSubject(formData).subscribe({
+      this.subjectService.createSubject(payload).subscribe({
         next: (response) => {
           if (response.success) {
             this.router.navigate(["/subjects"]);

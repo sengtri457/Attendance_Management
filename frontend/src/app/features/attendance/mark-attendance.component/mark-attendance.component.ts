@@ -10,6 +10,8 @@ import { StudentService } from '../../../services/studentservices/student.servic
 import { SubjectService } from '../../../services/subjectservice/subject.service';
 import { TeacherService } from '../../../services/teacherservice/teacher.service';
 import { Student, Teacher, Subject, Attendance, MarkAttendanceRequest } from '../../../models/user.model';
+import { ClassGroup } from '../../../models/class-group.model';
+import { ClassGroupService } from '../../../services/class-groupservice/class-group.service';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -30,6 +32,8 @@ export class MarkAttendanceComponent implements OnInit {
   
   // Filters
   selectedDate: string = new Date().toISOString().split('T')[0];
+  selectedClassGroupId: string = '';
+  classGroups: ClassGroup[] = [];
   
   // Teachers
   teachers: Teacher[] = [];
@@ -40,12 +44,27 @@ export class MarkAttendanceComponent implements OnInit {
     private studentService: StudentService,
     private subjectService: SubjectService,
     private teacherService: TeacherService,
+    private classGroupService: ClassGroupService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadTeachers();
-    this.loadData();
+    this.loadTeachers();
+    this.loadClassGroups();
+  }
+
+  loadClassGroups(): void {
+    this.classGroupService.getAllClassGroups().subscribe({
+      next: (res) => {
+        this.classGroups = res.data;
+        if (this.classGroups.length > 0) {
+           this.selectedClassGroupId = this.classGroups[0]._id || '';
+           this.loadData();
+        }
+      },
+      error: (err) => console.error('Error loading class groups', err)
+    });
   }
 
   loadTeachers(): void {
@@ -66,43 +85,83 @@ export class MarkAttendanceComponent implements OnInit {
     this.loadingData = true;
     this.attendanceMap.clear();
 
-    const students$ = this.studentService.getAll();
+    // 1. Get Students for selected ClassGroup
+    const students$ = this.studentService.getAll(); // Ideally backend supports filtering by classGroup in getAll, but we can client-filter if needed, or update service.
+    // However, best is to update studentService to accept classGroupId
+    
+    // 2. Get Subjects for selected ClassGroup & Date
+    // Note: getSubjectSchedule might need to filter by classGroup too if subjects are class-specific
     const subjects$ = this.subjectService.getSubjectSchedule(this.selectedDate); 
+
     const attendance$ = this.attendanceService.getAll({
       dateFrom: this.selectedDate, 
       dateTo: this.selectedDate 
     });
 
-    students$.subscribe({
-      next: (res) => {
-         this.students = res.data || res;
-         
-         subjects$.subscribe({
-             next: (subRes) => {
-                 this.subjects = subRes.data || [];
-                 
-                 attendance$.subscribe({
-                     next: (attRes) => {
-                         const attendances = attRes.data || [];
-                         this.processAttendance(attendances);
-                         this.loadingData = false;
-                     },
-                     error: (err) => {
-                         console.error('Error loading attendance', err);
-                         this.loadingData = false;
-                     }
-                 });
-             },
-             error: (err) => {
-                 console.error('Error loading subjects', err);
-                 this.loadingData = false;
-             }
-         });
-      },
-      error: (err) => {
-          console.error('Error loading students', err);
-          this.loadingData = false;
-      }
+    // We need to chain these or use forkJoin, but let's refine the logic.
+    // First get students of the class
+    
+    this.studentService.getAll().subscribe({
+        next: (res) => {
+            const allStudents = res.data || res;
+            // Filter students by class group
+            if (this.selectedClassGroupId) {
+                this.students = allStudents.filter((s:any) => s.classGroup === this.selectedClassGroupId || (s.classGroup && s.classGroup._id === this.selectedClassGroupId));
+            } else {
+                this.students = [];
+            }
+
+            if (this.students.length === 0) {
+                this.loadingData = false;
+                this.subjects = [];
+                return;
+            }
+
+            // Get subjects (filtered by classGroup if possible, or client side)
+            subjects$.subscribe({
+                next: (subRes) => {
+                    let allSubjects = subRes.data || [];
+                     // Filter subjects by selected class group
+                    if (this.selectedClassGroupId) {
+                        allSubjects = allSubjects.filter((sub: any) => {
+                            // Check legacy single class group
+                            const legacyMatch = sub.classGroup && (sub.classGroup._id === this.selectedClassGroupId || sub.classGroup === this.selectedClassGroupId);
+                            
+                            // Check new multiple class groups
+                            // Handle populated objects or raw IDs
+                            const newMatch = sub.classGroups && Array.isArray(sub.classGroups) && sub.classGroups.some((group: any) => 
+                                (typeof group === 'string' && group === this.selectedClassGroupId) || 
+                                (group && group._id === this.selectedClassGroupId)
+                            );
+                            
+                            return legacyMatch || newMatch;
+                        });
+                    }
+                    this.subjects = allSubjects;
+                    
+                    // Fetch attendance
+                    attendance$.subscribe({
+                        next: (attRes) => {
+                             const attendances = attRes.data || [];
+                             this.processAttendance(attendances);
+                             this.loadingData = false;
+                        },
+                        error: (err) => {
+                             console.error('Error loading attendance', err);
+                             this.loadingData = false;
+                        }
+                    });
+                },
+                error: (err) => {
+                    console.error('Error loading subjects', err);
+                    this.loadingData = false;
+                }
+            });
+        },
+        error: (err) => {
+             console.error('Error loading students', err);
+             this.loadingData = false;
+        }
     });
   }
   

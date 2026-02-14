@@ -66,4 +66,10 @@ export const routes: Routes = [
       import('./features/leave/leave.routes').then((m) => m.LEAVE_ROUTES),
     // canActivate: [authGuardGuard],
   },
+  {
+    path: 'class-groups',
+    loadChildren: () =>
+      import('./features/class-group/class-group.routes').then((m) => m.classGroupRoutes),
+    canActivate: [authGuardGuard],
+  },
 ];

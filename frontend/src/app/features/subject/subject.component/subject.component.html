@@ -7,166 +7,191 @@
       Subject Management
     </h1>
     @if (canCreate) {
-      <button class="btn btn-primary" (click)="createNewSubject()">
-        <i class="bi bi-plus-lg me-1"></i>
-        Create New Subject
-      </button>
+    <button class="btn btn-primary" (click)="createNewSubject()">
+      <i class="bi bi-plus-lg me-1"></i>
+      Create New Subject
+    </button>
     }
   </div>
 
   <!-- Loading State -->
   @if (loading) {
-    <div class="text-center py-5">
-      <div class="spinner-border text-primary mb-3" role="status">
-        <span class="visually-hidden">Loading...</span>
-      </div>
-      <p class="text-muted">Loading subjects...</p>
+  <div class="text-center py-5">
+    <div class="spinner-border text-primary mb-3" role="status">
+      <span class="visually-hidden">Loading...</span>
     </div>
+    <p class="text-muted">Loading subjects...</p>
+  </div>
   }
 
   <!-- Error State -->
   @if (error && !loading) {
-    <div class="alert alert-danger" role="alert">
-      <i class="bi bi-exclamation-triangle-fill me-2"></i>
-      <strong>Error:</strong> {{ error }}
-    </div>
+  <div class="alert alert-danger" role="alert">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Error:</strong> {{ error }}
+  </div>
   }
 
   <!-- Empty State - No Subjects Found -->
   @if (!loading && !error && subjects.length === 0) {
-    <div class="text-center py-5">
-      <div class="mb-4">
-        <i class="bi bi-journal-x display-1 text-muted"></i>
-      </div>
-      <h3 class="h4 mb-3">No Subjects Found</h3>
-      <p class="text-muted mb-4">Get started by creating your first subject!</p>
-      <button class="btn btn-primary" (click)="createNewSubject()">
-        <i class="bi bi-plus-lg me-1"></i>
-        Create Your First Subject
-      </button>
+  <div class="text-center py-5">
+    <div class="mb-4">
+      <i class="bi bi-journal-x display-1 text-muted"></i>
     </div>
+    <h3 class="h4 mb-3">No Subjects Found</h3>
+    <p class="text-muted mb-4">Get started by creating your first subject!</p>
+    <button class="btn btn-primary" (click)="createNewSubject()">
+      <i class="bi bi-plus-lg me-1"></i>
+      Create Your First Subject
+    </button>
+  </div>
   }
 
   <!-- Subject Cards Grid -->
   @if (!loading && subjects.length > 0) {
-    <div class="row g-3">
-      @for (subject of subjects; track subject; let i = $index) {
-        <div class="col-12 col-md-6 col-lg-6" [attr.data-index]="i">
-          <div class="card h-100 shadow-sm border">
-            <!-- Card Header with Subject Name and Code -->
-            <div class="card-header bg-white border-bottom">
-              <div class="d-flex justify-content-between align-items-start">
-                <h5 class="card-title mb-0 fw-semibold text-dark">
-                  {{ subject.subjectName }}
-                </h5>
-                @if (subject.subjectCode) {
-                  <span class="badge bg-primary">
-                    {{ subject.subjectCode }}
-                  </span>
-                }
-              </div>
-            </div>
-            <!-- Card Body with Subject Details -->
-            <div class="card-body">
-              <div class="d-grid gap-2">
-                <!-- Day of Week -->
-                @if (subject.dayOfWeek) {
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-calendar-day text-primary me-2"></i>
-                    <span class="text-muted small me-2">Day:</span>
-                    <span class="fw-medium">{{ subject.dayOfWeek }}</span>
-                  </div>
-                }
-                <!-- Time Schedule -->
-                @if (subject.teachTime && subject.endTime) {
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-clock text-primary me-2"></i>
-                    <span class="text-muted small me-2">Time:</span>
-                    <span class="fw-medium">
-                      {{ subject.teachTime | date:'shortTime' }} - {{ subject.endTime | date:'shortTime' }}
-                    </span>
-                  </div>
-                }
-                <!-- Credits -->
-                @if (subject.credit) {
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-star text-primary me-2"></i>
-                    <span class="text-muted small me-2">Credits:</span>
-                    <span class="fw-medium">{{ subject.credit }}</span>
-                  </div>
-                }
-                <!-- Teacher ID -->
-                @if (subject.teacherId) {
-                  <div class="d-flex align-items-center">
-                    <i class="bi bi-person-badge text-primary me-2"></i>
-                    <span class="text-muted small me-2">Teacher:</span>
-                    <span class="fw-medium">{{ subject.teacherId }}</span>
-                  </div>
-                }
-                <!-- Description -->
-                @if (subject.description) {
-                  <div class="mt-2">
-                    <div class="d-flex align-items-start">
-                      <i class="bi bi-card-text text-primary me-2 mt-1"></i>
-                      <div>
-                        <span class="text-muted small d-block mb-1">Description:</span>
-                        <p class="small mb-0 text-secondary">{{ subject.description }}</p>
-                      </div>
-                    </div>
-                  </div>
-                }
-                <!-- Created Date -->
-                @if (subject.createdAt) {
-                  <div class="d-flex align-items-center mt-2 pt-2 border-top">
-                    <i class="bi bi-calendar-check text-muted me-2"></i>
-                    <span class="text-muted small">
-                      Created: {{ subject.createdAt | date:'short' }}
-                    </span>
-                  </div>
-                }
-              </div>
-            </div>
-            <!-- Card Footer with Action Buttons -->
-            <div class="card-footer bg-light border-top">
-              <div class="d-flex gap-2">
-                <button class="btn btn-sm btn-outline-primary flex-fill" (click)="editSubject(subject._id)"
-                  title="Edit this subject">
-                  <i class="bi bi-pencil me-1"></i>
-                  Edit
-                </button>
-                <button class="btn btn-sm btn-outline-danger flex-fill" (click)="deleteSubject(subject._id)"
-                  title="Delete this subject">
-                  <i class="bi bi-trash me-1"></i>
-                  Delete
-                </button>
-              </div>
-            </div>
+  <div class="row g-3">
+    @for (subject of subjects; track subject; let i = $index) {
+    <div class="col-12 col-md-6 col-lg-6" [attr.data-index]="i">
+      <div class="card h-100 shadow-sm border">
+        <!-- Card Header with Subject Name and Code -->
+        <div class="card-header bg-white border-bottom">
+          <div class="d-flex justify-content-between align-items-start">
+            <h5 class="card-title mb-0 fw-semibold text-dark">
+              {{ subject.subjectName }}
+            </h5>
+            @if (subject.subjectCode) {
+            <span class="badge bg-primary">
+              {{ subject.subjectCode }}
+            </span>
+            }
           </div>
         </div>
-      }
+        <!-- Card Body with Subject Details -->
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <!-- Day of Week -->
+            @if (subject.dayOfWeek) {
+            <div class="d-flex align-items-center">
+              <i class="bi bi-calendar-day text-primary me-2"></i>
+              <span class="text-muted small me-2">Day:</span>
+              <span class="fw-medium">{{ subject.dayOfWeek }}</span>
+            </div>
+            }
+            <!-- Time Schedule -->
+            @if (subject.teachTime && subject.endTime) {
+            <div class="d-flex align-items-center mb-2">
+              <i class="bi bi-clock text-primary me-2"></i>
+              <span class="text-muted small me-2">Time:</span>
+              <span class="fw-medium">
+                {{ subject.teachTime | date:'shortTime' }} - {{ subject.endTime | date:'shortTime' }}
+              </span>
+            </div>
+            }
+
+            <!-- Sessions List -->
+            @if (subject.sessions && subject.sessions.length > 0) {
+            <div class="mt-2 mb-2">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-calendar-week text-primary me-2 mt-1"></i>
+                <div class="w-100">
+                  <span class="text-muted small d-block mb-1">Sessions:</span>
+                  <ul class="list-unstyled mb-0 small bg-light p-2 rounded">
+                    @for (session of subject.sessions; track session) {
+                    <li class="d-flex justify-content-between mb-1 last-mb-0">
+                      <span>
+                        <span class="fw-semibold text-dark">{{ session.dayOfWeek.substring(0, 3) }}:</span>
+                        {{ session.startTime }} - {{ session.endTime }}
+                      </span>
+                      @if (session.room) {
+                      <span class="badge bg-secondary opacity-75">{{ session.room }}</span>
+                      }
+                    </li>
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+            }
+            <!-- Credits -->
+            @if (subject.credit) {
+            <div class="d-flex align-items-center">
+              <i class="bi bi-star text-primary me-2"></i>
+              <span class="text-muted small me-2">Credits:</span>
+              <span class="fw-medium">{{ subject.credit }}</span>
+            </div>
+            }
+            <!-- Teacher ID -->
+            @if (subject.teacherId) {
+            <div class="d-flex align-items-center">
+              <i class="bi bi-person-badge text-primary me-2"></i>
+              <span class="text-muted small me-2">Teacher:</span>
+              <span class="fw-medium">{{ subject.teacherId.name }}</span>
+            </div>
+            }
+            <!-- Description -->
+            @if (subject.description) {
+            <div class="mt-2">
+              <div class="d-flex align-items-start">
+                <i class="bi bi-card-text text-primary me-2 mt-1"></i>
+                <div>
+                  <span class="text-muted small d-block mb-1">Description:</span>
+                  <p class="small mb-0 text-secondary">{{ subject.description }}</p>
+                </div>
+              </div>
+            </div>
+            }
+            <!-- Created Date -->
+            @if (subject.createdAt) {
+            <div class="d-flex align-items-center mt-2 pt-2 border-top">
+              <i class="bi bi-calendar-check text-muted me-2"></i>
+              <span class="text-muted small">
+                Created: {{ subject.createdAt | date:'short' }}
+              </span>
+            </div>
+            }
+          </div>
+        </div>
+        <!-- Card Footer with Action Buttons -->
+        <div class="card-footer bg-light border-top">
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary flex-fill" (click)="editSubject(subject._id)"
+              title="Edit this subject">
+              <i class="bi bi-pencil me-1"></i>
+              Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger flex-fill" (click)="deleteSubject(subject._id)"
+              title="Delete this subject">
+              <i class="bi bi-trash me-1"></i>
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
+    }
+  </div>
   }
 
   <!-- Summary Footer -->
   @if (!loading && subjects.length > 0) {
-    <div class="mt-4 pt-3 border-top">
-      <div class="d-flex justify-content-between align-items-center">
-        <p class="mb-0 text-muted">
-          <strong class="text-dark">Total Subjects:</strong>
-          {{ subjects.length }}
-          @if (subjects.length === 1) {
-            <span>subject</span>
-          }
-          @if (subjects.length !== 1) {
-            <span>subjects</span>
-          }
-        </p>
-        <button class="btn btn-sm btn-outline-secondary" (click)="createNewSubject()">
-          <i class="bi bi-plus-lg me-1"></i>
-          Add More
-        </button>
-      </div>
+  <div class="mt-4 pt-3 border-top">
+    <div class="d-flex justify-content-between align-items-center">
+      <p class="mb-0 text-muted">
+        <strong class="text-dark">Total Subjects:</strong>
+        {{ subjects.length }}
+        @if (subjects.length === 1) {
+        <span>subject</span>
+        }
+        @if (subjects.length !== 1) {
+        <span>subjects</span>
+        }
+      </p>
+      <button class="btn btn-sm btn-outline-secondary" (click)="createNewSubject()">
+        <i class="bi bi-plus-lg me-1"></i>
+        Add More
+      </button>
     </div>
+  </div>
   }
 
 </div>
