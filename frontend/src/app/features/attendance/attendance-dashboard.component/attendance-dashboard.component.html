@@ -190,7 +190,7 @@
 
   <!-- Recent Attendance -->
   <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white py-3">
+    <div class="card-header py-3">
       <h5 class="mb-0">
         <i class="bi bi-clock-history me-2"></i>
         Recent Check-ins
@@ -199,7 +199,7 @@
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
-          <thead class="table-light">
+          <thead>
             <tr>
               <th scope="col" class="ps-3">Student</th>
               <th scope="col">Status Summary</th>
@@ -220,10 +220,10 @@
                     {{ (group.student?.firstName || '').charAt(0) }}{{ (group.student?.lastName || '').charAt(0) }}
                   </div>
                   <div>
-                    <div class="fw-bold text-dark">
+                    <div class="fw-bold">
                       {{ group.student?.firstName }} {{ group.student?.lastName }}
                     </div>
-                    <small class="text-muted">
+                    <small class="text-secondary-c">
                       ID: {{ group.student?.studentId }}
                     </small>
                   </div>
@@ -273,42 +273,33 @@
 
             <!-- Detailed Expansion Row -->
             @if (isExpanded(group.student._id)) {
-            <tr class="detail-row bg-light">
+            <tr class="detail-row">
               <td colspan="6" class="p-3">
                 <div class="card border-0 shadow-sm">
-                  <div class="card-header bg-white border-bottom-0">
-                    <h6 class="mb-0 text-muted">Subject Details</h6>
+                  <div class="card-header border-bottom-0">
+                    <h6 class="mb-0 text-secondary-c">Subject Details</h6>
                   </div>
                   <div class="table-responsive">
                     <table class="table table-sm align-middle mb-0">
-                      <thead class="text-muted small text-uppercase">
+                      <thead class="text-uppercase small">
                         <tr>
                           <th class="ps-3">Subject</th>
-                          <th>Time</th>
                           <th>Status</th>
-                          <th>Late By</th>
-                          <th>Note</th>
-                          <th class="text-end pe-3">Actions</th>
+                          <th>MarkedByTeacher</th>
+                          <th class=" pe-3">Actions</th>
                         </tr>
                       </thead>
                       <tbody>
                         @for (att of group.records; track att._id) {
                         <tr>
                           <td class="ps-3 fw-medium">{{ att.subject?.subjectName || 'No Subject' }}</td>
-                          <td class="small text-muted">{{ attendanceService.formatTime(att.checkInTime) }}</td>
                           <td>
                             <span [class]="'badge bg-' + attendanceService.getStatusColor(att.status)">
                               {{ att.status | uppercase }}
                             </span>
                           </td>
-                          <td class="small">
-                            <span *ngIf="att.isLate" class="text-warning">{{ att.lateBy }} min</span>
-                            <span *ngIf="!att.isLate" class="text-muted">-</span>
-                          </td>
-                          <td class="small text-muted text-truncate" style="max-width: 150px;">
-                            {{ att.note || '-' }}
-                          </td>
-                          <td class="text-end pe-3">
+                          <td>{{ att.markedByTeacher.name }}</td>
+                          <td class=" pe-3">
                             <button class="btn btn-sm btn-link text-primary p-0 me-2"
                               (click)="startEdit(att); $event.stopPropagation()">
                               <i class="bi bi-pencil"></i>
@@ -323,7 +314,7 @@
                         @if (isEditing(att._id)) {
                         <tr>
                           <td colspan="6" class="p-0">
-                            <div class="p-3 bg-white border-top border-bottom">
+                            <div class="p-3 border-top border-bottom edit-form-container-c">
                               <div class="row g-2 align-items-end">
                                 <div class="col-md-3">
                                   <label class="form-label small mb-1">Check In</label>
@@ -376,7 +367,7 @@
 
     <!-- View All Link -->
     @if (todayAttendance.length > 10) {
-    <div class="card-footer bg-white text-center">
+    <div class="card-footer text-center">
       <button class="btn btn-sm btn-outline-primary" routerLink="list">
         <i class="bi bi-list-ul me-2"></i>
         View All {{ todayAttendance.length }} Records

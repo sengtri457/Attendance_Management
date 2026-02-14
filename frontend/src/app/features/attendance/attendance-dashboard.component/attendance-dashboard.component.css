@@ -154,7 +154,6 @@
 /* Summary Cards Custom Styling */
 .card-body h3 {
     font-weight: 700;
-    color: #1a1a1a;
 }
 
 .card-body small {
@@ -300,4 +299,137 @@
 .detail-row .card {
     box-shadow: none !important;
     background: transparent;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .bg-white {
+    background-color: var(--bg-surface) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-body) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-dark {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-light {
+    background-color: var(--bg-body);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--hover-overlay);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .group-row:hover {
+    background-color: var(--hover-overlay) !important;
+}
+
+[data-theme="dark"] .detail-row>td {
+    background-color: rgba(255, 255, 255, 0.02);
+}
+
+[data-theme="dark"] .edit-row {
+    background-color: var(--bg-surface) !important;
+}
+
+[data-theme="dark"] .edit-form-container {
+    background-color: var(--bg-surface);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .edit-form-header,
+[data-theme="dark"] .edit-form-footer {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background-color: var(--input-bg);
+    border-color: var(--input-border);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .card-body h3 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table-responsive::-webkit-scrollbar-track {
+    background: #333;
+}
+
+[data-theme="dark"] .table-responsive::-webkit-scrollbar-thumb {
+    background: #555;
+}
+
+[data-theme="dark"] .table-responsive::-webkit-scrollbar-thumb:hover {
+    background: #777;
+}
+
+/* Custom Semantic Classes */
+.text-secondary-c {
+    color: #6c757d;
+}
+
+[data-theme="dark"] .text-secondary-c {
+    color: var(--text-secondary);
+}
+
+.edit-form-container-c {
+    background-color: white;
+}
+
+[data-theme="dark"] .edit-form-container-c {
+    background-color: var(--bg-surface);
+}
+
+/* Ensure table header has correct background */
+.table thead th {
+    background-color: #f8f9fa;
+    color: #495057;
+    border-bottom: 2px solid #dee2e6;
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    border-bottom-color: var(--border-color);
+}
+
+/* Card Header/Footer Backgrounds */
+.card-header,
+.card-footer {
+    background-color: white;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+}
+
+[data-theme="dark"] .card-header,
+[data-theme="dark"] .card-footer {
+    background-color: var(--bg-surface);
+    border-color: var(--border-color);
+}
+
+/* Detail Row Background */
+.detail-row {
+    background-color: #f8f9fa;
+}
+
+[data-theme="dark"] .detail-row {
+    background-color: rgba(255, 255, 255, 0.02);
 }

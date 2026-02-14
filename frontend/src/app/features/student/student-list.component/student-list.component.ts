@@ -3,7 +3,10 @@ import {
   StudentQueryParams,
   StudentService,
 } from "../../../services/studentservices/student.service";
+import { QRCodeComponent } from 'angularx-qrcode';
 import { Student } from "../../../models/user.model";
+import { ClassGroupService } from "../../../services/class-groupservice/class-group.service";
+import { ClassGroup } from "../../../models/class-group.model";
 import { CommonModule } from "@angular/common";
 import { Router, RouterModule } from "@angular/router";
 import { AuthService } from "../../../services/authservice/auth.service";
@@ -14,15 +17,17 @@ import Swal from "sweetalert2";
 
 @Component({
   selector: "app-student-list.component",
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, QRCodeComponent],
   templateUrl: "./student-list.component.html",
   styleUrl: "./student-list.component.css",
 })
 export class StudentListComponent implements OnInit {
   private studentService = inject(StudentService);
+  private classGroupService = inject(ClassGroupService);
   private authService = inject(AuthService);
   private router = inject(Router);
   students: Student[] = [];
+  classGroups: ClassGroup[] = [];
   // Pagination
   currentPage = 1;
   totalPages = 0;
@@ -39,6 +44,11 @@ export class StudentListComponent implements OnInit {
   selectedSort = "createdAt-desc";
   sortBy = "createdAt";
   sortOrder: "asc" | "desc" = "desc";
+
+  // Filter
+  selectedClassGroup = "";
+  selectedStudentIdForQR: string | null = null;
+
   isLoading = false;
   loading = true;
   canCreate = false;
@@ -62,6 +72,9 @@ export class StudentListComponent implements OnInit {
         this.loadStudents();
       });
 
+
+
+    this.loadClassGroups();
     this.loadStudents();
   }
 
@@ -85,10 +98,12 @@ export class StudentListComponent implements OnInit {
         search: this.searchTerm,
         sortBy: this.sortBy,
         sortOrder: this.sortOrder,
+        classGroupId: this.selectedClassGroup,
       })
       .subscribe({
         next: (response) => {
           this.students = response.data;
+          console.log(this.students);
           this.currentPage = response.pagination.currentPage;
           this.totalPages = response.pagination.totalPages;
           this.totalCount = response.pagination.totalCount;
@@ -99,6 +114,22 @@ export class StudentListComponent implements OnInit {
           this.loading = false;
         },
       });
+  }
+
+
+
+  loadClassGroups() {
+    this.classGroupService.getAllClassGroups().subscribe({
+      next: (res) => {
+        this.classGroups = res.data;
+      },
+      error: (err) => console.error("Error loading class groups", err),
+    });
+  }
+
+  onClassGroupChange() {
+    this.currentPage = 1;
+    this.loadStudents();
   }
 
   onSearch() {
@@ -209,6 +240,16 @@ export class StudentListComponent implements OnInit {
         });
       }
     });
+  }
+
+  showQR(studentId: string, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.selectedStudentIdForQR = studentId;
+  }
+
+  closeQR(): void {
+    this.selectedStudentIdForQR = null;
   }
 
   triggerFileInput(): void {

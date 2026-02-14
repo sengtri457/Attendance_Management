@@ -33,6 +33,13 @@ export const ATTENDANCE_ROUTES: Routes = [
       ),
   },
   {
+    path: 'scan',
+    loadComponent: () =>
+      import('./scan-attendance.component/scan-attendance.component').then(
+        (m) => m.ScanAttendanceComponent
+      ),
+  },
+  {
     path: 'lateReport',
     loadComponent: () =>
       import('../attendance/late-report.component/late-report.component').then(

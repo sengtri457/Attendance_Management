@@ -33,13 +33,13 @@
   <div class="card mb-3">
     <div class="card-body">
       <div class="row g-3">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="input-group">
             <span class="input-group-text">
               <i class="bi bi-search"></i>
             </span>
-            <input type="text" class="form-control" placeholder="Search by name, email, phone, or student ID..."
-              [(ngModel)]="searchTerm" (input)="onSearch()" />
+            <input type="text" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
+              (input)="onSearch()" />
             @if (searchTerm) {
             <button class="btn btn-outline-secondary" type="button" (click)="clearSearch()">
               <i class="bi bi-x-lg"></i>
@@ -48,6 +48,14 @@
           </div>
         </div>
         <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedClassGroup" (change)="onClassGroupChange()">
+            <option value="">All Classes</option>
+            @for (group of classGroups; track group._id) {
+            <option [value]="group._id">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2">
           <select class="form-select" [(ngModel)]="selectedLimit" (change)="onLimitChange()">
             <option [value]="10">10 per page</option>
             <option [value]="25">25 per page</option>
@@ -90,20 +98,16 @@
                 Email
               </th>
               <th scope="col">
-                <i class="bi bi-telephone me-1"></i>
-                Phone
-              </th>
-              <th scope="col">
                 <i class="bi bi-gender-ambiguous me-1"></i>
                 Gender
               </th>
               <th scope="col">
-                <i class="bi bi-calendar2-event"></i>
-                DOB
-              </th>
-              <th scope="col">
                 <i class="bi bi-card-checklist"></i>
                 Blacklist
+              </th>
+              <th scope="col">
+                <i class="bi bi-room"></i>
+                classGroup
               </th>
               <th scope="col" class="text-center">Actions</th>
             </tr>
@@ -127,22 +131,11 @@
               </td>
               <td class="align-middle">{{ student.user.email }}</td>
               <td class="align-middle">
-                @if (student.phone) {
-                <i class="bi bi-telephone-fill text-success me-1"></i>
-                {{ student.phone }}
-                } @else {
-                <span class="text-muted">-</span>
-                }
-              </td>
-              <td class="align-middle">
                 @if (student.gender) {
                 <span class="badge bg-secondary">{{ student.gender }}</span>
                 } @else {
                 <span class="text-muted">-</span>
                 }
-              </td>
-              <td class="align-middle">
-                {{ student.dob | date:'shortDate' }}
               </td>
               <td class="align-middle">
                 @if (student.isBlacklisted) {
@@ -151,7 +144,13 @@
                 <span class="badge bg-success">No</span>
                 }
               </td>
-
+              <td class="align-middle">
+                @if (student.classGroup) {
+                <span class="badge bg-primary">{{ student.classGroup.name }}</span>
+                } @else {
+                <span class="text-muted">-</span>
+                }
+              </td>
               <td class="align-middle text-center">
                 <div class="btn-group btn-group-sm">
                   <button [routerLink]="['/students', student._id]" class="btn btn-outline-primary"
@@ -160,6 +159,9 @@
                   </button>
                   <button [routerLink]="['/students/edit', student._id]" class="btn btn-outline-success" title="Edit">
                     <i class="bi bi-pencil"></i>
+                  </button>
+                  <button (click)="showQR(student._id, $event)" class="btn btn-outline-dark" title="Show QR">
+                    <i class="bi bi-qr-code"></i>
                   </button>
                   <button (click)="deleteStudent(student._id, $event)" class="btn btn-outline-danger" title="Delete">
                     <i class="bi bi-trash"></i>
@@ -255,4 +257,18 @@
   </div>
   }
   }
+  <div *ngIf="selectedStudentIdForQR" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5)">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Student QR Code</h5>
+          <button type="button" class="btn-close" (click)="closeQR()"></button>
+        </div>
+        <div class="modal-body text-center">
+          <qrcode [qrdata]="selectedStudentIdForQR" [width]="256" [errorCorrectionLevel]="'M'"></qrcode>
+          <p class="mt-2 text-muted font-monospace small">{{selectedStudentIdForQR}}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

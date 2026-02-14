@@ -42,7 +42,13 @@
             Blacklisted
           </span>
           }
-
+          <!-- QR Code Section -->
+          <div class="mb-4 text-center">
+            <div class="d-inline-block shadow-sm p-2 bg-white rounded border">
+              <qrcode [qrdata]="student._id" [width]="160" [errorCorrectionLevel]="'M'"></qrcode>
+            </div>
+            <div class="mt-2 text-muted fw-light small">Attendance QR Code</div>
+          </div>
           <hr>
 
           <div class="text-start">

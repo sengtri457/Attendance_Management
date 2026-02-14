@@ -2,6 +2,7 @@ import { Component, inject } from "@angular/core";
 import { ActivatedRoute, Router, RouterModule } from "@angular/router";
 import { StudentService } from "../../../services/studentservices/student.service";
 import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
+import { QRCodeComponent } from 'angularx-qrcode';
 import {
   Attendance,
   PaginationResponse,
@@ -13,7 +14,7 @@ import { AuthService } from "../../../services/authservice/auth.service";
 
 @Component({
   selector: "app-student-detail.component",
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, QRCodeComponent],
   templateUrl: "./student-detail.component.html",
   styleUrl: "./student-detail.component.css",
 })

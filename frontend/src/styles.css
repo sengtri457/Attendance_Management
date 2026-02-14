@@ -30,6 +30,24 @@
 
   --input-bg: #ffffff;
   --input-border: #d1d5db;
+
+  /* Report Component Variables */
+  --bg-stats-warning: #fff3e0;
+  --border-stats-warning: #ffe0b2;
+  --text-stats-value: #ff9800;
+  --bg-filter-bar: #f9f9f9;
+  --bg-table-header: #f5f5f5;
+  --bg-student-id: #f5f5f5;
+  --bg-badge-warning: #fff3e0;
+  --text-badge-warning: #e65100;
+  --text-late-minutes: #f57c00;
+
+  /* Absent Report Component Variables */
+  --bg-stats-critical: #ffebee;
+  --border-stats-critical: #ffcdd2;
+  --text-stats-critical: #d32f2f;
+  --bg-badge-critical: #ffebee;
+  --text-badge-critical: #c62828;
 }
 
 [data-theme="dark"] {
@@ -62,6 +80,24 @@
 
   --input-bg: #374151;
   --input-border: #4b5563;
+
+  /* Report Component Dark Mode Overrides */
+  --bg-stats-warning: rgba(245, 158, 11, 0.1);
+  --border-stats-warning: rgba(245, 158, 11, 0.3);
+  --text-stats-value: #fbbf24;
+  --bg-filter-bar: rgba(255, 255, 255, 0.03);
+  --bg-table-header: rgba(255, 255, 255, 0.05);
+  --bg-student-id: rgba(255, 255, 255, 0.1);
+  --bg-badge-warning: rgba(245, 158, 11, 0.15);
+  --text-badge-warning: #fbbf24;
+  --text-late-minutes: #fbbf24;
+
+  /* Absent Report Component Dark Mode Overrides */
+  --bg-stats-critical: rgba(239, 68, 68, 0.1);
+  --border-stats-critical: rgba(239, 68, 68, 0.3);
+  --text-stats-critical: #f87171;
+  --bg-badge-critical: rgba(239, 68, 68, 0.15);
+  --text-badge-critical: #f87171;
 }
 
 body {

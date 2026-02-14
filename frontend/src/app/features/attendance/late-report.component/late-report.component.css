@@ -5,10 +5,12 @@
 }
 
 .card {
-    background: white;
+    background: var(--bg-surface);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-md);
     overflow: hidden;
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
 }
 
 .card-header {
@@ -16,22 +18,25 @@
     justify-content: space-between;
     align-items: center;
     padding: 24px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-surface);
 }
 
 h2 {
     margin: 0;
     font-size: 24px;
-    color: #1a1a1a;
+    color: var(--text-primary);
+    font-weight: 600;
 }
 
 .filters {
     display: flex;
     gap: 16px;
     padding: 20px 24px;
-    background: #f9f9f9;
-    border-bottom: 1px solid #e0e0e0;
+    background: var(--bg-filter-bar);
+    border-bottom: 1px solid var(--border-color);
     flex-wrap: wrap;
+    align-items: flex-end;
 }
 
 .form-group {
@@ -43,21 +48,24 @@ h2 {
 label {
     font-size: 13px;
     font-weight: 500;
-    color: #555;
+    color: var(--text-secondary);
     margin-bottom: 6px;
 }
 
 input {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     font-size: 14px;
-    transition: border-color 0.2s;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 input:focus {
     outline: none;
-    border-color: #ff9800;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 .btn {
@@ -68,7 +76,9 @@ input:focus {
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    align-self: flex-end;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .btn:disabled {
@@ -77,44 +87,64 @@ input:focus {
 }
 
 .btn-primary {
-    background: #4caf50;
+    background: var(--primary-color);
     color: white;
 }
 
 .btn-primary:hover:not(:disabled) {
-    background: #45a049;
+    background: var(--primary-hover);
 }
 
 .btn-secondary {
-    background: #ff9800;
+    background: var(--text-stats-value);
     color: white;
 }
 
 .btn-secondary:hover {
-    background: #f57c00;
+    filter: brightness(0.9);
+}
+
+.btn-success {
+    background: var(--success-color);
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    filter: brightness(0.9);
 }
 
 .btn-outline {
-    background: white;
-    color: #666;
-    border: 1px solid #ddd;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }
 
 .btn-outline:hover {
-    background: #f5f5f5;
+    background: var(--hover-overlay);
+    color: var(--text-primary);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+    background: rgba(59, 130, 246, 0.1);
 }
 
 .loading {
     padding: 60px 24px;
     text-align: center;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .spinner {
     width: 40px;
     height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid #ff9800;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 16px;
@@ -124,6 +154,7 @@ input:focus {
     0% {
         transform: rotate(0deg);
     }
+
     100% {
         transform: rotate(360deg);
     }
@@ -136,9 +167,9 @@ input:focus {
 }
 
 .alert-error {
-    background: #ffebee;
-    color: #c62828;
-    border: 1px solid #ef9a9a;
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger-color);
+    border: 1px solid var(--danger-color);
 }
 
 .stats-summary {
@@ -146,34 +177,35 @@ input:focus {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 16px;
     padding: 24px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .stat-item {
     text-align: center;
-    padding: 16px;
-    background: #fff3e0;
+    padding: 24px;
+    background: var(--bg-stats-warning);
     border-radius: 8px;
-    border: 1px solid #ffe0b2;
+    border: 1px solid var(--border-stats-warning);
 }
 
 .stat-value {
     font-size: 32px;
     font-weight: bold;
-    color: #ff9800;
+    color: var(--text-stats-value);
     margin-bottom: 8px;
 }
 
 .stat-label {
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    font-weight: 600;
 }
 
 .table-container {
     overflow-x: auto;
-    padding: 24px;
+    padding: 0;
 }
 
 table {
@@ -182,15 +214,16 @@ table {
 }
 
 th {
-    background: #f5f5f5;
-    padding: 12px;
+    background: var(--bg-table-header);
+    padding: 16px 24px;
     text-align: left;
     font-weight: 600;
-    font-size: 13px;
-    color: #555;
+    font-size: 12px;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 2px solid #e0e0e0;
+    border-bottom: 1px solid var(--border-color);
+    white-space: nowrap;
 }
 
 th.sortable {
@@ -200,31 +233,34 @@ th.sortable {
 }
 
 th.sortable:hover {
-    background: #eeeeee;
+    background: var(--hover-overlay);
 }
 
 .sort-icon {
     margin-left: 4px;
     font-size: 10px;
-    color: #999;
+    color: var(--text-tertiary);
 }
 
 td {
-    padding: 16px 12px;
-    border-bottom: 1px solid #f0f0f0;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border-color);
     font-size: 14px;
+    color: var(--text-primary);
+    vertical-align: middle;
 }
 
 tr:hover {
-    background: #fafafa;
+    background: var(--hover-overlay);
 }
 
 .student-id {
     font-family: monospace;
-    background: #f5f5f5;
+    background: var(--bg-student-id);
     padding: 4px 8px;
     border-radius: 4px;
     font-size: 13px;
+    color: var(--text-primary);
 }
 
 .student-info {
@@ -234,45 +270,42 @@ tr:hover {
 }
 
 .student-info strong {
-    color: #1a1a1a;
+    color: var(--text-primary);
+    font-weight: 500;
 }
 
 .student-info small {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
 .badge {
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
     font-weight: 600;
     display: inline-block;
 }
 
 .badge-warning {
-    background: #fff3e0;
-    color: #e65100;
-}
-
-.late-minutes {
-    font-weight: 600;
-    color: #ff9800;
+    background: var(--bg-badge-warning);
+    color: var(--text-badge-warning);
 }
 
 .late-minutes-total {
     font-weight: 600;
-    color: #f57c00;
+    color: var(--text-late-minutes);
 }
 
 .date {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 13px;
 }
 
 .no-data {
     text-align: center;
     padding: 60px 24px;
+    color: var(--text-tertiary);
 }
 
 .empty-state {
@@ -285,33 +318,42 @@ tr:hover {
 .empty-icon {
     font-size: 48px;
     opacity: 0.5;
+    margin-bottom: 8px;
 }
 
 .empty-state p {
     margin: 0;
-    color: #666;
+    color: var(--text-primary);
     font-size: 16px;
+    font-weight: 500;
 }
 
 .empty-state small {
-    color: #999;
-    font-size: 13px;
+    color: var(--text-secondary);
+    font-size: 14px;
 }
 
 .pagination {
     padding: 16px 24px;
-    border-top: 1px solid #e0e0e0;
-    text-align: center;
+    border-top: 1px solid var(--border-color);
+    text-align: left;
+    background: var(--bg-surface);
 }
 
 .pagination-info {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
+}
+
+/* Dark mode specific adjustments if needed beyond variables */
+:host-context([data-theme="dark"]) .card {
+    border-color: var(--border-color);
 }
 
 @media (max-width: 768px) {
     .filters {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .form-group {
@@ -319,7 +361,8 @@ tr:hover {
     }
 
     .btn {
-        align-self: stretch;
+        width: 100%;
+        margin-top: 8px;
     }
 
     .stats-summary {
@@ -330,9 +373,5 @@ tr:hover {
         flex-direction: column;
         gap: 16px;
         align-items: stretch;
-    }
-
-    .card-header .btn {
-        width: 100%;
     }
 }
