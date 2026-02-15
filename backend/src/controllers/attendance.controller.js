@@ -3,38 +3,38 @@
 // ===================================
 const Attendance = require("../models/Attendancce");
 const LeaveRequest = require("../models/LeaveRequest");
+const Subject = require("../models/Subject"); // Import Subject model
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
+
 // Configuration for attendance rules
 const ATTENDANCE_CONFIG = {
-    OFFICE_START_TIME: "08:00",
+    OFFICE_START_TIME: "08:00", // Default if no subject
     GRACE_PERIOD_MINUTES: 15,
     HALF_DAY_HOURS: 4,
     FULL_DAY_HOURS: 8,
     TIMEZONE: "Asia/Phnom_Penh"
 };
-const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
+
+const calculateAttendanceStatus = (checkInTime, checkOutTime, scheduleStartTime = ATTENDANCE_CONFIG.OFFICE_START_TIME) => {
     if (!checkInTime) {
         return {status: "absent", isLate: false, lateBy: 0, workHours: 0};
     }
 
-    // 🔧 FIX: Use moment-timezone and specify your timezone
-    const TIMEZONE = "Asia/Phnom_Penh"; // Change to your timezone
-
+    const TIMEZONE = "Asia/Phnom_Penh";
     const checkIn = moment.tz(checkInTime, TIMEZONE);
 
     if (! checkIn.isValid()) {
         return {status: "absent", isLate: false, lateBy: 0, workHours: 0};
     }
 
-    // Create office start time in the SAME timezone
-    const officeStart = moment.tz(checkInTime, TIMEZONE).set({
-        hour: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[0]),
-        minute: parseInt(ATTENDANCE_CONFIG.OFFICE_START_TIME.split(":")[1]),
-        second: 0
-    });
+    // Use provided schedule start time or default
+    const startHour = parseInt(scheduleStartTime.split(":")[0]);
+    const startMinute = parseInt(scheduleStartTime.split(":")[1]);
 
-    const graceTime = moment(officeStart).add(ATTENDANCE_CONFIG.GRACE_PERIOD_MINUTES, "minutes");
+    const classStart = moment.tz(checkInTime, TIMEZONE).set({hour: startHour, minute: startMinute, second: 0});
+
+    const graceTime = moment(classStart).add(ATTENDANCE_CONFIG.GRACE_PERIOD_MINUTES, "minutes");
 
     let status = "present";
     let isLate = false;
@@ -43,7 +43,7 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     // Late check
     if (checkIn.isAfter(graceTime)) {
         isLate = true;
-        lateBy = checkIn.diff(officeStart, "minutes");
+        lateBy = checkIn.diff(classStart, "minutes");
         status = "late";
     }
 
@@ -63,6 +63,43 @@ const calculateAttendanceStatus = (checkInTime, checkOutTime) => {
     }
 
     return {status, isLate, lateBy, workHours};
+};
+
+// Helper to get start time from subject for a specific date
+const getSubjectStartTime = async (subjectId, date) => {
+    if (!subjectId) 
+        return null;
+    
+
+
+    try {
+        const subject = await Subject.findById(subjectId);
+        if (! subject) 
+            return null;
+        
+
+
+        // 1. Check for sessions (Complex Schedule)
+        if (subject.sessions && subject.sessions.length > 0) {
+            const dayName = moment(date).format('dddd'); // e.g., "Monday"
+            const session = subject.sessions.find(s => s.dayOfWeek === dayName);
+            if (session && session.startTime) {
+                return session.startTime; // "14:00"
+            }
+        }
+
+        // 2. Fallback to teachTime (Simple Schedule)
+        if (subject.teachTime) {
+            // teachTime can be a Date object or string. Extract HH:mm.
+            // If Date stored in DB, usually full date.
+            return moment(subject.teachTime).format("HH:mm");
+        }
+
+        return null;
+    } catch (err) {
+        console.error("Error fetching subject time:", err);
+        return null;
+    }
 };
 // Helper function to check if student is on approved leave
 const checkLeaveStatus = async (studentId, date) => {
@@ -192,22 +229,33 @@ exports.markAttendance = async (req, res) => {
             subject: req.body.subjectId || null
         };
 
-        if (req.body.status) { // Manual status provided (e.g. from grid)
+        if (req.body.status) { // Manual status provided
             attendanceData.status = req.body.status;
             attendanceData.isLate = req.body.status === "late";
-            attendanceData.lateBy = 0; // consistent with manual entry
+            attendanceData.lateBy = 0;
             attendanceData.checkOutTime = null;
             attendanceData.workHours = 0;
             if (req.body.status === "excused") {
-                attendanceData.status = "excused"; // or map to something else if needed
+                attendanceData.status = "excused";
             }
         } else if (onLeave) { // Student is on approved leave
             attendanceData.status = "on-leave";
             attendanceData.isLate = false;
             attendanceData.lateBy = 0;
             attendanceData.leaveReference = onLeave._id;
-        } else { // Calculate status based on check-in time
-            const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(checkInTime, checkOutTime);
+        } else {
+            // Calculate status based on check-in time
+            // Determine schedule start time
+            let scheduleStartTime = ATTENDANCE_CONFIG.OFFICE_START_TIME;
+            if (req.body.subjectId) {
+                const subjectTime = await getSubjectStartTime(req.body.subjectId, date);
+                if (subjectTime) 
+                    scheduleStartTime = subjectTime;
+                
+
+            }
+
+            const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(checkInTime, checkOutTime, scheduleStartTime);
 
             attendanceData.status = status;
             attendanceData.isLate = isLate;
@@ -281,7 +329,19 @@ exports.updateAttendance = async (req, res) => {
 
         // Recalculate status if times changed
         if (checkInTime || checkOutTime) {
-            const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(attendance.checkInTime, attendance.checkOutTime);
+            let scheduleStartTime = ATTENDANCE_CONFIG.OFFICE_START_TIME;
+            if (attendance.subject) {
+                const subjectTime = await getSubjectStartTime(attendance.subject, attendance.date);
+                if (subjectTime) 
+                    scheduleStartTime = subjectTime;
+                
+            }
+
+            // Use existing times if not provided in update
+            const newCheckIn = checkInTime || attendance.checkInTime;
+            const newCheckOut = checkOutTime || attendance.checkOutTime;
+
+            const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(newCheckIn, newCheckOut, scheduleStartTime);
 
             attendance.status = manualStatus || status; // Allow manual override
             attendance.isLate = isLate;
