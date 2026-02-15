@@ -57,7 +57,17 @@
   </div>
 
   <!-- Table -->
-  <div class="card border-0 shadow-sm">
+  <div class="card border-0 shadow-sm position-relative" style="min-height: 200px;">
+    @if (loading) {
+    <div
+      class="position-absolute top-0 start-0 w-100 h-100 bg-white bg-opacity-75 d-flex align-items-center justify-content-center"
+      style="z-index: 10;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    }
+
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -74,35 +84,40 @@
           </thead>
           <tbody>
             @for (record of attendanceRecords; track record) {
-              <tr>
-                <td>{{ attendanceService.formatDate(record.date) }}</td>
-                <td>
-                  {{record.student?.firstName}}
-                  {{record.student?.lastName}}
-                </td>
-                @if(record.checkInTime != null){
-                  <td>{{ attendanceService.formatTime(record.checkInTime) }}</td>
-                  }@else{
-                  <td class="text-danger">No CheckIn</td>
+            <tr>
+              <td>{{ attendanceService.formatDate(record.date) }}</td>
+              <td>
+                {{record.student?.firstName}}
+                {{record.student?.lastName}}
+              </td>
+              @if(record.checkInTime != null){
+              <td>{{ attendanceService.formatTime(record.checkInTime) }}</td>
+              }@else{
+              <td class="text-danger">No CheckIn</td>
+              }
+              <td>{{ attendanceService.formatTime(record.checkOutTime) }}</td>
+              <td>
+                <span [class]="'badge bg-' + attendanceService.getStatusColor(record.status)">
+                  {{ record.status | titlecase }}
+                </span>
+              </td>
+              <td>
+                @if (record.isLate) {
+                <span class="text-warning">
+                  {{ record.lateBy }} min
+                </span>
                 }
-                <td>{{ attendanceService.formatTime(record.checkOutTime) }}</td>
-                <td>
-                  <span [class]="'badge bg-' + attendanceService.getStatusColor(record.status)">
-                    {{ record.status }}
-                  </span>
-                </td>
-                <td>
-                  @if (record.isLate) {
-                    <span class="text-warning">
-                      {{ record.lateBy }} min
-                    </span>
-                  }
-                  @if (!record.isLate) {
-                    <span class="text-success">No Late</span>
-                  }
-                </td>
-                <td>{{ record.workHours }} hrs</td>
-              </tr>
+                @if (!record.isLate) {
+                <span class="text-success">No Late</span>
+                }
+              </td>
+              <td>{{ record.workHours }} hrs</td>
+            </tr>
+            }
+            @if (attendanceRecords.length === 0 && !loading) {
+            <tr>
+              <td colspan="7" class="text-center py-5 text-muted">No attendance records found.</td>
+            </tr>
             }
           </tbody>
         </table>
@@ -110,20 +125,21 @@
 
       <!-- Pagination -->
       <div class="d-flex justify-content-between align-items-center p-3 border-top">
-        <div class="text-muted">
+        <div class="text-muted small">
           Showing {{ (currentPage - 1) * 20 + 1 }} to {{ Math.min(currentPage * 20, totalRecords) }}
           of {{ totalRecords }} records
         </div>
         <nav>
           <ul class="pagination mb-0">
-            <li class="page-item" [class.disabled]="currentPage === 1">
-              <a class="page-link" (click)="changePage(currentPage - 1)">Previous</a>
+            <li class="page-item" [class.disabled]="currentPage <= 1">
+              <a class="page-link" (click)="currentPage > 1 && changePage(currentPage - 1)">Previous</a>
             </li>
             <li class="page-item active">
-              <span class="page-link">{{ currentPage }}</span>
+              <span class="page-link">{{ currentPage }} <span class="fw-normal text-white-50 ms-1"
+                  style="font-size: 0.8em;">of {{ totalPages }}</span></span>
             </li>
-            <li class="page-item" [class.disabled]="currentPage === totalPages">
-              <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
+            <li class="page-item" [class.disabled]="currentPage >= totalPages">
+              <a class="page-link" (click)="currentPage < totalPages && changePage(currentPage + 1)">Next</a>
             </li>
           </ul>
         </nav>

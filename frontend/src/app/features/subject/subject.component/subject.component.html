@@ -99,7 +99,13 @@
                     @for (session of subject.sessions; track session) {
                     <li class="d-flex justify-content-between mb-1 last-mb-0">
                       <span>
-                        <span class="fw-semibold text-dark">{{ session.dayOfWeek.substring(0, 3) }}:</span>
+                        <span class="fw-semibold text-dark">
+                          @if (session.days && session.days.length > 0) {
+                          {{ session.days.join(', ') }}:
+                          } @else {
+                          {{ session.dayOfWeek }}:
+                          }
+                        </span>
                         {{ session.startTime }} - {{ session.endTime }}
                       </span>
                       @if (session.room) {

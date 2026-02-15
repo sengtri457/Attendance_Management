@@ -130,7 +130,7 @@ export class SubjectFormComponent implements OnInit {
               sessionsFormArray.clear();
               formData.sessions.forEach((session: any) => {
                   sessionsFormArray.push(this.fb.group({
-                      dayOfWeek: [session.dayOfWeek, Validators.required],
+                      days: [session.days || (session.dayOfWeek ? [session.dayOfWeek] : []), Validators.required],
                       startTime: [session.startTime, Validators.required],
                       endTime: [session.endTime, Validators.required],
                       room: [session.room]
@@ -164,7 +164,7 @@ export class SubjectFormComponent implements OnInit {
 
   addSession() {
       const sessionGroup = this.fb.group({
-          dayOfWeek: ['', Validators.required],
+          days: [[], Validators.required],
           startTime: ['', Validators.required],
           endTime: ['', Validators.required],
           room: ['']

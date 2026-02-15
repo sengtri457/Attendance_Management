@@ -298,7 +298,8 @@ export interface Subject {
   classGroup?: any;        // Legacy/Primary
   classGroups?: any[];     // New
   sessions?: {             // New
-      dayOfWeek: string;
+      days?: string[];
+      dayOfWeek?: string;
       startTime: string;
       endTime: string;
       room?: string;

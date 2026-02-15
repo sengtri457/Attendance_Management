@@ -117,14 +117,20 @@
                   <i class="bi bi-calendar-week text-primary me-2"></i>
                   Class Sessions (New)
                 </h5>
+                <p class="text-muted small mb-0 ms-4">
+                  Define the weekly schedule. You can add multiple sessions if the subject meets at different times on
+                  different days (e.g., Monday 1pm, Wednesday 4pm).
+                </p>
               </div>
 
               <div formArrayName="sessions">
                 <div *ngFor="let session of sessions.controls; let i=index" [formGroupName]="i"
-                  class="card mb-3 bg-light">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between mb-2">
-                      <h6 class="card-title">Session {{i + 1}}</h6>
+                  class="card mb-3 bg-light border-start border-4 border-secondary shadow-sm">
+                  <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                      <h6 class="card-title mb-0 fw-bold text-secondary">
+                        <i class="bi bi-clock-history me-1"></i> Session {{i + 1}}
+                      </h6>
                       <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeSession(i)">
                         <i class="bi bi-trash"></i> Remove
                       </button>
@@ -132,11 +138,11 @@
 
                     <div class="row g-3">
                       <div class="col-md-3">
-                        <label class="form-label small">Day</label>
-                        <select formControlName="dayOfWeek" class="form-select form-select-sm">
-                          <option value="">Select Day</option>
+                        <label class="form-label small">Days</label>
+                        <select formControlName="days" class="form-select form-select-sm" multiple size="4">
                           <option *ngFor="let day of daysOfWeek" [value]="day">{{day}}</option>
                         </select>
+                        <div class="form-text small" style="font-size: 0.7rem;">Hold Ctrl/Cmd to select multiple</div>
                       </div>
                       <div class="col-md-3">
                         <label class="form-label small">Start Time</label>

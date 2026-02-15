@@ -1,231 +1,229 @@
-<div class="container-fluid py-4">
-  <!-- Header -->
-  <div class="row mb-4 align-items-center">
-
-    <!-- Left: Title -->
-    <div class="col-lg-7 col-md-7 col-12 mb-3 mb-md-0 animate__animated animate__backInLeft">
-      <div class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center">
-        <div>
-          <h2 class="mb-1">
-            <i class="bi bi-calendar-check me-2"></i>
-            Attendance Dashboard
-          </h2>
-          <p class="text-muted mb-0 ">
-            {{ currentDate | date:'fullDate' }}
-          </p>
-        </div>
+<div class="container-fluid dashboard-container py-4">
+  <!-- Header Section -->
+  <div class="row align-items-center mb-4 fade-in-down">
+    <div class="col-auto">
+      <div
+        class="icon-box bg-primary bg-opacity-10 text-primary rounded-circle p-3 d-flex align-items-center justify-content-center"
+        style="width: 60px; height: 60px;">
+        <i class="bi bi-grid-fill fs-4"></i>
       </div>
     </div>
-
-    <!-- Right: Buttons -->
-    <div class="col-lg-5 col-md-5 col-12">
-      <div class="d-flex flex-wrap justify-content-lg-end justify-content-start gap-2">
-
-        <button class="btn btn-primary" routerLink="mark">
-          <i class="bi bi-plus-circle me-2"></i>
-          Mark Attendance
-        </button>
-
-        <button class="btn btn-primary" (click)="leaveRequest()">
-          <i class="bi bi-plus-circle me-2"></i>
-          Leave Request
-        </button>
-
-        @if(auth.isTeacher()){
-        <button class="btn btn-danger" routerLink="mark-absent">
-          <i class="bi bi-x-circle me-2"></i>
-          Mark Absent
-        </button>
-        }
-
-        <button class="btn btn-info text-white" routerLink="weekly-report">
-          <i class="bi bi-calendar-week me-2"></i>
-          Weekly Report
-        </button>
-
-        <button class="btn btn-outline-secondary" (click)="loadTodayAttendance()">
-          <i class="bi bi-arrow-clockwise"></i>
-        </button>
-
-      </div>
+    <div class="col">
+      <h2 class="fw-bold mb-1 text-dark">Attendance Dashboard</h2>
+      <p class="text-muted mb-0 d-flex align-items-center">
+        <i class="bi bi-calendar-event me-2"></i>
+        {{ currentDate | date:'fullDate' }}
+      </p>
     </div>
-
+    <div class="col-auto">
+      <button class="btn btn-light shadow-sm rounded-circle p-2" (click)="loadTodayAttendance()" title="Refresh Data"
+        style="width: 48px; height: 48px;">
+        <i class="bi bi-arrow-clockwise fs-5 text-primary" [class.spin]="loading"></i>
+      </button>
+    </div>
   </div>
 
-
   <!-- Loading Spinner -->
-  @if (loading) {
-  <div class="text-center py-5">
+  @if (loading && !summary.total) {
+  <div class="text-center py-5 fade-in">
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
+    <p class="text-muted mt-3">Loading dashboard data...</p>
   </div>
   }
 
-  <!-- Summary Cards -->
-  @if (!loading) {
-  <div class="row g-4 mb-4">
-    <!-- Total Present -->
-    <div class="col-md-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100">
+  <!-- Main Content -->
+  @if (!loading || summary.total) {
+
+  <!-- Stats Cards Row -->
+  <div class="row g-4 mb-4 fade-in-up">
+    <!-- Present -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 stat-card border-start-success">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
-              <p class="text-muted mb-1">Present Today</p>
-              <h3 class="mb-0">{{ summary.present }}</h3>
-              <small class="text-success">
-                <i class="bi bi-check-circle-fill"></i>
-                {{ getAttendanceRate() }}% attendance
-              </small>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Present Today</p>
+              <h2 class="mb-0 fw-bold text-dark">{{ summary.present }}</h2>
+              <div class="mt-2">
+                <span class="badge bg-success bg-opacity-10 text-success rounded-pill px-3 py-2">
+                  <i class="bi bi-check-circle me-1"></i>
+                  {{ getAttendanceRate() }}% Rate
+                </span>
+              </div>
             </div>
-            <div class="bg-success bg-opacity-10 p-3 rounded">
-              <i class="bi bi-check-circle text-success fs-2"></i>
+            <div class="stat-icon bg-success bg-opacity-10 text-success rounded-3 p-3">
+              <i class="bi bi-person-check fs-3"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Late Arrivals -->
-    <div class="col-md-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100">
+
+    <!-- Late -->
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 stat-card border-start-warning">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
-              <p class="text-muted mb-1">Late Arrivals</p>
-              <h3 class="mb-0">{{ summary.late }}</h3>
-              <small class="text-warning">
-                <i class="bi bi-clock-fill"></i>
-                {{ getPunctualityRate() }}% on-time
-              </small>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Late Arrivals</p>
+              <h2 class="mb-0 fw-bold text-dark">{{ summary.late }}</h2>
+              <div class="mt-2">
+                <span class="badge bg-warning bg-opacity-10 text-warning rounded-pill px-3 py-2">
+                  <i class="bi bi-clock-history me-1"></i>
+                  {{ getPunctualityRate() }}% On-time
+                </span>
+              </div>
             </div>
-            <div class="bg-warning bg-opacity-10 p-3 rounded">
-              <i class="bi bi-clock text-warning fs-2"></i>
+            <div class="stat-icon bg-warning bg-opacity-10 text-warning rounded-3 p-3">
+              <i class="bi bi-bicycle fs-3"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <!-- Absent -->
-    <div class="col-md-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100">
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 stat-card border-start-danger">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
-              <p class="text-muted mb-1">Absent</p>
-              <h3 class="mb-0">{{ summary.absent }}</h3>
-              <small class="text-danger">
-                <i class="bi bi-x-circle-fill"></i>
-                Not present
-              </small>
+              <p class="text-muted small text-uppercase fw-bold mb-1">Absent</p>
+              <h2 class="mb-0 fw-bold text-dark">{{ summary.absent }}</h2>
+              <div class="mt-2">
+                <span class="badge bg-danger bg-opacity-10 text-danger rounded-pill px-3 py-2">
+                  <i class="bi bi-emoji-frown me-1"></i>
+                  Requires Action
+                </span>
+              </div>
             </div>
-            <div class="bg-danger bg-opacity-10 p-3 rounded">
-              <i class="bi bi-x-circle text-danger fs-2"></i>
+            <div class="stat-icon bg-danger bg-opacity-10 text-danger rounded-3 p-3">
+              <i class="bi bi-person-x fs-3"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
+
     <!-- On Leave -->
-    <div class="col-md-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100">
+    <div class="col-xl-3 col-md-6">
+      <div class="card border-0 shadow-sm h-100 stat-card border-start-info">
         <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex justify-content-between align-items-start">
             <div>
-              <p class="text-muted mb-1">On Leave</p>
-              <h3 class="mb-0">{{ summary.onLeave }}</h3>
-              <small class="text-info">
-                <i class="bi bi-calendar-x-fill"></i>
-                Approved leave
-              </small>
+              <p class="text-muted small text-uppercase fw-bold mb-1">On Leave</p>
+              <h2 class="mb-0 fw-bold text-dark">{{ summary.onLeave }}</h2>
+              <div class="mt-2">
+                <span class="badge bg-info bg-opacity-10 text-info rounded-pill px-3 py-2">
+                  <i class="bi bi-calendar4-range me-1"></i>
+                  Approved
+                </span>
+              </div>
             </div>
-            <div class="bg-info bg-opacity-10 p-3 rounded">
-              <i class="bi bi-calendar-x text-info fs-2"></i>
+            <div class="stat-icon bg-info bg-opacity-10 text-info rounded-3 p-3">
+              <i class="bi bi-airplane fs-3"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  }
 
-  <!-- Quick Actions -->
-  <div class="row g-4 mb-4 animate__animated animate__backInUp animate__delay-0.7s">
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body text-center py-4">
-          <i class="bi bi-list-check text-primary fs-1 mb-3"></i>
-          <h5>View All Records</h5>
-          <p class="text-muted small">Browse complete attendance history</p>
-          <button class="btn btn-primary btn-sm" routerLink="list">
-            View Records
-          </button>
+  <!-- Operations Center (Actions & Reports) -->
+  <div class="row mb-4 fade-in-up delay-1">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white border-bottom-0 py-3">
+          <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
+            <i class="bi bi-layers text-primary me-2"></i> Operations Center
+          </h5>
         </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body text-center py-4">
-          <i class="bi bi-graph-up text-success fs-1 mb-3"></i>
-          <h5>Late Report</h5>
-          <p class="text-muted small">View students with late arrivals</p>
-          <button class="btn btn-success btn-sm" routerLink="lateReport">
-            View Report
-          </button>
-        </div>
-      </div>
-    </div>
-    <div class="col-md-4">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body text-center py-4">
-          <i class="bi bi-file-earmark-text text-danger fs-1 mb-3"></i>
-          <h5>Absent Report</h5>
-          <p class="text-muted small">View absence patterns</p>
-          <button class="btn btn-danger btn-sm" routerLink="absenteeReport">
-            View Report
-          </button>
+        <div class="card-body pt-0 pb-4">
+          <div class="row g-3">
+            <!-- Primary Actions -->
+            <div class="col-md-6">
+              <label class="text-muted small fw-bold text-uppercase mb-3 d-block">Quick Actions</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-primary d-flex align-items-center gap-2 px-4 shadow-sm" routerLink="mark">
+                  <i class="bi bi-plus-lg"></i> Mark Attendance
+                </button>
+                <button class="btn btn-outline-primary d-flex align-items-center gap-2 px-3" (click)="leaveRequest()">
+                  <i class="bi bi-calendar-plus"></i> Leave Request
+                </button>
+                @if(auth.isTeacher()){
+                <button class="btn btn-outline-danger d-flex align-items-center gap-2 px-3" routerLink="mark-absent">
+                  <i class="bi bi-person-x"></i> Mark Absent
+                </button>
+                }
+              </div>
+            </div>
+            <!-- Reports & history -->
+            <div class="col-md-6 ps-md-4 border-start-md">
+              <label class="text-muted small fw-bold text-uppercase mb-3 d-block">Reports & Insights</label>
+              <div class="d-flex flex-wrap gap-2">
+                <button class="btn btn-light text-dark d-flex align-items-center gap-2 border bg-white"
+                  routerLink="weekly-report">
+                  <i class="bi bi-table text-primary"></i> Weekly Report
+                </button>
+                <button class="btn btn-light text-dark d-flex align-items-center gap-2 border bg-white"
+                  routerLink="lateReport">
+                  <i class="bi bi-hourglass-split text-warning"></i> Late Report
+                </button>
+                <button class="btn btn-light text-dark d-flex align-items-center gap-2 border bg-white"
+                  routerLink="absenteeReport">
+                  <i class="bi bi-slash-circle text-danger"></i> Absent Report
+                </button>
+                <button class="btn btn-light text-dark d-flex align-items-center gap-2 border bg-white"
+                  routerLink="list">
+                  <i class="bi bi-journal-text text-secondary"></i> All Records
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Recent Attendance -->
-  <div class="card border-0 shadow-sm">
-    <div class="card-header py-3">
-      <h5 class="mb-0">
-        <i class="bi bi-clock-history me-2"></i>
-        Recent Check-ins
+  <!-- Recent Attendance Table -->
+  <div class="card border-0 shadow-sm fade-in-up delay-2">
+    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+      <h5 class="mb-0 fw-bold text-dark d-flex align-items-center">
+        <i class="bi bi-clock-history text-primary me-2"></i>Recent Check-ins
       </h5>
+      <span class="badge bg-light text-secondary border px-3 py-2">Today</span>
     </div>
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover mb-0">
-          <thead>
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="bg-light">
             <tr>
-              <th scope="col" class="ps-3">Student</th>
-              <th scope="col">Status Summary</th>
-              <th scope="col">Daily Status</th>
-              <th scope="col" class="text-end pe-4">Details</th>
+              <th scope="col" class="ps-4 py-3 text-secondary text-uppercase small fw-bold border-0">Student</th>
+              <th scope="col" class="py-3 text-secondary text-uppercase small fw-bold border-0">Status Overview</th>
+              <th scope="col" class="py-3 text-secondary text-uppercase small fw-bold border-0">Daily Assessment</th>
+              <th scope="col" class="text-end pe-4 py-3 text-secondary text-uppercase small fw-bold border-0">Details
+              </th>
             </tr>
           </thead>
           <tbody>
             <!-- Grouped Attendance Rows -->
             @for (group of groupedAttendance; track group.student._id) {
             <!-- Summary Row -->
-            <tr class="group-row cursor-pointer" (click)="toggleExpand(group.student._id)" style="cursor: pointer;">
-              <td>
+            <tr class="group-row cursor-pointer" (click)="toggleExpand(group.student._id)">
+              <td class="ps-4">
                 <div class="d-flex align-items-center">
-                  <div
-                    class="avatar-circle me-3 bg-light text-primary fw-bold d-flex align-items-center justify-content-center rounded-circle"
-                    style="width: 40px; height: 40px;">
+                  <div class="avatar-circle me-3 shadow-sm" style="width: 42px; height: 42px;">
                     {{ (group.student?.firstName || '').charAt(0) }}{{ (group.student?.lastName || '').charAt(0) }}
                   </div>
                   <div>
-                    <div class="fw-bold">
+                    <div class="fw-bold text-dark">
                       {{ group.student?.firstName }} {{ group.student?.lastName }}
                     </div>
-                    <small class="text-secondary-c">
-                      ID: {{ group.student?.studentId }}
-                    </small>
+                    <span class="small text-muted d-flex align-items-center">
+                      <i class="bi bi-card-text me-1"></i> {{ group.student?.studentId }}
+                    </span>
                   </div>
                 </div>
               </td>
@@ -234,23 +232,23 @@
               <td>
                 <div class="d-flex gap-2">
                   <span *ngIf="group.counts.present > 0"
-                    class="badge bg-success-subtle text-success border border-success-subtle">
+                    class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3">
                     P: {{ group.counts.present }}
                   </span>
                   <span *ngIf="group.counts.late > 0"
-                    class="badge bg-warning-subtle text-warning border border-warning-subtle">
+                    class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-3">
                     L: {{ group.counts.late }}
                   </span>
                   <span *ngIf="group.counts.absent > 0"
-                    class="badge bg-danger-subtle text-danger border border-danger-subtle">
+                    class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill px-3">
                     A: {{ group.counts.absent }}
                   </span>
                   <span *ngIf="group.counts.excused > 0"
-                    class="badge bg-info-subtle text-info border border-info-subtle">
+                    class="badge bg-info-subtle text-info border border-info-subtle rounded-pill px-3">
                     E: {{ group.counts.excused }}
                   </span>
                   <span *ngIf="group.counts.onLeave > 0"
-                    class="badge bg-primary-subtle text-primary border border-primary-subtle">
+                    class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3">
                     OL: {{ group.counts.onLeave }}
                   </span>
                 </div>
@@ -258,104 +256,124 @@
 
               <!-- Daily Status -->
               <td>
-                <span [class]="'badge bg-' + attendanceService.getStatusColor(group.dailyStatus)">
+                <span
+                  [class]="'badge rounded-pill px-3 py-2 bg-' + attendanceService.getStatusColor(group.dailyStatus)">
                   <i [class]="'bi bi-' + attendanceService.getStatusIcon(group.dailyStatus) + ' me-1'"></i>
-                  {{ group.dailyStatus | uppercase }}
+                  {{ group.dailyStatus | titlecase }}
                 </span>
               </td>
 
               <!-- Expand Icon -->
               <td class="text-end pe-4">
-                <i class="bi text-muted" [class.bi-chevron-down]="!isExpanded(group.student._id)"
-                  [class.bi-chevron-up]="isExpanded(group.student._id)"></i>
+                <button class="btn btn-sm btn-icon btn-light rounded-circle text-muted">
+                  <i class="bi" [class.bi-chevron-down]="!isExpanded(group.student._id)"
+                    [class.bi-chevron-up]="isExpanded(group.student._id)"></i>
+                </button>
               </td>
             </tr>
 
             <!-- Detailed Expansion Row -->
             @if (isExpanded(group.student._id)) {
             <tr class="detail-row">
-              <td colspan="6" class="p-3">
-                <div class="card border-0 shadow-sm">
-                  <div class="card-header border-bottom-0">
-                    <h6 class="mb-0 text-secondary-c">Subject Details</h6>
-                  </div>
-                  <div class="table-responsive">
-                    <table class="table table-sm align-middle mb-0">
-                      <thead class="text-uppercase small">
-                        <tr>
-                          <th class="ps-3">Subject</th>
-                          <th>Check In</th>
-                          <th>Check Out</th>
-                          <th>Status</th>
-                          <th>MarkedByTeacher</th>
-                          <th class=" pe-3">Actions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @for (att of group.records; track att._id) {
-                        <tr>
-                          <td class="ps-3 fw-medium">{{ att.subject?.subjectName || 'No Subject' }}</td>
-                          @if(att.status === 'present') {
-                          <td>Pesent</td>
-                          <td>Present</td>
-                          }@else if(att.status === 'absent'){
-                          <td>Absent</td>
-                          <td>Absent</td>
-                          }@else {
-                          <td>{{ att.checkInTime  | date: 'shortTime' }}</td>
-                          <td>{{ att.checkOutTime  | date: 'shortTime' }}</td>
-                          }
-                          <td>
-                            <span [class]="'badge bg-' + attendanceService.getStatusColor(att.status)">
-                              {{ att.status | uppercase }}
-                            </span>
-                          </td>
-                          <td>{{ att.markedByTeacher.name }}</td>
-                          <td class=" pe-3">
-                            <button class="btn btn-sm btn-link text-primary p-0 me-2"
-                              (click)="startEdit(att); $event.stopPropagation()">
-                              <i class="bi bi-pencil"></i>
-                            </button>
-                            <button class="btn btn-sm btn-link text-danger p-0"
-                              (click)="confirmDelete(att); $event.stopPropagation()">
-                              <i class="bi bi-trash"></i>
-                            </button>
-                          </td>
-                        </tr>
-                        <!-- Inline Edit Form for specific record -->
-                        @if (isEditing(att._id)) {
-                        <tr>
-                          <td colspan="6" class="p-0">
-                            <div class="p-3 border-top border-bottom edit-form-container-c">
-                              <div class="row g-2 align-items-end">
-                                <div class="col-md-3">
-                                  <label class="form-label small mb-1">Check In</label>
-                                  <input type="time" [(ngModel)]="editForm.checkInTime"
-                                    class="form-control form-control-sm">
+              <td colspan="6" class="p-0 border-0">
+                <div class="p-3 bg-light border-bottom">
+                  <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white border-bottom py-2">
+                      <div class="d-flex align-items-center text-primary">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <h6 class="mb-0 fw-bold">Subject Details</h6>
+                      </div>
+                    </div>
+                    <div class="table-responsive">
+                      <table class="table table-sm align-middle mb-0">
+                        <thead class="text-secondary small bg-light">
+                          <tr>
+                            <th class="ps-3 border-0">Subject</th>
+                            <th class="border-0">Check In</th>
+                            <th class="border-0">Check Out</th>
+                            <th class="border-0">Status</th>
+                            <th class="border-0">Teacher</th>
+                            <th class="border-0 text-end pe-3">Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          @for (att of group.records; track att._id) {
+                          <tr class="align-middle">
+                            <td class="ps-3 fw-bold text-dark">{{ att.subject?.subjectName || 'No Subject' }}</td>
+                            @if(att.status === 'present') {
+                            <td class="text-muted"><i class="bi bi-dash"></i></td>
+                            <td class="text-muted"><i class="bi bi-dash"></i></td>
+                            }@else if(att.status === 'absent'){
+                            <td class="text-secondary fst-italic">Absent</td>
+                            <td class="text-secondary fst-italic">Absent</td>
+                            }@else {
+                            <td class="text-dark font-monospace">{{ att.checkInTime  | date: 'shortTime' }}</td>
+                            <td class="text-dark font-monospace">{{ att.checkOutTime  | date: 'shortTime' }}</td>
+                            }
+                            <td>
+                              <span [class]="'badge rounded-pill bg-' + attendanceService.getStatusColor(att.status)">
+                                {{ att.status | titlecase }}
+                              </span>
+                            </td>
+                            <td class="text-muted small">
+                              <div class="d-flex align-items-center">
+                                <div
+                                  class="avatar-xs bg-primary-subtle text-primary rounded-circle me-2 d-flex align-items-center justify-content-center"
+                                  style="width: 24px; height: 24px; font-size: 11px; font-weight: bold;">
+                                  {{ att.markedByTeacher?.name?.charAt(0) || 'T' }}
                                 </div>
-                                <div class="col-md-3">
-                                  <label class="form-label small mb-1">Check Out</label>
-                                  <input type="time" [(ngModel)]="editForm.checkOutTime"
-                                    class="form-control form-control-sm">
-                                </div>
-                                <div class="col-md-4">
-                                  <label class="form-label small mb-1">Note</label>
-                                  <input type="text" [(ngModel)]="editForm.note" class="form-control form-control-sm"
-                                    placeholder="Note...">
-                                </div>
-                                <div class="col-md-2 d-flex gap-1">
-                                  <button class="btn btn-primary btn-sm w-100" (click)="saveEdit(att._id)">Save</button>
-                                  <button class="btn btn-outline-secondary btn-sm"
-                                    (click)="cancelEdit()">Cancel</button>
+                                {{ att.markedByTeacher?.name || 'Unknown' }}
+                              </div>
+                            </td>
+                            <td class="text-end pe-3">
+                              <div class="btn-group">
+                                <button class="btn btn-sm btn-light text-primary border"
+                                  (click)="startEdit(att); $event.stopPropagation()" title="Edit">
+                                  <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-light text-danger border"
+                                  (click)="confirmDelete(att); $event.stopPropagation()" title="Delete">
+                                  <i class="bi bi-trash"></i>
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                          <!-- Inline Edit Form for specific record -->
+                          @if (isEditing(att._id)) {
+                          <tr>
+                            <td colspan="6" class="p-0 border-0">
+                              <div class="p-3 bg-white border-top border-bottom border-primary-subtle shadow-inner">
+                                <div class="row g-3 align-items-end">
+                                  <div class="col-md-3">
+                                    <label class="form-label small fw-bold text-secondary mb-1">Check In</label>
+                                    <input type="time" [(ngModel)]="editForm.checkInTime"
+                                      class="form-control form-control-sm">
+                                  </div>
+                                  <div class="col-md-3">
+                                    <label class="form-label small fw-bold text-secondary mb-1">Check Out</label>
+                                    <input type="time" [(ngModel)]="editForm.checkOutTime"
+                                      class="form-control form-control-sm">
+                                  </div>
+                                  <div class="col-md-4">
+                                    <label class="form-label small fw-bold text-secondary mb-1">Note</label>
+                                    <input type="text" [(ngModel)]="editForm.note" class="form-control form-control-sm"
+                                      placeholder="Add a reason or note...">
+                                  </div>
+                                  <div class="col-md-2 d-flex justify-content-end gap-2">
+                                    <button class="btn btn-primary btn-sm flex-fill shadow-sm"
+                                      (click)="saveEdit(att._id)">Save</button>
+                                    <button class="btn btn-outline-secondary btn-sm flex-fill"
+                                      (click)="cancelEdit()">Cancel</button>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                        }
-                        }
-                      </tbody>
-                    </table>
+                            </td>
+                          </tr>
+                          }
+                          }
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </td>
@@ -366,9 +384,17 @@
             <!-- Empty State -->
             @if (groupedAttendance.length === 0) {
             <tr>
-              <td colspan="6" class="text-center py-5 text-muted">
-                <i class="bi bi-inbox fs-1 d-block mb-3 opacity-50"></i>
-                <p class="mb-0">No attendance records yet today</p>
+              <td colspan="6" class="text-center py-5">
+                <div class="py-4">
+                  <div class="bg-light rounded-circle d-inline-flex p-4 mb-3 text-muted">
+                    <i class="bi bi-clipboard-data fs-1"></i>
+                  </div>
+                  <h5 class="text-dark fw-bold">No Attendance Records</h5>
+                  <p class="text-muted mb-3">No attendance has been marked for today yet.</p>
+                  <button class="btn btn-primary shadow-sm" routerLink="mark">
+                    <i class="bi bi-plus-lg me-2"></i>Mark Attendance Now
+                  </button>
+                </div>
               </td>
             </tr>
             }
@@ -376,15 +402,6 @@
         </table>
       </div>
     </div>
-
-    <!-- View All Link -->
-    @if (todayAttendance.length > 10) {
-    <div class="card-footer text-center">
-      <button class="btn btn-sm btn-outline-primary" routerLink="list">
-        <i class="bi bi-list-ul me-2"></i>
-        View All {{ todayAttendance.length }} Records
-      </button>
-    </div>
-    }
   </div>
+  }
 </div>

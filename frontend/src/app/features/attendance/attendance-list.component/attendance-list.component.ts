@@ -9,9 +9,11 @@ import { AttendanceService } from '../../../services/attendanceservice/attendanc
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-attendance-list.component',
-  imports: [FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './attendance-list.component.html',
   styleUrl: './attendance-list.component.css',
 })
@@ -62,6 +64,9 @@ export class AttendanceListComponent implements OnInit {
   }
 
   changePage(page: number): void {
+    if (page < 1 || page > this.totalPages) {
+      return;
+    }
     this.filters.page = page;
     this.loadAttendance();
   }

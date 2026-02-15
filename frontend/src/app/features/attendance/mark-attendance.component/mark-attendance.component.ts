@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, SecurityContext } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormsModule,
@@ -13,6 +13,7 @@ import { Student, Teacher, Subject, Attendance, MarkAttendanceRequest } from '..
 import { ClassGroup } from '../../../models/class-group.model';
 import { ClassGroupService } from '../../../services/class-groupservice/class-group.service';
 import { Router, RouterModule } from '@angular/router';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-mark-attendance',
@@ -38,6 +39,20 @@ export class MarkAttendanceComponent implements OnInit {
   // Teachers
   teachers: Teacher[] = [];
   selectedTeacherId: string = '';
+  
+  // Search
+  private _searchText: string = '';
+  get searchText(): string { return this._searchText; }
+  set searchText(value: string) {
+    this._searchText = value;
+    this.currentPage = 1; // Reset to first page on search
+  }
+
+  // Pagination
+  currentPage: number = 1;
+  pageSize: number = 20;
+  totalPages: number = 0;
+  Math = Math; // For template access
 
   constructor(
     private attendanceService: AttendanceService,
@@ -45,7 +60,8 @@ export class MarkAttendanceComponent implements OnInit {
     private subjectService: SubjectService,
     private teacherService: TeacherService,
     private classGroupService: ClassGroupService,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -84,32 +100,30 @@ export class MarkAttendanceComponent implements OnInit {
   loadData(): void {
     this.loadingData = true;
     this.attendanceMap.clear();
+    this.currentPage = 1; // Reset pagination logic
 
     // 1. Get Students for selected ClassGroup
-    const students$ = this.studentService.getAll(); // Ideally backend supports filtering by classGroup in getAll, but we can client-filter if needed, or update service.
-    // However, best is to update studentService to accept classGroupId
-    
+    // Use backend filtering and pagination to get all relevant students
     // 2. Get Subjects for selected ClassGroup & Date
-    // Note: getSubjectSchedule might need to filter by classGroup too if subjects are class-specific
     const subjects$ = this.subjectService.getSubjectSchedule(this.selectedDate); 
 
     const attendance$ = this.attendanceService.getAll({
-      dateFrom: this.selectedDate, 
-      dateTo: this.selectedDate 
+       dateFrom: this.selectedDate, 
+       dateTo: this.selectedDate 
     });
 
-    // We need to chain these or use forkJoin, but let's refine the logic.
-    // First get students of the class
-    
-    this.studentService.getAll().subscribe({
+    const params: any = { limit: 100 }; // Fetch up to 100 students (reasonable for a class)
+    if (this.selectedClassGroupId) {
+        params.classGroupId = this.selectedClassGroupId;
+    }
+
+    this.studentService.getAll(params).subscribe({
         next: (res) => {
-            const allStudents = res.data || res;
-            // Filter students by class group
-            if (this.selectedClassGroupId) {
-                this.students = allStudents.filter((s:any) => s.classGroup === this.selectedClassGroupId || (s.classGroup && s.classGroup._id === this.selectedClassGroupId));
-            } else {
-                this.students = [];
-            }
+            // Backend now handles filtering by classGroup if provided
+            this.students = res.data || [];
+            
+            // If fetching all classes but still want client-side safety or additional specific logic
+            // (The previous client-side filter is removed as we trust the backend filter for classGroupId)
 
             if (this.students.length === 0) {
                 this.loadingData = false;
@@ -117,7 +131,7 @@ export class MarkAttendanceComponent implements OnInit {
                 return;
             }
 
-            // Get subjects (filtered by classGroup if possible, or client side)
+            // Get subjects logic remains same
             subjects$.subscribe({
                 next: (subRes) => {
                     let allSubjects = subRes.data || [];
@@ -242,6 +256,65 @@ export class MarkAttendanceComponent implements OnInit {
               });
           }
       });
+  }
+
+  get filteredStudents(): Student[] {
+    if (!this._searchText) {
+      return this.students;
+    }
+    const lower = this._searchText.toLowerCase();
+    return this.students.filter(student => 
+      (student.firstName && student.firstName.toLowerCase().includes(lower)) ||
+      (student.lastName && student.lastName.toLowerCase().includes(lower)) ||
+      (student.studentId && student.studentId.toLowerCase().includes(lower))
+    );
+  }
+
+  get paginatedStudents(): Student[] {
+    const filtered = this.filteredStudents;
+    this.totalPages = Math.ceil(filtered.length / this.pageSize);
+    
+    // Ensure current page is valid
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+        this.currentPage = this.totalPages;
+    } else if (this.currentPage < 1) {
+        this.currentPage = 1;
+    }
+
+    const startIndex = (this.currentPage - 1) * this.pageSize;
+    return filtered.slice(startIndex, startIndex + this.pageSize);
+  }
+
+  changePage(page: number): void {
+      if (page >= 1 && page <= this.totalPages) {
+          this.currentPage = page;
+      }
+  }
+
+  getPages(): number[] {
+      const pages: number[] = [];
+      const maxButtons = 5;
+      let start = Math.max(1, this.currentPage - Math.floor(maxButtons / 2));
+      let end = Math.min(this.totalPages, start + maxButtons - 1);
+      
+      if (end - start + 1 < maxButtons) {
+          start = Math.max(1, end - maxButtons + 1);
+      }
+
+      for (let i = start; i <= end; i++) {
+          pages.push(i);
+      }
+      return pages;
+  }
+
+  highlightMatch(text: string): SafeHtml {
+    if (!this.searchText || !text) return text;
+    
+    const pattern = this.searchText.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    const newText = text.replace(regex, (match) => `<span class="bg-warning text-dark fw-bold px-1 rounded">${match}</span>`);
+    
+    return this.sanitizer.bypassSecurityTrustHtml(newText);
   }
 }
 

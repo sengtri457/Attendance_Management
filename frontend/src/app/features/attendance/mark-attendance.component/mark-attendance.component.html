@@ -59,79 +59,147 @@
     <p class="text-secondary">Please check the schedule or select another date.</p>
   </div>
 
-  <!-- Attendance Grid -->
-  <div class="card shadow-sm border-0 rounded-4 overflow-hidden fade-in-up" style="animation-delay: 0.2s"
-    *ngIf="subjects.length > 0">
-    <div class="table-responsive">
-      <table class="table table-hover align-middle mb-0">
-        <thead class="bg-light">
-          <tr>
-            <th class="ps-4 py-3 text-uppercase text-xs fw-bold text-muted tracking-wider" style="width: 250px;">Student
-            </th>
-            <th *ngFor="let subject of subjects"
-              class="text-center py-3 text-uppercase text-xs fw-bold text-muted tracking-wider">
-              <div class="d-flex flex-column">
-                <span class="text-dark fw-bold">{{ subject.subjectName }}</span>
-                <span class="text-xs text-muted fw-normal">{{ subject.teachTime | date:'shortTime' }} -
-                  {{ subject.endTime | date:'shortTime' }}</span>
-              </div>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let student of students" class="border-light"
-            [class.bg-success-subtle-row]="getStudentProgress(student._id) === 'full'"
-            [class.bg-info-subtle-row]="getStudentProgress(student._id) === 'partial'">
-            <td class="ps-4 py-3">
-              <div class="d-flex align-items-center">
-                <div class="position-relative">
-                  <div
-                    class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold">
-                    {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
-                  </div>
-                  <!-- Checkmark for full attendance -->
-                  <span *ngIf="getStudentProgress(student._id) === 'full'"
-                    class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-success border border-white p-1">
-                    <span class="visually-hidden">Complete</span>
-                  </span>
-                </div>
-                <div>
-                  <div class="fw-bold text-dark d-flex align-items-center">
-                    {{ student.firstName }} {{ student.lastName }}
-                    <i *ngIf="getStudentProgress(student._id) === 'full'"
-                      class="bi bi-check-circle-fill text-success ms-2 fs-6"></i>
-                  </div>
-                  <div class="small text-muted">{{ student.studentId }}</div>
-                </div>
-              </div>
-            </td>
-            <td *ngFor="let subject of subjects" class="text-center py-3">
-              <div class="btn-group shadow-sm rounded-pill" role="group">
-                <button type="button" class="btn btn-sm rounded-start-pill fw-bold transition-all"
-                  [class.btn-success]="getStatus(student._id, subject._id) === 'present'"
-                  [class.btn-light]="getStatus(student._id, subject._id) !== 'present'"
-                  [class.text-muted]="getStatus(student._id, subject._id) !== 'present'"
-                  (click)="mark(student._id, subject._id, 'present')" title="Present">P</button>
-                <button type="button" class="btn btn-sm fw-bold transition-all"
-                  [class.btn-warning]="getStatus(student._id, subject._id) === 'late'"
-                  [class.btn-light]="getStatus(student._id, subject._id) !== 'late'"
-                  [class.text-muted]="getStatus(student._id, subject._id) !== 'late'"
-                  (click)="mark(student._id, subject._id, 'late')" title="Late">L</button>
-                <button type="button" class="btn btn-sm fw-bold transition-all"
-                  [class.btn-danger]="getStatus(student._id, subject._id) === 'absent'"
-                  [class.btn-light]="getStatus(student._id, subject._id) !== 'absent'"
-                  [class.text-muted]="getStatus(student._id, subject._id) !== 'absent'"
-                  (click)="mark(student._id, subject._id, 'absent')" title="Absent">A</button>
-                <button type="button" class="btn btn-sm rounded-end-pill fw-bold transition-all"
-                  [class.btn-info]="getStatus(student._id, subject._id) === 'excused'"
-                  [class.btn-light]="getStatus(student._id, subject._id) !== 'excused'"
-                  [class.text-muted]="getStatus(student._id, subject._id) !== 'excused'"
-                  (click)="mark(student._id, subject._id, 'excused')" title="Excused">E</button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+</div>
+
+<!-- Search Bar -->
+<div *ngIf="subjects.length > 0" class="card shadow-sm border-0 mb-4 rounded-4 fade-in-up"
+  style="animation-delay: 0.15s">
+  <div class="card-body p-3">
+    <div class="row align-items-center">
+      <div class="col-md-8">
+        <div class="input-group input-group-lg">
+          <span class="input-group-text bg-light border-0">
+            <i class="bi bi-search text-primary"></i>
+          </span>
+          <input type="text" class="form-control bg-light border-0" placeholder="Search student by name or ID..."
+            [(ngModel)]="searchText">
+          <button class="btn btn-light border-0" *ngIf="searchText" (click)="searchText = ''">
+            <i class="bi bi-x-circle text-muted"></i>
+          </button>
+        </div>
+      </div>
+      <div class="col-md-4 text-end">
+        <span class="text-muted small me-2">Show</span>
+        <select class="form-select form-select-sm d-inline-block w-auto border-0 bg-light" [(ngModel)]="pageSize"
+          (change)="currentPage = 1">
+          <option [ngValue]="5">5</option>
+          <option [ngValue]="10">10</option>
+          <option [ngValue]="20">20</option>
+          <option [ngValue]="50">50</option>
+        </select>
+        <span class="text-muted small ms-2">per page</span>
+      </div>
     </div>
+  </div>
+</div>
+
+<!-- Attendance Grid -->
+<div class="card shadow-sm border-0 rounded-4 overflow-hidden fade-in-up" style="animation-delay: 0.2s"
+  *ngIf="subjects.length > 0">
+  <div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+      <thead class="bg-light">
+        <tr>
+          <th class="ps-4 py-3 text-uppercase text-xs fw-bold text-muted tracking-wider" style="width: 250px;">Student
+          </th>
+          <th *ngFor="let subject of subjects"
+            class="text-center py-3 text-uppercase text-xs fw-bold text-muted tracking-wider">
+            <div class="d-flex flex-column">
+              <span class="text-dark fw-bold">{{ subject.subjectName }}</span>
+              <span class="text-xs text-muted fw-normal">{{ subject.teachTime | date:'shortTime' }} -
+                {{ subject.endTime | date:'shortTime' }}</span>
+            </div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      <tbody>
+        <tr *ngFor="let student of paginatedStudents" class="border-light"
+          [class.bg-success-subtle-row]="getStudentProgress(student._id) === 'full'"
+          [class.bg-info-subtle-row]="getStudentProgress(student._id) === 'partial'">
+          <td class="ps-4 py-3">
+            <div class="d-flex align-items-center">
+              <div class="position-relative">
+                <div
+                  class="avatar-sm bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold">
+                  {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                </div>
+                <!-- Checkmark for full attendance -->
+                <span *ngIf="getStudentProgress(student._id) === 'full'"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-circle bg-success border border-white p-1">
+                  <span class="visually-hidden">Complete</span>
+                </span>
+              </div>
+              <div>
+                <div class="fw-bold text-dark d-flex align-items-center">
+                  <span [innerHTML]="highlightMatch(student.firstName + ' ' + student.lastName)"></span>
+                  <i *ngIf="getStudentProgress(student._id) === 'full'"
+                    class="bi bi-check-circle-fill text-success ms-2 fs-6"></i>
+                </div>
+                <div class="small text-muted" [innerHTML]="highlightMatch(student.studentId)"></div>
+              </div>
+            </div>
+          </td>
+          <td *ngFor="let subject of subjects" class="text-center py-3">
+            <div class="btn-group shadow-sm rounded-pill" role="group">
+              <button type="button" class="btn btn-sm rounded-start-pill fw-bold transition-all"
+                [class.btn-success]="getStatus(student._id, subject._id) === 'present'"
+                [class.btn-light]="getStatus(student._id, subject._id) !== 'present'"
+                [class.text-muted]="getStatus(student._id, subject._id) !== 'present'"
+                (click)="mark(student._id, subject._id, 'present')" title="Present">P</button>
+              <button type="button" class="btn btn-sm fw-bold transition-all"
+                [class.btn-warning]="getStatus(student._id, subject._id) === 'late'"
+                [class.btn-light]="getStatus(student._id, subject._id) !== 'late'"
+                [class.text-muted]="getStatus(student._id, subject._id) !== 'late'"
+                (click)="mark(student._id, subject._id, 'late')" title="Late">L</button>
+              <button type="button" class="btn btn-sm fw-bold transition-all"
+                [class.btn-danger]="getStatus(student._id, subject._id) === 'absent'"
+                [class.btn-light]="getStatus(student._id, subject._id) !== 'absent'"
+                [class.text-muted]="getStatus(student._id, subject._id) !== 'absent'"
+                (click)="mark(student._id, subject._id, 'absent')" title="Absent">A</button>
+              <button type="button" class="btn btn-sm rounded-end-pill fw-bold transition-all"
+                [class.btn-info]="getStatus(student._id, subject._id) === 'excused'"
+                [class.btn-light]="getStatus(student._id, subject._id) !== 'excused'"
+                [class.text-muted]="getStatus(student._id, subject._id) !== 'excused'"
+                (click)="mark(student._id, subject._id, 'excused')" title="Excused">E</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination Footer -->
+  <div class="card-footer bg-white border-0 py-3 d-flex justify-content-between align-items-center"
+    *ngIf="totalPages > 1">
+    <div class="text-muted small">
+      Showing {{ (currentPage - 1) * pageSize + 1 }} to {{ Math.min(currentPage * pageSize, filteredStudents.length) }}
+      of {{ filteredStudents.length }} students
+    </div>
+    <nav aria-label="Page navigation">
+      <ul class="pagination pagination-sm mb-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <button class="page-link border-0 rounded d-flex align-items-center justify-content-center mx-1"
+            (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" style="width: 32px; height: 32px;">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+        </li>
+
+        <li class="page-item" *ngFor="let page of getPages()" [class.active]="page === currentPage">
+          <button class="page-link border-0 rounded d-flex align-items-center justify-content-center mx-1"
+            (click)="changePage(page)" style="width: 32px; height: 32px;">
+            {{ page }}
+          </button>
+        </li>
+
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <button class="page-link border-0 rounded d-flex align-items-center justify-content-center mx-1"
+            (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages"
+            style="width: 32px; height: 32px;">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </li>
+      </ul>
+    </nav>
   </div>
 </div>

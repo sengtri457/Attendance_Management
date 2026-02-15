@@ -120,6 +120,23 @@
                         {{ subject.dayOfWeek }}
                       </p>
                       }
+                      @if (subject.sessions && subject.sessions.length > 0) {
+                      <div class="mt-2">
+                        @for (session of subject.sessions; track $index) {
+                        <p class="text-muted small mb-1">
+                          <i class="bi bi-calendar-event me-1"></i>
+                          <strong>
+                            @if (session.days && session.days.length > 0) {
+                            {{ session.days.join(', ') }}
+                            } @else {
+                            {{ session.dayOfWeek }}
+                            }
+                          </strong>:
+                          {{ session.startTime }} - {{ session.endTime }}
+                        </p>
+                        }
+                      </div>
+                      }
                     </div>
                   </div>
                 </div>
