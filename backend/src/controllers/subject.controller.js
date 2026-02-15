@@ -253,6 +253,8 @@ exports.getSubjectSchedule = async (req, res) => {
                 {
                     dayOfWeek: dayName
                 }, {
+                    "sessions.days": dayName
+                }, {
                     "sessions.dayOfWeek": dayName
                 }
             ];
@@ -278,7 +280,7 @@ exports.getSubjectSchedule = async (req, res) => {
 
             subjects.forEach(sub => { // Check if it's a multi-session subject
                 if (sub.sessions && sub.sessions.length > 0) {
-                    const session = sub.sessions.find(s => s.dayOfWeek === dayName);
+                    const session = sub.sessions.find(s => (s.days && s.days.includes(dayName)) || s.dayOfWeek === dayName);
                     if (session) {
                         // Construct a date object for the session time
                         // session.startTime is "HH:mm"
@@ -303,7 +305,21 @@ exports.getSubjectSchedule = async (req, res) => {
             // Re-sort based on the potentially updated teachTime
             subjects.sort((a, b) => new Date(a.teachTime) - new Date(b.teachTime));
         } else { // Fallback sort if no date provided
-            subjects.sort((a, b) => new Date(a.teachTime) - new Date(b.teachTime));
+            subjects.sort((a, b) => {
+                const getTime = (subj) => {
+                    if (subj.teachTime) 
+                        return new Date(subj.teachTime).getTime();
+                    
+                    if (subj.sessions && subj.sessions.length > 0) { // Parse "HH:mm" from the first session as a fallback comparison
+                        const [hours, minutes] = subj.sessions[0].startTime.split(':');
+                        const d = new Date();
+                        d.setHours(hours, minutes, 0, 0);
+                        return d.getTime();
+                    }
+                    return 8640000000000; // Far future for subjects with no time
+                };
+                return getTime(a) - getTime(b);
+            });
         }
 
         res.json({success: true, data: subjects, count: subjects.length});

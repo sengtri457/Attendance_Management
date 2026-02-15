@@ -58,18 +58,23 @@ const subjectSchema = new mongoose.Schema({
     ],
     sessions: [
         {
-            dayOfWeek: {
+            days: [
+                {
+                    type: String,
+                    enum: [
+                        "Monday",
+                        "Tuesday",
+                        "Wednesday",
+                        "Thursday",
+                        "Friday",
+                        "Saturday",
+                        "Sunday"
+                    ]
+                }
+            ],
+            dayOfWeek: { // Deprecated: kept for backward compatibility
                 type: String,
-                enum: [
-                    "Monday",
-                    "Tuesday",
-                    "Wednesday",
-                    "Thursday",
-                    "Friday",
-                    "Saturday",
-                    "Sunday"
-                ],
-                required: true
+                required: false
             },
             startTime: {
                 type: String,
