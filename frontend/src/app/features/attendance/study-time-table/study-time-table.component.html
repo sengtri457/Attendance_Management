@@ -1,0 +1,102 @@
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <button routerLink="/attendance/scan" class="btn btn-link text-decoration-none p-0 mb-1">
+                <i class="bi bi-arrow-left me-2"></i>Back to Scanner
+            </button>
+            <h2 class="mb-0 fw-bold text-primary">Daily Study Report</h2>
+            <p class="text-muted mb-0">{{ date | date:'fullDate' }}</p>
+        </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+
+    <div *ngIf="!loading && student" class="row g-4">
+        <!-- Student Profile & Summary -->
+        <div class="col-md-4">
+            <div class="card h-100">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center"
+                            style="width: 80px; height: 80px; font-size: 2rem;">
+                            {{ student.firstName.charAt(0) }}{{ student.lastName.charAt(0) }}
+                        </div>
+                    </div>
+                    <h4 class="mb-1">{{ student.firstName }} {{ student.lastName }}</h4>
+                    <p class="text-muted small mb-4">{{ student.studentId }}</p>
+
+                    <div class="bg-light-primary rounded p-3 text-start">
+                        <h6 class="text-primary mb-2">Today's Total</h6>
+                        <div class="d-flex align-items-baseline">
+                            <span class="display-4 fw-bold me-2">{{ totalStudyMinutes }}</span>
+                            <span class="text-muted">minutes</span>
+                        </div>
+                        <p class="small text-muted mb-0">
+                            {{ (totalStudyMinutes / 60) | number:'1.1-1' }} hours
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Table -->
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-header bg-white py-3">
+                    <h5 class="mb-0">Session Details</h5>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Subject / Activity</th>
+                                <th>Check In</th>
+                                <th>Check Out</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let session of sessions">
+                                <td class="ps-4 fw-medium">{{ session.subjectName }}</td>
+                                <td>
+                                    <i class="bi bi-box-arrow-in-right text-success me-1"></i>
+                                    {{ session.checkIn | date:'shortTime' }}
+                                </td>
+                                <td>
+                                    <span *ngIf="session.checkOut">
+                                        <i class="bi bi-box-arrow-left text-danger me-1"></i>
+                                        {{ session.checkOut | date:'shortTime' }}
+                                    </span>
+                                    <span *ngIf="!session.checkOut" class="badge bg-warning text-dark">Active</span>
+                                </td>
+                                <td>
+                                    <span class="fw-bold">{{ session.durationMinutes }}</span> min
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill" [ngClass]="{
+                            'bg-success': session.status === 'present',
+                            'bg-warning text-dark': session.status === 'late',
+                            'bg-secondary': session.status === 'half-day'
+                          }">
+                                        {{ session.status | titlecase }}
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr *ngIf="sessions.length === 0">
+                                <td colspan="5" class="text-center py-4 text-muted">
+                                    No study sessions recorded for today.
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

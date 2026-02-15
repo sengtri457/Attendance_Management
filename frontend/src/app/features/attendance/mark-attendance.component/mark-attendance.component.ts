@@ -222,6 +222,11 @@ export class MarkAttendanceComponent implements OnInit {
           markedByTeacherId: this.selectedTeacherId,
       };
 
+      // User requested to detect check-in time when marking, to enable later calculation
+      if (status === 'present' || status === 'late') {
+          request.checkInTime = new Date().toISOString();
+      }
+
       this.attendanceService.mark(request).subscribe({
           next: () => {
               // Success

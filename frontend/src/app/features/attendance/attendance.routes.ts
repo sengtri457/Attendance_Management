@@ -61,6 +61,13 @@ export const ATTENDANCE_ROUTES: Routes = [
       ),
   },
   {
+    path: 'study-time',
+    loadComponent: () =>
+      import('../attendance/study-time-table/study-time-table.component').then(
+        (m) => m.StudyTimeTableComponent
+      ),
+  },
+  {
     path: 'weekly-report',
     loadComponent: () =>
       import('./weekly-report.component/weekly-report.component').then(

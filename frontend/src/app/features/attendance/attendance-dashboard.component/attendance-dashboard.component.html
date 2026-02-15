@@ -284,6 +284,8 @@
                       <thead class="text-uppercase small">
                         <tr>
                           <th class="ps-3">Subject</th>
+                          <th>Check In</th>
+                          <th>Check Out</th>
                           <th>Status</th>
                           <th>MarkedByTeacher</th>
                           <th class=" pe-3">Actions</th>
@@ -293,6 +295,16 @@
                         @for (att of group.records; track att._id) {
                         <tr>
                           <td class="ps-3 fw-medium">{{ att.subject?.subjectName || 'No Subject' }}</td>
+                          @if(att.status === 'present') {
+                          <td>Pesent</td>
+                          <td>Present</td>
+                          }@else if(att.status === 'absent'){
+                          <td>Absent</td>
+                          <td>Absent</td>
+                          }@else {
+                          <td>{{ att.checkInTime  | date: 'shortTime' }}</td>
+                          <td>{{ att.checkOutTime  | date: 'shortTime' }}</td>
+                          }
                           <td>
                             <span [class]="'badge bg-' + attendanceService.getStatusColor(att.status)">
                               {{ att.status | uppercase }}

@@ -6,6 +6,10 @@
         <button routerLink="/attendance/mark" class="btn btn-outline-secondary">
             <i class="bi bi-list-check me-2"></i>Manual Marking
         </button>
+        <button class="btn ms-2" [ngClass]="isDailyMode ? 'btn-danger' : 'btn-success'" (click)="toggleMode()">
+            <i class="bi" [ngClass]="isDailyMode ? 'bi-clock-history' : 'bi-journal-check'"></i>
+            {{ isDailyMode ? 'Switch to Subject Mode' : 'Switch to Daily Check-in/out' }}
+        </button>
     </div>
 
     <!-- Controls -->
@@ -16,6 +20,9 @@
                     <label class="form-label small text-uppercase text-muted fw-bold">Date</label>
                     <input type="date" class="form-control" [(ngModel)]="selectedDate" (change)="loadSubjects()">
                 </div>
+                <!-- Hide Class & Subject in Daily Mode if not needed, or keep Class for filtering students? 
+                     User said "it not care about subject". Keeping class filter is useful for pre-loading students if needed, 
+                     but logic handles student lookup. Let's keep Class Group for filtering student cache but hide Subject. -->
                 <div class="col-md-3">
                     <label class="form-label small text-uppercase text-muted fw-bold">Class Group</label>
                     <select class="form-select" [(ngModel)]="selectedClassGroupId" (change)="onClassChange()">
@@ -23,13 +30,21 @@
                         <option *ngFor="let g of classGroups" [value]="g._id">{{ g.name }}</option>
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-3" *ngIf="!isDailyMode">
                     <label class="form-label small text-uppercase text-muted fw-bold">Subject</label>
                     <select class="form-select" [(ngModel)]="selectedSubjectId">
                         <option value="" disabled>Select Subject</option>
                         <option *ngFor="let s of subjects" [value]="s._id">{{ s.subjectName }}
                             ({{ s.teachTime | date:'shortTime' }})</option>
                     </select>
+                </div>
+                <div class="col-md-3" *ngIf="isDailyMode">
+                    <label class="form-label small text-uppercase text-muted fw-bold">Active Subject (Auto)</label>
+                    <div class="form-control fw-bold"
+                        [ngClass]="detectedSubject ? 'text-primary bg-light-primary' : 'text-success bg-light'">
+                        <i class="bi" [ngClass]="detectedSubject ? 'bi-journals' : 'bi-clock-history'"></i>
+                        {{ detectedSubject?.subjectName || 'Time Tracking (General)' }}
+                    </div>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label small text-uppercase text-muted fw-bold">Marked By</label>
@@ -98,14 +113,15 @@
                             <span class="visually-hidden">Scanning...</span>
                         </div>
                         <h5 class="fw-bold text-primary">
-                            {{ selectedSubjectId ? 'Scan Student QR' : 'Select a Subject' }}
+                            {{ isDailyMode || selectedSubjectId ? 'Scan Student QR' : 'Select a Subject' }}
                         </h5>
-                        <div *ngIf="selectedSubjectId">
+                        <div *ngIf="isDailyMode || selectedSubjectId">
                             <p class="mb-1">Point scanner at the <strong>Student's QR Code</strong></p>
                             <span class="badge bg-warning text-dark border"><i
                                     class="bi bi-exclamation-triangle me-1"></i>Not Face Recognition</span>
                         </div>
-                        <p *ngIf="!selectedSubjectId" class="text-danger fw-bold">Please select a subject above first!
+                        <p *ngIf="!isDailyMode && !selectedSubjectId" class="text-danger fw-bold">Please select a
+                            subject above first!
                         </p>
                         <!-- Debug Helper -->
                         <div *ngIf="lastResultString" class="mt-3 p-2 bg-light rounded border text-muted small">
@@ -115,16 +131,22 @@
 
                     <!-- Success State -->
                     <div *ngIf="scanStatus === 'success'" class="w-100">
-                        <div class="mb-3 text-success">
-                            <i class="bi bi-check-circle-fill" style="font-size: 5rem;"></i>
+                        <div class="mb-3" [ngClass]="lastAttendanceStatus === 'late' ? 'text-warning' : 'text-success'">
+                            <i *ngIf="lastAttendanceStatus === 'late'" class="bi bi-clock-history"
+                                style="font-size: 5rem;"></i>
+                            <i *ngIf="lastAttendanceStatus !== 'late'" class="bi bi-check-circle-fill"
+                                style="font-size: 5rem;"></i>
                         </div>
                         <h3 class="fw-bold mb-1">{{ lastScannedStudent?.firstName }}</h3>
                         <h4 class="fw-light mb-3">{{ lastScannedStudent?.lastName }}</h4>
                         <div class="badge bg-light text-dark border p-2 mb-4 fs-6">
                             ID: {{ lastScannedStudent?.studentId }}
                         </div>
-                        <div class="alert alert-success border-0 mb-0">
-                            <i class="bi bi-check-lg me-2"></i>Marked <strong>PRESENT</strong>
+                        <div class="alert border-0 mb-0"
+                            [ngClass]="lastAttendanceStatus === 'late' ? 'alert-warning text-dark' : 'alert-success'">
+                            <i class="bi me-2"
+                                [ngClass]="lastAttendanceStatus === 'late' ? 'bi-exclamation-circle' : 'bi-check-lg'"></i>
+                            {{ scanMessage }}
                         </div>
                     </div>
 
