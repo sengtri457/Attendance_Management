@@ -6,6 +6,7 @@ const LeaveRequest = require("../models/LeaveRequest");
 const Subject = require("../models/Subject"); // Import Subject model
 const mongoose = require("mongoose");
 const moment = require("moment-timezone");
+const telegramUtils = require("../utils/telegram");
 
 // Configuration for attendance rules
 const ATTENDANCE_CONFIG = {
@@ -81,8 +82,16 @@ const getSubjectStartTime = async (subjectId, date) => {
 
         // 1. Check for sessions (Complex Schedule)
         if (subject.sessions && subject.sessions.length > 0) {
-            const dayName = moment(date).format('dddd'); // e.g., "Monday"
-            const session = subject.sessions.find(s => s.dayOfWeek === dayName);
+            const dayName = moment(date).format('dddd');
+            // e.g., "Monday"
+
+            // Fix: Check both 'days' array and legacy 'dayOfWeek'
+            const session = subject.sessions.find(s => {
+                const hasDayInArray = s.days && s.days.includes(dayName);
+                const hasLegacyDay = s.dayOfWeek === dayName;
+                return hasDayInArray || hasLegacyDay;
+            });
+
             if (session && session.startTime) {
                 return session.startTime; // "14:00"
             }
@@ -253,6 +262,7 @@ exports.markAttendance = async (req, res) => {
                     scheduleStartTime = subjectTime;
                 
 
+
             }
 
             const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(checkInTime, checkOutTime, scheduleStartTime);
@@ -270,6 +280,13 @@ exports.markAttendance = async (req, res) => {
         // Populate before sending response
         await attendance.populate("student", "firstName lastName studentId");
         await attendance.populate("markedByTeacher", "name");
+
+        if (attendance.subject) {
+            await attendance.populate("subject", "subjectName");
+        }
+
+        // Notify Telegram
+        telegramUtils.sendAttendanceNotification(attendance, attendance.student, attendance.subject);
 
         res.status(201).json({success: true, message: "Attendance marked successfully", data: attendance});
     } catch (error) {
@@ -335,6 +352,8 @@ exports.updateAttendance = async (req, res) => {
                 if (subjectTime) 
                     scheduleStartTime = subjectTime;
                 
+
+
             }
 
             // Use existing times if not provided in update
