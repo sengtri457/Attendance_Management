@@ -47,4 +47,8 @@ export class UserService {
       newPassword,
     });
   }
+
+  updateProfile(id: string, user: Partial<User>): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/${id}/profile`, user);
+  }
 }

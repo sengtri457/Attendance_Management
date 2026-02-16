@@ -1,0 +1,142 @@
+<div class="profile-container fade-in">
+    <div class="profile-header">
+        <div class="header-icon">
+            <i class="bi bi-person-gear"></i>
+        </div>
+        <div class="header-text">
+            <h1>Profile Settings</h1>
+            <p>Manage your account details and security</p>
+        </div>
+    </div>
+
+    <div class="profile-content">
+        <!-- User Profile Card -->
+        <div class="card profile-card">
+            <div class="card-header">
+                <i class="bi bi-person-badge"></i>
+                <h2>Personal Information</h2>
+            </div>
+            <div class="card-body">
+                <div *ngIf="loadingProfile" class="loading-spinner">
+                    <div class="spinner"></div>
+                </div>
+
+                <form [formGroup]="profileForm" (ngSubmit)="updateProfile()" *ngIf="!loadingProfile">
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-person"></i>
+                            <input type="text" id="username" formControlName="username" class="form-control"
+                                placeholder="Enter username">
+                        </div>
+                        <div class="error-feedback"
+                            *ngIf="profileForm.get('username')?.touched && profileForm.get('username')?.invalid">
+                            <small *ngIf="profileForm.get('username')?.errors?.['required']">Username is
+                                required</small>
+                            <small *ngIf="profileForm.get('username')?.errors?.['minlength']">Username must be at least
+                                3 characters</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-envelope"></i>
+                            <input type="email" id="email" formControlName="email" class="form-control"
+                                placeholder="Enter email">
+                        </div>
+                        <div class="error-feedback"
+                            *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.invalid">
+                            <small *ngIf="profileForm.get('email')?.errors?.['required']">Email is required</small>
+                            <small *ngIf="profileForm.get('email')?.errors?.['email']">Enter a valid email
+                                address</small>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"
+                            [disabled]="profileForm.invalid || submittingProfile">
+                            <span *ngIf="submittingProfile" class="spinner-sm"></span>
+                            {{ submittingProfile ? 'Saving...' : 'Save Changes' }}
+                        </button>
+                    </div>
+
+                    <div class="alert alert-success" *ngIf="successMessage">
+                        <i class="bi bi-check-circle"></i> {{ successMessage }}
+                    </div>
+                    <div class="alert alert-danger" *ngIf="errorMessage">
+                        <i class="bi bi-exclamation-circle"></i> {{ errorMessage }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Change Password Card -->
+        <div class="card password-card">
+            <div class="card-header">
+                <i class="bi bi-shield-lock"></i>
+                <h2>Security</h2>
+            </div>
+            <div class="card-body">
+                <form [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+                    <div class="form-group">
+                        <label for="currentPassword">Current Password</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-key"></i>
+                            <input type="password" id="currentPassword" formControlName="currentPassword"
+                                class="form-control" placeholder="Enter current password">
+                        </div>
+                        <div class="error-feedback"
+                            *ngIf="passwordForm.get('currentPassword')?.touched && passwordForm.get('currentPassword')?.invalid">
+                            <small>Current password is required</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="newPassword">New Password</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-lock"></i>
+                            <input type="password" id="newPassword" formControlName="newPassword" class="form-control"
+                                placeholder="Enter new password">
+                        </div>
+                        <div class="error-feedback"
+                            *ngIf="passwordForm.get('newPassword')?.touched && passwordForm.get('newPassword')?.invalid">
+                            <small *ngIf="passwordForm.get('newPassword')?.errors?.['required']">New password is
+                                required</small>
+                            <small *ngIf="passwordForm.get('newPassword')?.errors?.['minlength']">Password must be at
+                                least 6 characters</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmNewPassword">Confirm New Password</label>
+                        <div class="input-wrapper">
+                            <i class="bi bi-lock-fill"></i>
+                            <input type="password" id="confirmNewPassword" formControlName="confirmNewPassword"
+                                class="form-control" placeholder="Confirm new password">
+                        </div>
+                        <div class="error-feedback"
+                            *ngIf="passwordForm.touched && passwordForm.errors?.['passwordMismatch']">
+                            <small>Passwords do not match</small>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-warning"
+                            [disabled]="passwordForm.invalid || submittingPassword">
+                            <span *ngIf="submittingPassword" class="spinner-sm"></span>
+                            {{ submittingPassword ? 'Updating...' : 'Change Password' }}
+                        </button>
+                    </div>
+
+                    <div class="alert alert-success" *ngIf="passwordSuccessMessage">
+                        <i class="bi bi-check-circle"></i> {{ passwordSuccessMessage }}
+                    </div>
+                    <div class="alert alert-danger" *ngIf="passwordErrorMessage">
+                        <i class="bi bi-exclamation-circle"></i> {{ passwordErrorMessage }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -23,12 +23,14 @@
             <span class="nav-text">Dashboard</span>
           </a>
         </li>
+        @if(currentUser?.role !== 'Parent'){
         <li class="nav-item">
           <a class="nav-link" routerLink="/students" routerLinkActive="active">
             <i class="bi bi-people"></i>
             <span class="nav-text">Students</span>
           </a>
         </li>
+        }
         @if(currentUser?.role !== 'Parent'){
         <li class="nav-item">
           <a class="nav-link" routerLink="/teachers" routerLinkActive="active">
@@ -150,7 +152,7 @@
 
           @if (userMenuOpen) {
           <div class="user-dropdown">
-            <a class="dropdown-item" href="#">
+            <a class="dropdown-item" routerLink="/profile">
               <i class="bi bi-gear"></i>
               <span>Settings</span>
             </a>

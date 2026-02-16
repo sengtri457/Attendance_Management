@@ -46,6 +46,14 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client,
   },
   {
+    path: 'class-groups/edit/:id',
+    renderMode: RenderMode.Client,
+  },
+  {
+    path: 'class-groups/students/:id',
+    renderMode: RenderMode.Client,
+  },
+  {
     path: '**',
     renderMode: RenderMode.Prerender,
   },

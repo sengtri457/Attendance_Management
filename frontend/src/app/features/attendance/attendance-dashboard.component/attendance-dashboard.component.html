@@ -300,15 +300,14 @@
                           @for (att of group.records; track att._id) {
                           <tr class="align-middle">
                             <td class="ps-3 fw-bold text-dark">{{ att.subject?.subjectName || 'No Subject' }}</td>
-                            @if(att.status === 'present') {
-                            <td class="text-muted"><i class="bi bi-dash"></i></td>
-                            <td class="text-muted"><i class="bi bi-dash"></i></td>
-                            }@else if(att.status === 'absent'){
+                            @if(att.status === 'absent'){
                             <td class="text-secondary fst-italic">Absent</td>
                             <td class="text-secondary fst-italic">Absent</td>
                             }@else {
-                            <td class="text-dark font-monospace">{{ att.checkInTime  | date: 'shortTime' }}</td>
-                            <td class="text-dark font-monospace">{{ att.checkOutTime  | date: 'shortTime' }}</td>
+                            <td class="text-dark font-monospace">
+                              {{ att.checkInTime ? (att.checkInTime | date: 'shortTime') : '-' }}</td>
+                            <td class="text-dark font-monospace">
+                              {{ att.checkOutTime ? (att.checkOutTime | date: 'shortTime') : '-' }}</td>
                             }
                             <td>
                               <span [class]="'badge rounded-pill bg-' + attendanceService.getStatusColor(att.status)">
