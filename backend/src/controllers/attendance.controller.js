@@ -10,7 +10,7 @@ const telegramUtils = require("../utils/telegram");
 
 // Configuration for attendance rules
 const ATTENDANCE_CONFIG = {
-    OFFICE_START_TIME: "08:00", // Default if no subject
+    OFFICE_START_TIME: "13:00", // Default if no subject
     GRACE_PERIOD_MINUTES: 15,
     HALF_DAY_HOURS: 4,
     FULL_DAY_HOURS: 8,
@@ -82,7 +82,7 @@ const getSubjectStartTime = async (subjectId, date) => {
 
         // 1. Check for sessions (Complex Schedule)
         if (subject.sessions && subject.sessions.length > 0) {
-            const dayName = moment(date).format('dddd');
+            const dayName = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).format('dddd');
             // e.g., "Monday"
 
             // Fix: Check both 'days' array and legacy 'dayOfWeek'
@@ -101,7 +101,7 @@ const getSubjectStartTime = async (subjectId, date) => {
         if (subject.teachTime) {
             // teachTime can be a Date object or string. Extract HH:mm.
             // If Date stored in DB, usually full date.
-            return moment(subject.teachTime).format("HH:mm");
+            return moment.tz(subject.teachTime, ATTENDANCE_CONFIG.TIMEZONE).format("HH:mm");
         }
 
         return null;
@@ -112,7 +112,7 @@ const getSubjectStartTime = async (subjectId, date) => {
 };
 // Helper function to check if student is on approved leave
 const checkLeaveStatus = async (studentId, date) => {
-    const targetDate = moment(date).startOf("day");
+    const targetDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
 
     const approvedLeave = await LeaveRequest.findOne({
         student: studentId,
@@ -153,12 +153,12 @@ exports.getAttendance = async (req, res) => {
             query.date = {};
             // Use moment to handle timezone correctly, consistent with markAttendance
             if (dateFrom) 
-                query.date.$gte = moment(dateFrom).startOf('day').toDate();
+                query.date.$gte = moment.tz(dateFrom, ATTENDANCE_CONFIG.TIMEZONE).startOf('day').toDate();
             
 
 
             if (dateTo) 
-                query.date.$lte = moment(dateTo).endOf('day').toDate();
+                query.date.$lte = moment.tz(dateTo, ATTENDANCE_CONFIG.TIMEZONE).endOf('day').toDate();
             
 
 
@@ -214,7 +214,7 @@ exports.markAttendance = async (req, res) => {
         // Check if attendance already exists for this date and subject
         const existingQuery = {
             student: studentId,
-            date: moment(date).startOf("day").toDate()
+            date: moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day").toDate()
         };
         if (req.body.subjectId) {
             existingQuery.subject = req.body.subjectId;
@@ -231,7 +231,7 @@ exports.markAttendance = async (req, res) => {
 
         let attendanceData = {
             student: studentId,
-            date: moment(date).startOf("day").toDate(),
+            date: moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day").toDate(),
             checkInTime,
             markedByTeacher: markedByTeacherId,
             note,
@@ -956,5 +956,105 @@ exports.getLeaveRequest = async (req, res) => {
     } catch (error) {
         console.error("Error getting leave request:", error);
         res.status(500).json({success: false, message: "Failed to get leave request", error: error.message});
+    }
+};
+
+exports.markBulkAttendance = async (req, res) => {
+    try {
+        const {
+            students,
+            date,
+            subjectId,
+            markedByTeacherId,
+            status
+        } = req.body;
+
+        if (!students || !Array.isArray(students) || students.length === 0) {
+            return res.status(400).json({success: false, message: "No students provided"});
+        }
+
+        const targetDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day").toDate();
+        const results = [];
+        const errors = [];
+
+        // Determine schedule start time
+        let scheduleStartTime = ATTENDANCE_CONFIG.OFFICE_START_TIME;
+        if (subjectId) {
+            const subjectTime = await getSubjectStartTime(subjectId, date);
+            if (subjectTime) 
+                scheduleStartTime = subjectTime;
+            
+        }
+
+        const checkInTime = new Date().toISOString();
+
+        for (const studentId of students) {
+            try { // Check if already marked
+                const existing = await Attendance.findOne({
+                    student: studentId,
+                    date: targetDate,
+                    subject: subjectId || null
+                });
+
+                if (existing) {
+                    continue; // Skip if already marked
+                }
+
+                // Check leave status
+                const onLeave = await checkLeaveStatus(studentId, date);
+
+                let attendanceData = {
+                    student: studentId,
+                    date: targetDate,
+                    markedByTeacher: markedByTeacherId,
+                    subject: subjectId || null
+                };
+
+                if (onLeave) {
+                    attendanceData.status = "on-leave";
+                    attendanceData.leaveReference = onLeave._id;
+                } else {
+                    const finalStatus = status || "present";
+                    attendanceData.checkInTime = checkInTime;
+
+                    if (finalStatus === "present" || finalStatus === "late") {
+                        const calc = calculateAttendanceStatus(checkInTime, null, scheduleStartTime);
+                        attendanceData.status = status || calc.status;
+                        attendanceData.isLate = calc.isLate;
+                        attendanceData.lateBy = calc.lateBy;
+                    } else {
+                        attendanceData.status = finalStatus;
+                    }
+                }
+
+                const attendance = new Attendance(attendanceData);
+                await attendance.save();
+
+                // Notify Telegram (Background)
+                Attendance.findById(attendance._id).populate("student", "firstName lastName studentId").populate("subject", "subjectName").then(populated => {
+                    if (populated) {
+                        telegramUtils.sendAttendanceNotification(populated, populated.student, populated.subject);
+                    }
+                }).catch(console.error);
+
+                results.push(attendance._id);
+            } catch (studentErr) {
+                errors.push({studentId, error: studentErr.message});
+            }
+        }
+
+        res.json({
+            success: true,
+            message: `Processed ${
+                students.length
+            } students. ${
+                results.length
+            } marked.`,
+            count: results.length,
+            errors: errors.length > 0 ? errors : undefined
+        });
+    } catch (error) {
+        console.error("Bulk attendance error:", error);
+        res.status(500).json({success: false, message: "Server error during bulk operation"});
     }
 };

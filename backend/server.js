@@ -11,6 +11,8 @@ app.use(morgan("dev"));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // Root health check
 app.get("/", (req, res) => {
     res.json({success: true, message: "Attendance API is running 🚀"});

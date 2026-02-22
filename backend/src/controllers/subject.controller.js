@@ -3,6 +3,9 @@
 // ===================================
 const Subject = require("../models/Subject");
 const Teacher = require("../models/Teacher");
+const moment = require("moment-timezone");
+
+const TIMEZONE = "Asia/Phnom_Penh";
 
 exports.getAllSubjects = async (req, res) => {
     try {
@@ -228,27 +231,14 @@ exports.getSubjectsByTeacher = async (req, res) => {
 exports.getSubjectSchedule = async (req, res) => {
     try {
         const {date} = req.query;
-
         let query = {};
+        let dayName = null;
 
-        // If date is provided, filter subjects for that day
         if (date) {
-            const queryDate = new Date(date);
-            const days = [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday"
-            ];
-            const dayName = days[queryDate.getDay()];
-            // e.g. "Monday"
+            const queryDate = moment.tz(date, TIMEZONE).startOf("day");
+            dayName = queryDate.format("dddd");
 
             // Filter for subjects that meet on this day
-            // EITHER legacy way: dayOfWeek == dayName
-            // OR new way: sessions array contains an entry with day == dayName
             query.$or = [
                 {
                     dayOfWeek: dayName
@@ -261,48 +251,47 @@ exports.getSubjectSchedule = async (req, res) => {
         }
 
         const subjects = await Subject.find(query).populate("teacherId", "name phone").populate("classGroup", "name").populate("classGroups", "name").lean();
-        // Use lean() to allow modification
 
-        // If filtering by date, we need to transform the data to show the correct time for that day
-        // because "teachTime" might be legacy or null for multi-session subjects
-        if (date) {
-            const queryDate = new Date(date);
-            const days = [
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday"
-            ];
-            const dayName = days[queryDate.getDay()];
+        // If filtering by date, transform data to show the correct time for that day
+        if (date && dayName) {
+            subjects.forEach(sub => {
+                let sessionStartTime = null;
+                let sessionEndTime = null;
 
-            subjects.forEach(sub => { // Check if it's a multi-session subject
+                // 1. Try multi-session schedule first
                 if (sub.sessions && sub.sessions.length > 0) {
                     const session = sub.sessions.find(s => (s.days && s.days.includes(dayName)) || s.dayOfWeek === dayName);
+
                     if (session) {
-                        // Construct a date object for the session time
-                        // session.startTime is "HH:mm"
-                        const [startHour, startMin] = session.startTime.split(':');
-                        const [endHour, endMin] = session.endTime.split(':');
+                        sessionStartTime = session.startTime;
+                        sessionEndTime = session.endTime;
+                        sub.room = session.room;
+                    }
+                }
 
-                        // Create Date objects for this specific day
-                        const sTime = new Date(queryDate);
-                        sTime.setHours(parseInt(startHour), parseInt(startMin), 0);
+                // 2. Fallback to legacy fields if no session found for this day
+                if (! sessionStartTime && sub.teachTime) { // Extract HH:mm in the correct timezone context from the stored Date
+                    sessionStartTime = moment.tz(sub.teachTime, TIMEZONE).format("HH:mm");
+                    if (sub.endTime) {
+                        sessionEndTime = moment.tz(sub.endTime, TIMEZONE).format("HH:mm");
+                    }
+                }
 
-                        const eTime = new Date(queryDate);
-                        eTime.setHours(parseInt(endHour), parseInt(endMin), 0);
+                // 3. Create standardized display strings and override Date objects
+                if (sessionStartTime) { // Create moments anchored to the requested date and target timezone
+                    const sMoment = moment.tz(`${date} ${sessionStartTime}`, "YYYY-MM-DD HH:mm", TIMEZONE);
+                    sub.teachTime = sMoment.toDate(); // UTC for DB/Frontend
+                    sub.startTimeDisplay = sMoment.format("h:mm A");
 
-                        // Override the display properties
-                        sub.teachTime = sTime;
-                        sub.endTime = eTime;
-                        sub.room = session.room; // Add room if available
+                    if (sessionEndTime) {
+                        const eMoment = moment.tz(`${date} ${sessionEndTime}`, "YYYY-MM-DD HH:mm", TIMEZONE);
+                        sub.endTime = eMoment.toDate();
+                        sub.endTimeDisplay = eMoment.format("h:mm A");
                     }
                 }
             });
 
-            // Re-sort based on the potentially updated teachTime
+            // Re-sort based on the updated teachTime
             subjects.sort((a, b) => new Date(a.teachTime) - new Date(b.teachTime));
         } else { // Fallback sort if no date provided
             subjects.sort((a, b) => {
@@ -310,13 +299,13 @@ exports.getSubjectSchedule = async (req, res) => {
                     if (subj.teachTime) 
                         return new Date(subj.teachTime).getTime();
                     
-                    if (subj.sessions && subj.sessions.length > 0) { // Parse "HH:mm" from the first session as a fallback comparison
+                    if (subj.sessions && subj.sessions.length > 0) {
                         const [hours, minutes] = subj.sessions[0].startTime.split(':');
                         const d = new Date();
-                        d.setHours(hours, minutes, 0, 0);
+                        d.setHours(parseInt(hours), parseInt(minutes), 0, 0);
                         return d.getTime();
                     }
-                    return 8640000000000; // Far future for subjects with no time
+                    return 8640000000000;
                 };
                 return getTime(a) - getTime(b);
             });
