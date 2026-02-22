@@ -119,3 +119,19 @@
 .transition-all {
   transition: all 0.2s ease-in-out;
 }
+
+.opacity-0 {
+  opacity: 0;
+}
+
+.opacity-50 {
+  opacity: 0.5;
+}
+
+.group:hover .group-hover-opacity-100 {
+  opacity: 1;
+}
+
+.group-hover-opacity-100 {
+  cursor: pointer;
+}

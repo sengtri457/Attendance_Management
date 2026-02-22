@@ -146,6 +146,15 @@ export class StudentLeaveRequestComponent implements OnInit {
     this.fromDate = today;
   }
 
+  selectedFiles: File[] = [];
+
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    if (files) {
+      this.selectedFiles = Array.from(files);
+    }
+  }
+
   submitLeaveRequest(): void {
     // Validation
     if (!this.selectedStudent || !this.studentId) {
@@ -165,20 +174,20 @@ export class StudentLeaveRequestComponent implements OnInit {
 
     this.submitting = true;
 
-    const data = {
+    this.leaveRequestService.create({
       studentId: this.studentId,
       fromDate: this.fromDate,
       toDate: this.toDate,
       reason: this.reason.trim(),
-    };
-
-    this.leaveRequestService.createLeaveRequest(data).subscribe({
+      evidence: this.selectedFiles
+    }).subscribe({
       next: (response) => {
         this.showSuccessModal = true;
         this.submitting = false;
 
         // Reset form
         this.reason = '';
+        this.selectedFiles = [];
         this.setMinDate();
 
         // Reload requests

@@ -11,6 +11,7 @@ export interface LeaveRequest {
   reviewedBy?: string | { username: string; _id: string };
   reviewedAt?: Date | string;
   requestedAt: Date | string;
+  attachments?: string[];
 }
 
 export interface CreateLeaveRequest {
@@ -18,6 +19,7 @@ export interface CreateLeaveRequest {
   fromDate: string;
   toDate: string;
   reason: string;
+  evidence?: File[];
 }
 
 export interface ReviewLeaveRequest {

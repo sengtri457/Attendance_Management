@@ -89,7 +89,7 @@
             @for (request of filteredRequests; track request) {
             <tr>
               <td>
-                <strong>{{ request.student?.firstName }} {{ request.student?.lastName }}</strong>
+                <strong>{{ request.student.firstName }} {{ request.student.lastName }}</strong>
               </td>
               <td>{{ request.fromDate | date: 'MMM dd, yyyy' }}</td>
               <td>{{ request.toDate | date: 'MMM dd, yyyy' }}</td>
@@ -177,6 +177,31 @@
           <div class="mb-3">
             <strong>Reason:</strong>
             <p class="text-muted">{{ selectedRequest.reason }}</p>
+          </div>
+
+          <div class="mb-3">
+            <strong>Medical Evidence:</strong>
+            @if (selectedRequest.attachments && selectedRequest.attachments.length > 0) {
+            <div class="d-flex flex-wrap gap-2 mt-2">
+              @for (file of selectedRequest.attachments; track file) {
+              <div class="evidence-item">
+                @if (isImage(file)) {
+                <a [href]="getFileUrl(file)" target="_blank" class="d-block">
+                  <img [src]="getFileUrl(file)" class="img-thumbnail"
+                    style="width: 100px; height: 100px; object-fit: cover;" />
+                </a>
+                } @else {
+                <a [href]="getFileUrl(file)" target="_blank"
+                  class="btn btn-outline-primary btn-sm d-flex align-items-center">
+                  <i class="bi bi-file-earmark-pdf me-1"></i> View Document
+                </a>
+                }
+              </div>
+              }
+            </div>
+            } @else {
+            <p class="text-muted small">No evidence provided.</p>
+            }
           </div>
           <div class="alert" [ngClass]="reviewAction === 'approved' ? 'alert-success' : 'alert-danger'">
             <i class="bi me-2"

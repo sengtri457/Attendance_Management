@@ -79,6 +79,20 @@ export class AttendanceService {
     }>(this.apiUrl, attendance);
   }
 
+  markBulk(data: {
+    students: string[];
+    date: string;
+    subjectId: string;
+    markedByTeacherId: string;
+    status?: string;
+  }): Observable<{ success: boolean; message: string; count: number }> {
+    return this.http.post<{
+      success: boolean;
+      message: string;
+      count: number;
+    }>(`${this.apiUrl}/bulk`, data);
+  }
+
   /**
    * Update existing attendance record
    */

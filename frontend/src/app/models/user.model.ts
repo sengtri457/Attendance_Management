@@ -107,6 +107,7 @@ export interface LeaveRequest {
   };
   reviewedAt?: string;
   requestedAt: string;
+  attachments?: string[];
   onLeave?: boolean;
 }
 export interface MarkAttendanceRequest {
@@ -138,6 +139,7 @@ export interface Attendance {
   markedByTeacher: string | any;
   note?: string;
   leaveReference?: string | LeaveRequest;
+  attachments?: string[];
   createdAt?: Date | string;
   updatedAt?: Date | string;
 }
@@ -304,4 +306,6 @@ export interface Subject {
       endTime: string;
       room?: string;
   }[];
+  startTimeDisplay?: string;
+  endTimeDisplay?: string;
 }

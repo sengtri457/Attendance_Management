@@ -17,11 +17,7 @@
 
     <!-- Back button -->
     <div class="col-lg-3 col-md-4 col-12 text-md-end text-start">
-      <button
-        (click)="backToDashboard()"
-        type="button"
-        class="btn btn-outline-primary w-100 w-md-auto"
-        >
+      <button (click)="backToDashboard()" type="button" class="btn btn-outline-primary w-100 w-md-auto">
         <i class="bi bi-arrow-left me-2"></i>
         Back to Dashboard
       </button>
@@ -52,369 +48,376 @@
             </span>
             <input type="text" class="form-control border-start-0" [(ngModel)]="searchTerm" (input)="onSearchChange()"
               placeholder="Type to search by name or email..." [disabled]="loadingStudents" />
-              @if (searchTerm) {
-                <button class="btn btn-outline-secondary" type="button"
-                  (click)="searchTerm=''; onSearchChange()">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              }
-            </div>
-            <small class="form-text text-muted">Search and filter students by name or email</small>
+            @if (searchTerm) {
+            <button class="btn btn-outline-secondary" type="button" (click)="searchTerm=''; onSearchChange()">
+              <i class="bi bi-x-lg"></i>
+            </button>
+            }
           </div>
+          <small class="form-text text-muted">Search and filter students by name or email</small>
+        </div>
 
-          <!-- Select Dropdown -->
+        <!-- Select Dropdown -->
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-people me-1"></i>
+            Or Select from List
+          </label>
+          <select class="form-select" [(ngModel)]="studentId" (change)="onStudentChange($event)"
+            [disabled]="loadingStudents">
+            <option value="">-- Select a Student --</option>
+            @for (student of filteredStudents; track student) {
+            <option [value]="student._id">
+              {{ student.firstName }} {{ student.lastName }} - {{ student.user.email }}
+            </option>
+            }
+          </select>
+          <small class="form-text text-muted">
+            <i class="bi bi-funnel me-1"></i>
+            Showing {{ filteredStudents.length }} of {{ students.length }} students
+          </small>
+        </div>
+
+        <!-- Loading State -->
+        @if (loadingStudents) {
+        <div class="col-12">
+          <div class="alert alert-info mb-0 d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            Loading students...
+          </div>
+        </div>
+        }
+
+        <!-- Clear Button -->
+        @if (selectedStudent || searchTerm) {
+        <div class="col-12">
+          <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearStudentSelection()">
+            <i class="bi bi-x-lg me-2"></i>
+            Clear Selection & Search
+          </button>
+        </div>
+        }
+      </div>
+
+      <!-- Selected Student Info -->
+      @if (selectedStudent) {
+      <div class="alert alert-success border-success mt-3 mb-0">
+        <div class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3"
+              style="width: 50px; height: 50px; flex-shrink: 0;">
+              <strong class="fs-5">
+                {{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}
+              </strong>
+            </div>
+            <div>
+              <h6 class="mb-0 text-success">
+                <i class="bi bi-check-circle-fill me-1"></i>
+                Selected Student
+              </h6>
+              <div class="mt-1">
+                <strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong>
+                <br>
+                <small class="text-muted">
+                  <i class="bi bi-envelope me-1"></i>
+                  {{ selectedStudent.user.email }}
+                </small>
+              </div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-outline-danger" (click)="clearStudentSelection()"
+            title="Clear selection">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+      </div>
+      }
+
+      <!-- No Results Message -->
+      @if (searchTerm && filteredStudents.length === 0 && !loadingStudents) {
+      <div class="alert alert-warning border-warning mt-3 mb-0">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        No students found matching "<strong>{{ searchTerm }}</strong>"
+        <button type="button" class="btn btn-sm btn-outline-warning ms-2" (click)="searchTerm=''; onSearchChange()">
+          Clear Search
+        </button>
+      </div>
+      }
+    </div>
+  </div>
+
+  <!-- Leave Request Form (Only show when student is selected) -->
+  @if (selectedStudent) {
+  <div class="card shadow-sm mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="bi bi-plus-circle me-2"></i>
+        Step 2: Submit Leave Request
+      </h5>
+    </div>
+    <div class="card-body">
+      <form (ngSubmit)="submitLeaveRequest()">
+        <div class="row g-3">
+          <!-- Student Info Summary -->
+          <div class="col-12">
+            <div class="alert alert-light border">
+              <strong>Submitting leave for:</strong>
+              {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+            </div>
+          </div>
+          <!-- From Date -->
           <div class="col-md-6">
             <label class="form-label fw-semibold">
-              <i class="bi bi-people me-1"></i>
-              Or Select from List
+              <i class="bi bi-calendar-event me-1"></i>
+              From Date
+              <span class="text-danger">*</span>
             </label>
-            <select class="form-select" [(ngModel)]="studentId" (change)="onStudentChange($event)"
-              [disabled]="loadingStudents">
-              <option value="">-- Select a Student --</option>
-              @for (student of filteredStudents; track student) {
-                <option [value]="student._id">
-                  {{ student.firstName }} {{ student.lastName }} - {{ student.user.email }}
-                </option>
-              }
-            </select>
+            <input type="date" class="form-control" [(ngModel)]="fromDate" name="fromDate" [min]="fromDate" required />
+          </div>
+          <!-- To Date -->
+          <div class="col-md-6">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-calendar-check me-1"></i>
+              To Date
+              <span class="text-danger">*</span>
+            </label>
+            <input type="date" class="form-control" [(ngModel)]="toDate" name="toDate" [min]="fromDate" required />
+          </div>
+          <!-- Duration Display -->
+          @if (fromDate && toDate) {
+          <div class="col-12">
+            <div class="alert alert-info border-info">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>Duration:</strong> {{ calculateDuration(fromDate, toDate) }} day(s)
+            </div>
+          </div>
+          }
+          <!-- Evidence -->
+          <div class="col-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-paperclip me-1"></i>
+              Medical Evidence (Optional)
+            </label>
+            <input type="file" class="form-control" (change)="onFileSelected($event)" multiple accept="image/*,.pdf" />
+            <div class="form-text">Upload images or PDF documents (Doctor's notes, etc.)</div>
+          </div>
+          <!-- Reason -->
+          <div class="col-12">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-chat-left-text me-1"></i>
+              Reason for Leave
+              <span class="text-danger">*</span>
+            </label>
+            <textarea class="form-control" rows="5" [(ngModel)]="reason" name="reason"
+              placeholder="Please provide a detailed reason for the leave request..." required
+              maxlength="500"></textarea>
             <small class="form-text text-muted">
-              <i class="bi bi-funnel me-1"></i>
-              Showing {{ filteredStudents.length }} of {{ students.length }} students
+              <i class="bi bi-pencil me-1"></i>
+              {{ reason.length }}/500 characters
             </small>
           </div>
-
-          <!-- Loading State -->
-          @if (loadingStudents) {
-            <div class="col-12">
-              <div class="alert alert-info mb-0 d-flex align-items-center">
-                <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
-                  <span class="visually-hidden">Loading...</span>
-                </div>
-                Loading students...
-              </div>
-            </div>
-          }
-
-          <!-- Clear Button -->
-          @if (selectedStudent || searchTerm) {
-            <div class="col-12">
-              <button type="button" class="btn btn-outline-secondary btn-sm" (click)="clearStudentSelection()">
-                <i class="bi bi-x-lg me-2"></i>
-                Clear Selection & Search
+          <!-- Submit Button -->
+          <div class="col-12">
+            <hr>
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary px-4"
+                [disabled]="submitting || !fromDate || !toDate || !reason.trim()">
+                <i class="bi me-2" [ngClass]="submitting ? 'bi-arrow-repeat' : 'bi-send'"></i>
+                {{ submitting ? 'Submitting...' : 'Submit Leave Request' }}
+              </button>
+              <button type="button" class="btn btn-outline-secondary" (click)="reason=''; setMinDate()"
+                [disabled]="submitting">
+                <i class="bi bi-arrow-clockwise me-2"></i>
+                Reset Form
               </button>
             </div>
-          }
+          </div>
         </div>
+      </form>
+    </div>
+  </div>
+  }
 
-        <!-- Selected Student Info -->
-        @if (selectedStudent) {
-          <div class="alert alert-success border-success mt-3 mb-0">
-            <div class="d-flex align-items-center justify-content-between">
-              <div class="d-flex align-items-center">
-                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center me-3"
-                  style="width: 50px; height: 50px; flex-shrink: 0;">
-                  <strong class="fs-5">
-                    {{ selectedStudent.firstName.charAt(0) }}{{ selectedStudent.lastName.charAt(0) }}
-                  </strong>
-                </div>
-                <div>
-                  <h6 class="mb-0 text-success">
-                    <i class="bi bi-check-circle-fill me-1"></i>
-                    Selected Student
-                  </h6>
-                  <div class="mt-1">
-                    <strong>{{ selectedStudent.firstName }} {{ selectedStudent.lastName }}</strong>
-                    <br>
-                      <small class="text-muted">
-                        <i class="bi bi-envelope me-1"></i>
-                        {{ selectedStudent.user.email }}
-                      </small>
-                    </div>
-                  </div>
-                </div>
-                <button type="button" class="btn btn-sm btn-outline-danger" (click)="clearStudentSelection()"
-                  title="Clear selection">
-                  <i class="bi bi-x-lg"></i>
-                </button>
-              </div>
-            </div>
-          }
+  <!-- Placeholder when no student selected -->
+  @if (!selectedStudent) {
+  <div class="card shadow-sm mb-4">
+    <div class="card-body text-center py-5">
+      <i class="bi bi-person-plus-fill text-muted" style="font-size: 5rem;"></i>
+      <h4 class="mt-4 text-muted">No Student Selected</h4>
+      <p class="text-muted mb-0">
+        Use the search box or dropdown above to find and select a student,<br>
+        then submit their leave request.
+      </p>
+    </div>
+  </div>
+  }
 
-          <!-- No Results Message -->
-          @if (searchTerm && filteredStudents.length === 0 && !loadingStudents) {
-            <div
-              class="alert alert-warning border-warning mt-3 mb-0">
-              <i class="bi bi-exclamation-triangle me-2"></i>
-              No students found matching "<strong>{{ searchTerm }}</strong>"
-              <button type="button" class="btn btn-sm btn-outline-warning ms-2" (click)="searchTerm=''; onSearchChange()">
-                Clear Search
-              </button>
-            </div>
-          }
-        </div>
-      </div>
-
-      <!-- Leave Request Form (Only show when student is selected) -->
-      @if (selectedStudent) {
-        <div class="card shadow-sm mb-4">
-          <div class="card-header bg-primary text-white">
-            <h5 class="mb-0">
-              <i class="bi bi-plus-circle me-2"></i>
-              Step 2: Submit Leave Request
-            </h5>
-          </div>
-          <div class="card-body">
-            <form (ngSubmit)="submitLeaveRequest()">
-              <div class="row g-3">
-                <!-- Student Info Summary -->
-                <div class="col-12">
-                  <div class="alert alert-light border">
-                    <strong>Submitting leave for:</strong>
-                    {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
-                  </div>
-                </div>
-                <!-- From Date -->
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">
-                    <i class="bi bi-calendar-event me-1"></i>
-                    From Date
-                    <span class="text-danger">*</span>
-                  </label>
-                  <input type="date" class="form-control" [(ngModel)]="fromDate" name="fromDate" [min]="fromDate" required />
-                </div>
-                <!-- To Date -->
-                <div class="col-md-6">
-                  <label class="form-label fw-semibold">
-                    <i class="bi bi-calendar-check me-1"></i>
-                    To Date
-                    <span class="text-danger">*</span>
-                  </label>
-                  <input type="date" class="form-control" [(ngModel)]="toDate" name="toDate" [min]="fromDate" required />
-                </div>
-                <!-- Duration Display -->
-                @if (fromDate && toDate) {
-                  <div class="col-12">
-                    <div class="alert alert-info border-info">
-                      <i class="bi bi-info-circle me-2"></i>
-                      <strong>Duration:</strong> {{ calculateDuration(fromDate, toDate) }} day(s)
-                    </div>
-                  </div>
-                }
-                <!-- Reason -->
-                <div class="col-12">
-                  <label class="form-label fw-semibold">
-                    <i class="bi bi-chat-left-text me-1"></i>
-                    Reason for Leave
-                    <span class="text-danger">*</span>
-                  </label>
-                  <textarea class="form-control" rows="5" [(ngModel)]="reason" name="reason"
-                    placeholder="Please provide a detailed reason for the leave request..." required
-                  maxlength="500"></textarea>
-                  <small class="form-text text-muted">
-                    <i class="bi bi-pencil me-1"></i>
-                    {{ reason.length }}/500 characters
-                  </small>
-                </div>
-                <!-- Submit Button -->
-                <div class="col-12">
-                  <hr>
-                    <div class="d-flex gap-2">
-                      <button type="submit" class="btn btn-primary px-4"
-                        [disabled]="submitting || !fromDate || !toDate || !reason.trim()">
-                        <i class="bi me-2" [ngClass]="submitting ? 'bi-arrow-repeat' : 'bi-send'"></i>
-                        {{ submitting ? 'Submitting...' : 'Submit Leave Request' }}
-                      </button>
-                      <button type="button" class="btn btn-outline-secondary" (click)="reason=''; setMinDate()"
-                        [disabled]="submitting">
-                        <i class="bi bi-arrow-clockwise me-2"></i>
-                        Reset Form
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-        }
-
-        <!-- Placeholder when no student selected -->
-        @if (!selectedStudent) {
-          <div class="card shadow-sm mb-4">
-            <div class="card-body text-center py-5">
-              <i class="bi bi-person-plus-fill text-muted" style="font-size: 5rem;"></i>
-              <h4 class="mt-4 text-muted">No Student Selected</h4>
-              <p class="text-muted mb-0">
-                Use the search box or dropdown above to find and select a student,<br>
-                then submit their leave request.
-              </p>
-            </div>
-          </div>
-        }
-
-        <!-- Student's Leave Requests History -->
-        @if (selectedStudent) {
-          <div class="card shadow-sm">
-            <div class="card-header bg-white border-bottom">
-              <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                <div>
-                  <h5 class="mb-0 fw-semibold">
-                    <i class="bi bi-clock-history me-2 text-primary"></i>
-                    Leave Request History
-                  </h5>
-                  <small class="text-muted">
-                    All leave requests for {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
-                  </small>
-                </div>
-                <span class="badge bg-primary rounded-pill">
-                  {{ myLeaveRequests.length }} Request{{ myLeaveRequests.length !== 1 ? 's' : '' }}
-                </span>
-              </div>
-            </div>
-            <div class="card-body">
-              <!-- Loading -->
-              @if (loading) {
-                <div class="text-center py-5">
-                  <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
-                    <span class="visually-hidden">Loading...</span>
-                  </div>
-                  <p class="mt-3 text-muted">Loading leave requests...</p>
-                </div>
-              }
-              <!-- Leave Requests Table -->
-              @if (!loading && myLeaveRequests.length > 0) {
-                <div class="table-responsive">
-                  <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
-                      <tr>
-                        <th>From Date</th>
-                        <th>To Date</th>
-                        <th>Duration</th>
-                        <th>Reason</th>
-                        <th>Status</th>
-                        <th>Reviewed By</th>
-                        <th>Requested At</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      @for (request of myLeaveRequests; track request) {
-                        <tr>
-                          <td class="text-nowrap">
-                            <i class="bi bi-calendar-event text-primary me-1"></i>
-                            {{ request.fromDate | date: 'MMM dd, yyyy' }}
-                          </td>
-                          <td class="text-nowrap">
-                            <i class="bi bi-calendar-check text-success me-1"></i>
-                            {{ request.toDate | date: 'MMM dd, yyyy' }}
-                          </td>
-                          <td>
-                            <span class="badge bg-secondary">
-                              <i class="bi bi-hourglass-split me-1"></i>
-                              {{ calculateDuration(request.fromDate, request.toDate) }} day(s)
-                            </span>
-                          </td>
-                          <td>
-                            <span class="text-truncate d-inline-block" style="max-width: 250px; cursor: help;"
-                              [title]="request.reason">
-                              {{ request.reason }}
-                            </span>
-                          </td>
-                          <td>
-                            <span class="badge rounded-pill px-3" [ngClass]="'bg-' + getStatusClass(request.status)">
-                              <i class="bi me-1" [ngClass]="getStatusIcon(request.status)"></i>
-                              {{ request.status | titlecase }}
-                            </span>
-                          </td>
-                          <td>
-                            @if (request.reviewedBy) {
-                              <span class="text-nowrap">
-                                <i class="bi bi-person-check text-success me-1"></i>
-                                {{ request.reviewedBy.username }}
-                              </span>
-                            }
-                            @if (!request.reviewedBy) {
-                              <span class="text-muted text-nowrap">
-                                <i class="bi bi-hourglass-split me-1"></i>
-                                Pending Review
-                              </span>
-                            }
-                          </td>
-                          <td class="text-nowrap">
-                            <small class="text-muted">
-                              <i class="bi bi-clock me-1"></i>
-                              {{ request.requestedAt | date: 'MMM dd, yyyy' }}<br>
-                              {{ request.requestedAt | date: 'hh:mm a' }}
-                            </small>
-                          </td>
-                        </tr>
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              }
-              <!-- No Requests -->
-              @if (!loading && myLeaveRequests.length === 0) {
-                <div class="text-center py-5">
-                  <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
-                  <h5 class="mt-3 text-muted">No Leave Requests</h5>
-                  <p class="text-muted mb-0">This student hasn't submitted any leave requests yet.</p>
-                </div>
-              }
-            </div>
-          </div>
-        }
-
-      </div>
-
-      <!-- Success Modal -->
-      @if (showSuccessModal) {
+  <!-- Student's Leave Requests History -->
+  @if (selectedStudent) {
+  <div class="card shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
         <div>
-          <div class="modal-backdrop fade show"></div>
-          <div class="modal fade show d-block" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-              <div class="modal-content border-0 shadow">
-                <div class="card-header bg-success text-white border-0">
-                  <div class="d-flex align-items-center justify-content-between">
-                    <h5 class="mb-0">
-                      <i class="bi bi-check-circle-fill me-2"></i>
-                      Success!
-                    </h5>
-                    <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"></button>
-                  </div>
-                </div>
-                <div class="modal-body text-center py-5">
-                  <div
-                    class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-4"
-                    style="width: 100px; height: 100px;">
-                    <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
-                  </div>
-                  <h4 class="mb-3">Leave Request Submitted Successfully!</h4>
-                  <p class="text-muted mb-2">
-                    Leave request for
-                    <strong class="text-dark">
-                      {{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}
-                    </strong>
-                    has been submitted.
-                  </p>
-                  <div class="alert alert-info border-info mt-4 mb-0 text-start">
-                    <h6 class="alert-heading fw-semibold">
-                      <i class="bi bi-info-circle me-2"></i>
-                      What's Next?
-                    </h6>
-                    <ul class="mb-0 ps-3 small">
-                      <li>The request is now pending approval</li>
-                      <li>An administrator will review it shortly</li>
-                      <li>The student will be notified of the decision</li>
-                    </ul>
-                  </div>
-                </div>
-                <div class="modal-footer border-0 bg-light">
-                  <button type="button" class="btn btn-success px-4" (click)="closeSuccessModal()">
-                    <i class="bi bi-check-lg me-2"></i>
-                    Close
-                  </button>
-                </div>
-              </div>
-            </div>
+          <h5 class="mb-0 fw-semibold">
+            <i class="bi bi-clock-history me-2 text-primary"></i>
+            Leave Request History
+          </h5>
+          <small class="text-muted">
+            All leave requests for {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+          </small>
+        </div>
+        <span class="badge bg-primary rounded-pill">
+          {{ myLeaveRequests.length }} Request{{ myLeaveRequests.length !== 1 ? 's' : '' }}
+        </span>
+      </div>
+    </div>
+    <div class="card-body">
+      <!-- Loading -->
+      @if (loading) {
+      <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-3 text-muted">Loading leave requests...</p>
+      </div>
+      }
+      <!-- Leave Requests Table -->
+      @if (!loading && myLeaveRequests.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>From Date</th>
+              <th>To Date</th>
+              <th>Duration</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Reviewed By</th>
+              <th>Requested At</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (request of myLeaveRequests; track request) {
+            <tr>
+              <td class="text-nowrap">
+                <i class="bi bi-calendar-event text-primary me-1"></i>
+                {{ request.fromDate | date: 'MMM dd, yyyy' }}
+              </td>
+              <td class="text-nowrap">
+                <i class="bi bi-calendar-check text-success me-1"></i>
+                {{ request.toDate | date: 'MMM dd, yyyy' }}
+              </td>
+              <td>
+                <span class="badge bg-secondary">
+                  <i class="bi bi-hourglass-split me-1"></i>
+                  {{ calculateDuration(request.fromDate, request.toDate) }} day(s)
+                </span>
+              </td>
+              <td>
+                <span class="text-truncate d-inline-block" style="max-width: 250px; cursor: help;"
+                  [title]="request.reason">
+                  {{ request.reason }}
+                </span>
+              </td>
+              <td>
+                <span class="badge rounded-pill px-3" [ngClass]="'bg-' + getStatusClass(request.status)">
+                  <i class="bi me-1" [ngClass]="getStatusIcon(request.status)"></i>
+                  {{ request.status | titlecase }}
+                </span>
+              </td>
+              <td>
+                @if (request.reviewedBy) {
+                <span class="text-nowrap">
+                  <i class="bi bi-person-check text-success me-1"></i>
+                  {{ request.reviewedBy.username }}
+                </span>
+                }
+                @if (!request.reviewedBy) {
+                <span class="text-muted text-nowrap">
+                  <i class="bi bi-hourglass-split me-1"></i>
+                  Pending Review
+                </span>
+                }
+              </td>
+              <td class="text-nowrap">
+                <small class="text-muted">
+                  <i class="bi bi-clock me-1"></i>
+                  {{ request.requestedAt | date: 'MMM dd, yyyy' }}<br>
+                  {{ request.requestedAt | date: 'hh:mm a' }}
+                </small>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      }
+      <!-- No Requests -->
+      @if (!loading && myLeaveRequests.length === 0) {
+      <div class="text-center py-5">
+        <i class="bi bi-inbox text-muted" style="font-size: 4rem;"></i>
+        <h5 class="mt-3 text-muted">No Leave Requests</h5>
+        <p class="text-muted mb-0">This student hasn't submitted any leave requests yet.</p>
+      </div>
+      }
+    </div>
+  </div>
+  }
+
+</div>
+
+<!-- Success Modal -->
+@if (showSuccessModal) {
+<div>
+  <div class="modal-backdrop fade show"></div>
+  <div class="modal fade show d-block" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow">
+        <div class="card-header bg-success text-white border-0">
+          <div class="d-flex align-items-center justify-content-between">
+            <h5 class="mb-0">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              Success!
+            </h5>
+            <button type="button" class="btn-close btn-close-white" (click)="closeSuccessModal()"></button>
           </div>
         </div>
-      }
+        <div class="modal-body text-center py-5">
+          <div
+            class="rounded-circle bg-success bg-opacity-10 d-inline-flex align-items-center justify-content-center mb-4"
+            style="width: 100px; height: 100px;">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 4rem;"></i>
+          </div>
+          <h4 class="mb-3">Leave Request Submitted Successfully!</h4>
+          <p class="text-muted mb-2">
+            Leave request for
+            <strong class="text-dark">
+              {{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}
+            </strong>
+            has been submitted.
+          </p>
+          <div class="alert alert-info border-info mt-4 mb-0 text-start">
+            <h6 class="alert-heading fw-semibold">
+              <i class="bi bi-info-circle me-2"></i>
+              What's Next?
+            </h6>
+            <ul class="mb-0 ps-3 small">
+              <li>The request is now pending approval</li>
+              <li>An administrator will review it shortly</li>
+              <li>The student will be notified of the decision</li>
+            </ul>
+          </div>
+        </div>
+        <div class="modal-footer border-0 bg-light">
+          <button type="button" class="btn btn-success px-4" (click)="closeSuccessModal()">
+            <i class="bi bi-check-lg me-2"></i>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+}

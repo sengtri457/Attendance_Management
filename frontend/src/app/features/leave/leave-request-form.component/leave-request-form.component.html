@@ -11,17 +11,17 @@
 
     <!-- Alert Messages -->
     @if (error) {
-      <div class="alert alert-danger">
-        <i class="icon-alert-circle"></i>
-        {{ error }}
-      </div>
+    <div class="alert alert-danger">
+      <i class="icon-alert-circle"></i>
+      {{ error }}
+    </div>
     }
 
     @if (success) {
-      <div class="alert alert-success">
-        <i class="icon-check-circle"></i>
-        {{ success }}
-      </div>
+    <div class="alert alert-success">
+      <i class="icon-check-circle"></i>
+      {{ success }}
+    </div>
     }
 
     <!-- Form -->
@@ -39,128 +39,114 @@
                 <i class="icon-calendar"></i>
                 From Date
               </label>
-              <input
-                type="date"
-                id="fromDate"
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('fromDate')"
-                formControlName="fromDate"
-                [min]="minDate"
-                />
-                @if (isFieldInvalid('fromDate')) {
-                  <div class="invalid-feedback">
-                    {{ getFieldError('fromDate') }}
-                  </div>
-                }
+              <input type="date" id="fromDate" class="form-control" [class.is-invalid]="isFieldInvalid('fromDate')"
+                formControlName="fromDate" [min]="minDate" />
+              @if (isFieldInvalid('fromDate')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('fromDate') }}
               </div>
+              }
             </div>
-
-            <!-- To Date -->
-            <div class="col-md-6">
-              <div class="form-group">
-                <label for="toDate" class="form-label required">
-                  <i class="icon-calendar"></i>
-                  To Date
-                </label>
-                <input
-                  type="date"
-                  id="toDate"
-                  class="form-control"
-                  [class.is-invalid]="isFieldInvalid('toDate')"
-                  formControlName="toDate"
-                  [min]="leaveForm.get('fromDate')?.value || minDate"
-                  />
-                  @if (isFieldInvalid('toDate')) {
-                    <div class="invalid-feedback">
-                      {{ getFieldError('toDate') }}
-                    </div>
-                  }
-                </div>
-              </div>
-            </div>
-
-            <!-- Calculated Days -->
-            @if (calculatedDays > 0) {
-              <div class="leave-duration">
-                <div class="duration-badge">
-                  <i class="icon-clock"></i>
-                  <span class="duration-text">
-                    <strong>{{ calculatedDays }}</strong>
-                    {{ calculatedDays === 1 ? 'Day' : 'Days' }}
-                  </span>
-                </div>
-              </div>
-            }
           </div>
 
-          <!-- Reason Section -->
-          <div class="form-section">
-            <h3 class="section-title">Reason for Leave</h3>
-
+          <!-- To Date -->
+          <div class="col-md-6">
             <div class="form-group">
-              <label for="reason" class="form-label required">
-                <i class="icon-file-text"></i>
-                Please provide a detailed reason
+              <label for="toDate" class="form-label required">
+                <i class="icon-calendar"></i>
+                To Date
               </label>
-              <textarea
-                id="reason"
-                class="form-control"
-                [class.is-invalid]="isFieldInvalid('reason')"
-                formControlName="reason"
-                rows="5"
-                placeholder="Example: I need to attend a family function in my hometown..."
-              ></textarea>
-              <div class="form-text">
-                {{ leaveForm.get('reason')?.value?.length || 0 }} / 500 characters
-                (minimum 10 required)
+              <input type="date" id="toDate" class="form-control" [class.is-invalid]="isFieldInvalid('toDate')"
+                formControlName="toDate" [min]="leaveForm.get('fromDate')?.value || minDate" />
+              @if (isFieldInvalid('toDate')) {
+              <div class="invalid-feedback">
+                {{ getFieldError('toDate') }}
               </div>
-              @if (isFieldInvalid('reason')) {
-                <div class="invalid-feedback">
-                  {{ getFieldError('reason') }}
-                </div>
               }
             </div>
           </div>
+        </div>
 
-          <!-- Guidelines -->
-          <div class="guidelines-section">
-            <h4>
-              <i class="icon-info"></i>
-              Important Guidelines
-            </h4>
-            <ul>
-              <li>Leave requests must be submitted at least 2 days in advance</li>
-              <li>Provide a clear and valid reason for your leave</li>
-              <li>You will be notified once your request is reviewed</li>
-              <li>Approved leaves will automatically update your attendance</li>
-            </ul>
+        <!-- Calculated Days -->
+        @if (calculatedDays > 0) {
+        <div class="leave-duration">
+          <div class="duration-badge">
+            <i class="icon-clock"></i>
+            <span class="duration-text">
+              <strong>{{ calculatedDays }}</strong>
+              {{ calculatedDays === 1 ? 'Day' : 'Days' }}
+            </span>
           </div>
-
-          <!-- Action Buttons -->
-          <div class="form-actions">
-            <button
-              type="button"
-              class="btn btn-secondary"
-              (click)="onCancel()"
-              [disabled]="loading"
-              >
-              <i class="icon-x"></i>
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="btn btn-primary"
-              [disabled]="loading || leaveForm.invalid"
-              >
-              @if (loading) {
-                <span class="spinner-border spinner-border-sm"></span>
-              }
-              @if (!loading) {
-                <i class="icon-send"></i>
-              }
-              {{ loading ? 'Submitting...' : 'Submit Request' }}
-            </button>
-          </div>
-        </form>
+        </div>
+        }
       </div>
-    </div>
+
+      <!-- Reason Section -->
+      <div class="form-section">
+        <h3 class="section-title">Reason for Leave</h3>
+
+        <div class="form-group">
+          <label for="reason" class="form-label required">
+            <i class="icon-file-text"></i>
+            Please provide a detailed reason
+          </label>
+          <textarea id="reason" class="form-control" [class.is-invalid]="isFieldInvalid('reason')"
+            formControlName="reason" rows="5"
+            placeholder="Example: I need to attend a family function in my hometown..."></textarea>
+          <div class="form-text">
+            {{ leaveForm.get('reason')?.value?.length || 0 }} / 500 characters
+            (minimum 10 required)
+          </div>
+          @if (isFieldInvalid('reason')) {
+          <div class="invalid-feedback">
+            {{ getFieldError('reason') }}
+          </div>
+          }
+        </div>
+
+        <div class="mb-4">
+          <label for="evidence" class="form-label fw-bold d-flex align-items-center">
+            <i class="bi bi-paperclip me-2 text-primary"></i>
+            Medical Evidence (Optional)
+          </label>
+          <input type="file" id="evidence" class="form-control" (change)="onFileSelected($event)" multiple
+            accept="image/*,.pdf" />
+          <div class="form-text">
+            Upload images or PDF documents (Doctor's notes, etc.)
+          </div>
+        </div>
+      </div>
+
+      <!-- Guidelines -->
+      <div class="guidelines-section">
+        <h4>
+          <i class="icon-info"></i>
+          Important Guidelines
+        </h4>
+        <ul>
+          <li>Leave requests must be submitted at least 2 days in advance</li>
+          <li>Provide a clear and valid reason for your leave</li>
+          <li>You will be notified once your request is reviewed</li>
+          <li>Approved leaves will automatically update your attendance</li>
+        </ul>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="onCancel()" [disabled]="loading">
+          <i class="icon-x"></i>
+          Cancel
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading || leaveForm.invalid">
+          @if (loading) {
+          <span class="spinner-border spinner-border-sm"></span>
+          }
+          @if (!loading) {
+          <i class="icon-send"></i>
+          }
+          {{ loading ? 'Submitting...' : 'Submit Request' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -104,15 +104,24 @@
           </th>
           <th *ngFor="let subject of subjects"
             class="text-center py-3 text-uppercase text-xs fw-bold text-muted tracking-wider">
-            <div class="d-flex flex-column">
-              <span class="text-dark fw-bold">{{ subject.subjectName }}</span>
-              <span class="text-xs text-muted fw-normal">{{ subject.teachTime | date:'shortTime' }} -
-                {{ subject.endTime | date:'shortTime' }}</span>
+            <div class="d-flex flex-column text-center position-relative group">
+              <div class="d-flex align-items-center justify-content-center">
+                <span class="text-dark fw-bold me-1">{{ subject.subjectName }}</span>
+                <button class="btn btn-link btn-sm p-0 text-success opacity-50 group-hover-opacity-100 transition-all"
+                  (click)="markAllPresent(subject._id)" title="Mark all as present">
+                  <i class="bi bi-check-all fs-5"></i>
+                </button>
+              </div>
+              <span class="text-xs text-muted fw-normal" *ngIf="subject.startTimeDisplay">
+                {{ subject.startTimeDisplay }} - {{ subject.endTimeDisplay }}
+              </span>
+              <span class="text-xs text-muted fw-normal" *ngIf="!subject.startTimeDisplay">
+                {{ subject.teachTime | date:'shortTime' }} - {{ subject.endTime | date:'shortTime' }}
+              </span>
             </div>
           </th>
         </tr>
       </thead>
-      <tbody>
       <tbody>
         <tr *ngFor="let student of paginatedStudents" class="border-light"
           [class.bg-success-subtle-row]="getStudentProgress(student._id) === 'full'"

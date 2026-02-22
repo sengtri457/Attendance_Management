@@ -100,19 +100,28 @@ export class LeaveRequestService {
     return this.getAll(studentId, "approved");
   }
 
-  /**
-   * Create a new leave request
-   */
   create(request: CreateLeaveRequest): Observable<{
     success: boolean;
     message: string;
     data: { leaveId: string };
   }> {
+    const formData = new FormData();
+    formData.append("studentId", request.studentId);
+    formData.append("fromDate", request.fromDate);
+    formData.append("toDate", request.toDate);
+    formData.append("reason", request.reason);
+
+    if (request.evidence && request.evidence.length > 0) {
+      request.evidence.forEach((file) => {
+        formData.append("evidence", file, file.name);
+      });
+    }
+
     return this.http.post<{
       success: boolean;
       message: string;
       data: { leaveId: string };
-    }>(this.apiUrl, request);
+    }>(this.apiUrl, formData);
   }
 
   /**

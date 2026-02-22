@@ -66,7 +66,6 @@ export class MarkAttendanceComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadTeachers();
-    this.loadTeachers();
     this.loadClassGroups();
   }
 
@@ -223,9 +222,6 @@ export class MarkAttendanceComponent implements OnInit {
       const key = `${studentId}_${subjectId}`;
       const oldStatus = this.attendanceMap.get(key);
       
-      // Toggle off if clicking same status? (Optional, user didn't ask but good UX)
-      // User said "click like btn have P,L,A and E". Usually implies selection.
-      
       this.attendanceMap.set(key, status);
 
       const request: MarkAttendanceRequest = {
@@ -236,7 +232,6 @@ export class MarkAttendanceComponent implements OnInit {
           markedByTeacherId: this.selectedTeacherId,
       };
 
-      // User requested to detect check-in time when marking, to enable later calculation
       if (status === 'present' || status === 'late') {
           request.checkInTime = new Date().toISOString();
       }
@@ -253,6 +248,53 @@ export class MarkAttendanceComponent implements OnInit {
                   icon: 'error',
                   title: 'Error',
                   text: 'Failed to mark attendance'
+              });
+          }
+      });
+  }
+
+  markAllPresent(subjectId: string) {
+      if (!this.selectedTeacherId) {
+          Swal.fire('Error', 'Please select a teacher first', 'error');
+          return;
+      }
+
+      // Find students who haven't been marked for this subject yet
+      const unMarkedStudents = this.filteredStudents.filter(s => !this.attendanceMap.has(`${s._id}_${subjectId}`));
+
+      if (unMarkedStudents.length === 0) {
+          Swal.fire('Info', 'All students are already marked for this subject', 'info');
+          return;
+      }
+
+      Swal.fire({
+          title: 'Mark All as Present?',
+          text: `This will mark ${unMarkedStudents.length} students as present for this subject.`,
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonText: 'Yes, Mark All',
+          confirmButtonColor: '#28a745'
+      }).then((result) => {
+          if (result.isConfirmed) {
+              const studentIds = unMarkedStudents.map(s => s._id);
+              
+              this.attendanceService.markBulk({
+                  students: studentIds,
+                  subjectId: subjectId,
+                  date: this.selectedDate,
+                  markedByTeacherId: this.selectedTeacherId,
+                  status: 'present'
+              }).subscribe({
+                  next: (res) => {
+                      // Update local map for UI
+                      studentIds.forEach(id => {
+                          this.attendanceMap.set(`${id}_${subjectId}`, 'present');
+                      });
+                      Swal.fire('Success', res.message, 'success');
+                  },
+                  error: (err) => {
+                      Swal.fire('Error', 'Failed to mark bulk attendance', 'error');
+                  }
               });
           }
       });

@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { CountService } from '../../../service/count.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-leave-review.component',
@@ -147,5 +148,19 @@ export class LeaveReviewComponent {
 
   get rejectedCount(): number {
     return this.leaveRequests.filter((r) => r.status === 'rejected').length;
+  }
+
+  getFileUrl(path: string): string {
+    if (!path) return '';
+    // Assuming environment.apiUrl is like http://localhost:4000/api
+    const baseUrl = environment.apiUrl.replace('/api', '');
+    // Ensure path doesn't have leading slash if baseUrl has trailing, etc.
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    return `${baseUrl}/${cleanPath}`;
+  }
+
+  isImage(path: string): boolean {
+    const ext = path.split('.').pop()?.toLowerCase() || '';
+    return ['jpg', 'jpeg', 'png', 'webp', 'gif'].includes(ext);
   }
 }

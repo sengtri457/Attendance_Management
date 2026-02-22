@@ -100,6 +100,15 @@ export class LeaveRequestFormComponent implements OnInit {
       },
     });
   }
+  selectedFiles: File[] = [];
+
+  onFileSelected(event: any) {
+    const files = event.target.files;
+    if (files) {
+      this.selectedFiles = Array.from(files);
+    }
+  }
+
   onSubmit() {
     if (this.leaveForm.invalid) {
       this.markFormGroupTouched(this.leaveForm);
@@ -125,12 +134,14 @@ export class LeaveRequestFormComponent implements OnInit {
         fromDate,
         toDate,
         reason,
+        evidence: this.selectedFiles,
       })
       .subscribe({
         next: (response) => {
           this.success =
             'Leave request submitted successfully! Waiting for approval.';
           this.leaveForm.reset();
+          this.selectedFiles = [];
           this.review();
           this.calculatedDays = 0;
           this.loading = false;
