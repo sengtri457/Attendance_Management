@@ -112,18 +112,46 @@ const getSubjectStartTime = async (subjectId, date) => {
 };
 // Helper function to check if student is on approved leave
 const checkLeaveStatus = async (studentId, date) => {
-    const targetDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
+    const targetDateStr = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).format("YYYY-MM-DD");
 
+    // Use $expr with $dateToString to compare dates as strings in the same timezone.
+    // This avoids UTC offset issues where leave fromDate (stored as UTC midnight)
+    // doesn't match the attendance date (converted to Asia/Phnom_Penh start of day).
     const approvedLeave = await LeaveRequest.findOne({
         student: studentId,
         status: "approved",
-        fromDate: {
-            $lte: targetDate.toDate()
-        },
-        toDate: {
-            $gte: targetDate.toDate()
+        $expr: {
+            $and: [
+                {
+                    $lte: [
+                        {
+                            $dateToString: {
+                                format: "%Y-%m-%d",
+                                date: "$fromDate",
+                                timezone: ATTENDANCE_CONFIG.TIMEZONE
+                            }
+                        },
+                        targetDateStr
+                    ]
+                }, {
+                    $gte: [
+                        {
+                            $dateToString: {
+                                format: "%Y-%m-%d",
+                                date: "$toDate",
+                                timezone: ATTENDANCE_CONFIG.TIMEZONE
+                            }
+                        },
+                        targetDateStr
+                    ]
+                }
+            ]
         }
     });
+
+    if (approvedLeave) {
+        console.log(`Leave detected for student ${studentId} on ${targetDateStr}:`, approvedLeave._id);
+    }
 
     return approvedLeave;
 };
@@ -211,6 +239,13 @@ exports.markAttendance = async (req, res) => {
             note
         } = req.body;
 
+        // Validate: Cannot mark attendance for future dates
+        const attendanceDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
+        const todayDate = moment.tz(ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
+        if (attendanceDate.isAfter(todayDate)) {
+            return res.status(400).json({success: false, message: "Cannot mark attendance for a future date. Please select today or a past date."});
+        }
+
         // Check if attendance already exists for this date and subject
         const existingQuery = {
             student: studentId,
@@ -238,7 +273,14 @@ exports.markAttendance = async (req, res) => {
             subject: req.body.subjectId || null
         };
 
-        if (req.body.status) { // Manual status provided
+        if (onLeave) { // Student is on approved leave — always takes priority
+            attendanceData.status = "on-leave";
+            attendanceData.isLate = false;
+            attendanceData.lateBy = 0;
+            attendanceData.leaveReference = onLeave._id;
+            attendanceData.checkOutTime = null;
+            attendanceData.workHours = 0;
+        } else if (req.body.status) { // Manual status provided (no leave)
             attendanceData.status = req.body.status;
             attendanceData.isLate = req.body.status === "late";
             attendanceData.lateBy = 0;
@@ -247,11 +289,6 @@ exports.markAttendance = async (req, res) => {
             if (req.body.status === "excused") {
                 attendanceData.status = "excused";
             }
-        } else if (onLeave) { // Student is on approved leave
-            attendanceData.status = "on-leave";
-            attendanceData.isLate = false;
-            attendanceData.lateBy = 0;
-            attendanceData.leaveReference = onLeave._id;
         } else {
             // Calculate status based on check-in time
             // Determine schedule start time
@@ -261,8 +298,6 @@ exports.markAttendance = async (req, res) => {
                 if (subjectTime) 
                     scheduleStartTime = subjectTime;
                 
-
-
             }
 
             const {status, isLate, lateBy, workHours} = calculateAttendanceStatus(checkInTime, checkOutTime, scheduleStartTime);
@@ -973,6 +1008,13 @@ exports.markBulkAttendance = async (req, res) => {
             return res.status(400).json({success: false, message: "No students provided"});
         }
 
+        // Validate: Cannot mark attendance for future dates
+        const attendanceDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
+        const todayDate = moment.tz(ATTENDANCE_CONFIG.TIMEZONE).startOf("day");
+        if (attendanceDate.isAfter(todayDate)) {
+            return res.status(400).json({success: false, message: "Cannot mark attendance for a future date. Please select today or a past date."});
+        }
+
         const targetDate = moment.tz(date, ATTENDANCE_CONFIG.TIMEZONE).startOf("day").toDate();
         const results = [];
         const errors = [];
@@ -984,6 +1026,8 @@ exports.markBulkAttendance = async (req, res) => {
             if (subjectTime) 
                 scheduleStartTime = subjectTime;
             
+
+
         }
 
         const checkInTime = new Date().toISOString();
@@ -1044,8 +1088,7 @@ exports.markBulkAttendance = async (req, res) => {
         }
 
         res.json({
-            success: true,
-            message: `Processed ${
+                success: true, message: `Processed ${
                 students.length
             } students. ${
                 results.length
