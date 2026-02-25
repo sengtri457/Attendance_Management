@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuardGuard } from './core/guards/auth.guard-guard';
+import { authGuardGuard, guestGuard } from './core/guards/auth.guard-guard';
 import { LeaveRequestFormComponent } from './features/leave/leave-request-form.component/leave-request-form.component';
 import { LeaveApproveComponent } from './features/leave/leave-approve.component/leave-approve.component';
 import { SubjectComponent } from './features/subject/subject.component/subject.component';
@@ -9,11 +9,12 @@ export const routes: Routes = [
     path: 'auth',
     loadChildren: () =>
       import('./features/auth/auth.routes').then((m) => m.AUTH_ROUTES),
+    canActivate: [guestGuard],
   },
 
   {
     path: '',
-    redirectTo: 'auth/login',
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {

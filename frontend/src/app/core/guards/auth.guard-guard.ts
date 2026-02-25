@@ -13,6 +13,19 @@ export const authGuardGuard: CanActivateFn = (route, state) => {
   router.navigate(["/auth/login"]);
   return false;
 };
+// Guard for guest-only pages (login, register) - redirects to dashboard if already logged in
+export const guestGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  if (authService.isAuthenticated()) {
+    router.navigate(["/dashboard"]);
+    return false;
+  }
+
+  return true;
+};
+
 export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
   return () => {
     const authService = inject(AuthService);

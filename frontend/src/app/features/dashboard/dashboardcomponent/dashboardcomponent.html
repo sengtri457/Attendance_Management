@@ -284,21 +284,61 @@
       </div>
     </div>
   </div>
+  <!-- Weekly Attendance Trend Chart -->
   <div class="row mt-4">
     <div class="col-12">
-      <div class="card">
-        <div class="card-header">
-          <h5 class="mb-0">
-            <i class="bi bi-pie-chart-fill me-2"></i>
-            Attendance Overview
-          </h5>
-          <!-- Line Chart -->
-          <div class="chart-container chart-wide">
-            <canvas #lineCanvas style="height: 400px"></canvas>
+      <div class="card chart-card">
+        <div class="card-header chart-card-header">
+          <div class="chart-header-top">
+            <div class="chart-title-section">
+              <h5 class="mb-0 chart-main-title">
+                <i class="bi bi-graph-up me-2"></i>
+                Weekly Attendance Overview
+              </h5>
+              <span class="chart-week-label">{{ weekRangeLabel }}</span>
+            </div>
+            <div class="chart-nav-controls">
+              <button class="btn btn-sm chart-nav-btn" (click)="navigateWeek(-1)" title="Previous Week">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+              <button class="btn btn-sm chart-nav-btn today-btn" (click)="weekOffset = 0; updateLineChart()"
+                [disabled]="weekOffset === 0">
+                Today
+              </button>
+              <button class="btn btn-sm chart-nav-btn" (click)="navigateWeek(1)" [disabled]="weekOffset >= 0"
+                title="Next Week">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <!-- Weekly summary stats -->
+          <div class="chart-summary-row">
+            <div class="chart-stat-badge present-badge">
+              <span class="stat-dot present-dot"></span>
+              <span class="stat-label">Present</span>
+              <span class="stat-value">{{ weekSummary.present }}</span>
+            </div>
+            <div class="chart-stat-badge late-badge">
+              <span class="stat-dot late-dot"></span>
+              <span class="stat-label">Late</span>
+              <span class="stat-value">{{ weekSummary.late }}</span>
+            </div>
+            <div class="chart-stat-badge leave-badge">
+              <span class="stat-dot leave-dot"></span>
+              <span class="stat-label">On Leave</span>
+              <span class="stat-value">{{ weekSummary.onLeave }}</span>
+            </div>
+            <div class="chart-stat-badge absent-badge">
+              <span class="stat-dot absent-dot"></span>
+              <span class="stat-label">Absent</span>
+              <span class="stat-value">{{ weekSummary.absent }}</span>
+            </div>
           </div>
         </div>
         <div class="card-body">
-          <p class="card-text">Summary of attendance statistics</p>
+          <div class="chart-container chart-wide">
+            <canvas #lineCanvas style="height: 400px"></canvas>
+          </div>
         </div>
       </div>
     </div>

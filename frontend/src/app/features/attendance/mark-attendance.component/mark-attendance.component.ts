@@ -33,6 +33,7 @@ export class MarkAttendanceComponent implements OnInit {
   
   // Filters
   selectedDate: string = new Date().toISOString().split('T')[0];
+  todayStr: string = new Date().toISOString().split('T')[0];
   selectedClassGroupId: string = '';
   classGroups: ClassGroup[] = [];
   
@@ -190,8 +191,29 @@ export class MarkAttendanceComponent implements OnInit {
   }
 
   onDateChange(event: any): void {
-      this.selectedDate = event.target.value;
+      const newDate = event.target.value;
+      if (this.isFutureDate(newDate)) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Invalid Date',
+              text: 'You cannot mark attendance for a future date.',
+              confirmButtonColor: '#6366f1'
+          });
+          // Reset to today
+          this.selectedDate = this.todayStr;
+          event.target.value = this.todayStr;
+          return;
+      }
+      this.selectedDate = newDate;
       this.loadData();
+  }
+
+  // Check if a date string is in the future (after today)
+  isFutureDate(dateStr: string): boolean {
+      const selected = new Date(dateStr + 'T23:59:59');
+      const today = new Date();
+      today.setHours(23, 59, 59, 999);
+      return selected > today;
   }
 
   getStatus(studentId: string, subjectId: string): string {
@@ -216,6 +238,16 @@ export class MarkAttendanceComponent implements OnInit {
   mark(studentId: string, subjectId: string, status: "present" | "absent" | "late" | "excused") {
       if (!this.selectedTeacherId) {
           Swal.fire('Error', 'Please select a teacher first', 'error');
+          return;
+      }
+
+      if (this.isFutureDate(this.selectedDate)) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Cannot Mark Future Date',
+              text: 'Attendance can only be marked for today or past dates.',
+              confirmButtonColor: '#6366f1'
+          });
           return;
       }
       
@@ -256,6 +288,16 @@ export class MarkAttendanceComponent implements OnInit {
   markAllPresent(subjectId: string) {
       if (!this.selectedTeacherId) {
           Swal.fire('Error', 'Please select a teacher first', 'error');
+          return;
+      }
+
+      if (this.isFutureDate(this.selectedDate)) {
+          Swal.fire({
+              icon: 'warning',
+              title: 'Cannot Mark Future Date',
+              text: 'Attendance can only be marked for today or past dates.',
+              confirmButtonColor: '#6366f1'
+          });
           return;
       }
 

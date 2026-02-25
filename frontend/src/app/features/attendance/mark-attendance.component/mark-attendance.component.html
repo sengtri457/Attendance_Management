@@ -22,7 +22,7 @@
         <div class="col-md-3">
           <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Date</label>
           <input type="date" class="form-control form-control-lg border-0 bg-light" [ngModel]="selectedDate"
-            (change)="onDateChange($event)">
+            [max]="todayStr" (change)="onDateChange($event)">
         </div>
         <div class="col-md-3">
           <label class="form-label text-uppercase text-xs fw-bold text-muted tracking-wider">Class Group</label>

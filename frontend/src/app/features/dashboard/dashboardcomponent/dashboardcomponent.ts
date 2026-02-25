@@ -23,6 +23,7 @@ import {
 import { TeacherService } from "../../../services/teacherservice/teacher.service";
 import { AttendanceService } from "../../../services/attendanceservice/attendance.service";
 import { ParentService } from "../../../services/parentservice/parent.service";
+import { LeaveRequestService } from "../../../services/leaveRequestservice/leave-request.service";
 import { Chart, ChartConfiguration, registerables } from "chart.js";
 
 // Register Chart.js components
@@ -55,6 +56,14 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
   private teacherService = inject(TeacherService);
   private attendanceService = inject(AttendanceService);
   private parentService = inject(ParentService);
+  private leaveRequestService = inject(LeaveRequestService);
+
+  // Week navigation
+  weekOffset = 0;
+  weekRangeLabel = '';
+  weekSummary = { present: 0, late: 0, onLeave: 0, absent: 0 };
+  leaveRequests: any[] = [];
+
   summary: TodayAttendanceSummary = {
     total: 0,
     present: 0,
@@ -268,12 +277,13 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
     this.doughnutChart = new Chart(this.doughnutCanvas.nativeElement, config);
   }
-  // Create Modern Line Chart
+  // Create Modern Multi-Line Chart with Present, Late, On Leave
   createLineChart(): void {
     if (!this.lineCanvas) return;
 
-    const last7Days = this.getLast7Days();
-    const labels = last7Days.map((date) => this.formatDateLabel(date));
+    const weekDays = this.getWeekDays();
+    const labels = weekDays.map((date) => this.formatDateLabel(date));
+    this.weekRangeLabel = this.getWeekRangeLabel(weekDays);
 
     const config: ChartConfiguration = {
       type: "line",
@@ -281,37 +291,96 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
         labels: labels,
         datasets: [
           {
-            label: "Total Attendance",
-            data: [0, 1, 3, 4, 5, 6, 7, 8],
-            borderColor: "rgba(99, 102, 241, 1)",
+            label: "Present",
+            data: new Array(7).fill(0),
+            borderColor: "rgba(16, 185, 129, 1)",
             backgroundColor: (context: any) => {
               const ctx = context.chart.ctx;
               const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-              gradient.addColorStop(0, "rgba(99, 102, 241, 0.3)");
-              gradient.addColorStop(0.5, "rgba(99, 102, 241, 0.1)");
-              gradient.addColorStop(1, "rgba(99, 102, 241, 0)");
+              gradient.addColorStop(0, "rgba(16, 185, 129, 0.2)");
+              gradient.addColorStop(1, "rgba(16, 185, 129, 0)");
               return gradient;
             },
             borderWidth: 3,
             fill: true,
             tension: 0.4,
-            pointBackgroundColor: "rgba(99, 102, 241, 1)",
+            pointBackgroundColor: "rgba(16, 185, 129, 1)",
             pointBorderColor: "#fff",
-            pointBorderWidth: 3,
-            pointRadius: 6,
+            pointBorderWidth: 2,
+            pointRadius: 5,
             pointHoverRadius: 8,
-            pointHoverBackgroundColor: "rgba(99, 102, 241, 1)",
+            pointHoverBackgroundColor: "rgba(16, 185, 129, 1)",
             pointHoverBorderColor: "#fff",
-            pointHoverBorderWidth: 4,
-            segment: {
-              borderColor: (ctx) => {
-                const p0Value = ctx.p0?.parsed?.y ?? 0;
-                const p1Value = ctx.p1?.parsed?.y ?? 0;
-                return p0Value > p1Value
-                  ? "rgba(239, 68, 68, 0.8)"
-                  : "rgba(99, 102, 241, 1)";
-              },
+            pointHoverBorderWidth: 3,
+          },
+          {
+            label: "Late",
+            data: new Array(7).fill(0),
+            borderColor: "rgba(245, 158, 11, 1)",
+            backgroundColor: (context: any) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+              gradient.addColorStop(0, "rgba(245, 158, 11, 0.2)");
+              gradient.addColorStop(1, "rgba(245, 158, 11, 0)");
+              return gradient;
             },
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: "rgba(245, 158, 11, 1)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: "rgba(245, 158, 11, 1)",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 3,
+          },
+          {
+            label: "On Leave",
+            data: new Array(7).fill(0),
+            borderColor: "rgba(139, 92, 246, 1)",
+            backgroundColor: (context: any) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+              gradient.addColorStop(0, "rgba(139, 92, 246, 0.2)");
+              gradient.addColorStop(1, "rgba(139, 92, 246, 0)");
+              return gradient;
+            },
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: "rgba(139, 92, 246, 1)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: "rgba(139, 92, 246, 1)",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 3,
+          },
+          {
+            label: "Absent",
+            data: new Array(7).fill(0),
+            borderColor: "rgba(239, 68, 68, 1)",
+            backgroundColor: (context: any) => {
+              const ctx = context.chart.ctx;
+              const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+              gradient.addColorStop(0, "rgba(239, 68, 68, 0.2)");
+              gradient.addColorStop(1, "rgba(239, 68, 68, 0)");
+              return gradient;
+            },
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointBackgroundColor: "rgba(239, 68, 68, 1)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 8,
+            pointHoverBackgroundColor: "rgba(239, 68, 68, 1)",
+            pointHoverBorderColor: "#fff",
+            pointHoverBorderWidth: 3,
           },
         ],
       },
@@ -340,16 +409,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
             },
           },
           title: {
-            display: true,
-            text: "Attendance Trend Overview",
-            font: {
-              size: 20,
-              weight: 700,
-              family: "'Inter', 'Segoe UI', sans-serif",
-            },
-            color: "#111827",
-            padding: { top: 15, bottom: 30 },
-            align: "start",
+            display: false,
           },
           tooltip: {
             backgroundColor: "rgba(17, 24, 39, 0.95)",
@@ -365,22 +425,23 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
             callbacks: {
               title: (context) => {
                 const index = context[0].dataIndex;
-                return last7Days[index];
+                const date = new Date(weekDays[index]);
+                const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return `${dayNames[date.getDay()]}, ${this.formatDateLabel(weekDays[index])}`;
               },
               label: (context) => {
                 const value = context.parsed.y ?? 0;
-                const prev =
-                  context.dataIndex > 0
-                    ? (context.dataset.data[context.dataIndex - 1] as number)
-                    : 0;
-                const change = value - prev;
-                const trend = change > 0 ? "↑" : change < 0 ? "↓" : "→";
-                return [
-                  `Records: ${value}`,
-                  change !== 0
-                    ? `${trend} ${Math.abs(change)} from previous`
-                    : "",
-                ].filter(Boolean);
+                const label = context.dataset.label || '';
+                return `  ${label}: ${value} students`;
+              },
+              afterBody: (context) => {
+                const index = context[0].dataIndex;
+                const presentVal = (this.lineChart?.data.datasets[0].data[index] as number) || 0;
+                const lateVal = (this.lineChart?.data.datasets[1].data[index] as number) || 0;
+                const leaveVal = (this.lineChart?.data.datasets[2].data[index] as number) || 0;
+                const absentVal = (this.lineChart?.data.datasets[3].data[index] as number) || 0;
+                const total = presentVal + lateVal + leaveVal + absentVal;
+                return total > 0 ? [`\n  Total: ${total} students`] : [];
               },
             },
             titleFont: {
@@ -405,13 +466,13 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
                 weight: 500,
                 family: "'Inter', 'Segoe UI', sans-serif",
               },
-              stepSize: 1,
+              stepSize: 2,
               color: "#6b7280",
               padding: 10,
               precision: 0,
             },
             grid: {
-              color: "rgba(229, 231, 235, 0.8)",
+              color: "rgba(229, 231, 235, 0.6)",
               lineWidth: 1,
               display: true,
             },
@@ -420,7 +481,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
             },
             title: {
               display: true,
-              text: "Number of Records",
+              text: "Number of Students",
               font: {
                 size: 13,
                 weight: 600,
@@ -447,17 +508,6 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
               minRotation: 0,
               color: "#6b7280",
               padding: 10,
-            },
-            title: {
-              display: true,
-              text: "Last 7 Days",
-              font: {
-                size: 13,
-                weight: 600,
-                family: "'Inter', 'Segoe UI', sans-serif",
-              },
-              color: "#374151",
-              padding: { top: 10 },
             },
           },
         },
@@ -489,6 +539,7 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     this.countParents();
     this.loadTodayAttendance();
     this.countAttendance();
+    this.loadLeaveRequests();
   }
 
   // Parent Dashboard
@@ -569,12 +620,33 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
     });
   }
 
+  // Load all leave requests
+  loadLeaveRequests(): void {
+    this.leaveRequestService.getAll(undefined, 'approved').subscribe({
+      next: (response: any) => {
+        this.leaveRequests = response.data || [];
+        console.log('Leave requests loaded:', this.leaveRequests.length);
+        this.updateAttendanceCharts();
+      },
+      error: (error) => {
+        console.error('Error loading leave requests:', error);
+      },
+    });
+  }
+
   // Update charts with real data
   updateCharts(): void {
     const studentCount = this.students.length;
     const teacherCount = this.teacher.length;
     const parentCount = this.parents.length;
-    const attendanceCount = this.todayAttendance.length;
+
+    // Count unique students who have attendance today (not raw records)
+    const todayStudentIds = new Set<string>();
+    this.todayAttendance.forEach((record: any) => {
+      const studentId = typeof record.student === 'object' ? record.student?._id : record.student;
+      if (studentId) todayStudentIds.add(studentId);
+    });
+    const attendanceCount = todayStudentIds.size;
 
     console.log("Updating bar chart with:", {
       students: studentCount,
@@ -597,113 +669,293 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
   // Update attendance charts
   updateAttendanceCharts(): void {
-    const present = this.summary?.present || 0;
-    const absent = this.summary?.absent || 0;
-    const late = this.summary?.late || 0;
-    const onleave = this.summary?.onLeave || 0;
+    // Calculate today's per-student status for doughnut chart
+    const todayStats = this.getTodayPerStudentStats();
 
-    // Update Doughnut Chart
+    // Update Doughnut Chart with per-student counts
     if (this.doughnutChart) {
       this.doughnutChart.data.datasets[0].data = [
-        present,
-        absent,
-        late,
-        onleave,
+        todayStats.present,
+        todayStats.absent,
+        todayStats.late,
+        todayStats.onLeave,
       ];
       this.doughnutChart.update();
     }
 
-    // Update Line Chart with actual date-based data
-    const weeklyData = this.getWeeklyAttendance();
-    const last7Days = this.getLast7Days();
-    const labels = last7Days.map((date) => this.formatDateLabel(date));
+    // Update Line Chart with status-based data
+    this.updateLineChart();
+  }
 
-    console.log("Line chart data:", {
-      dates: last7Days,
-      labels: labels,
-      counts: weeklyData,
+  /**
+   * Calculate today's attendance with per-student aggregation.
+   * Each student gets ONE status for the day based on worst-status-wins:
+   * absent > on-leave > late > half-day > present
+   */
+  getTodayPerStudentStats(): { present: number; absent: number; late: number; onLeave: number } {
+    const studentStatuses: { [studentId: string]: string[] } = {};
+
+    this.todayAttendance.forEach((record: any) => {
+      const studentId = typeof record.student === 'object' ? record.student?._id : record.student;
+      if (!studentId) return;
+
+      if (!studentStatuses[studentId]) studentStatuses[studentId] = [];
+      studentStatuses[studentId].push(record.status || 'present');
     });
+
+    let present = 0, absent = 0, late = 0, onLeave = 0;
+
+    Object.values(studentStatuses).forEach((statuses) => {
+      const dailyStatus = this.resolveStudentDailyStatus(statuses);
+      switch (dailyStatus) {
+        case 'absent': absent++; break;
+        case 'on-leave': onLeave++; break;
+        case 'late': late++; break;
+        case 'half-day': late++; break; // count half-day as late
+        default: present++; break;
+      }
+    });
+
+    return { present, absent, late, onLeave };
+  }
+
+  /**
+   * Resolve a student's daily status from multiple subject records.
+   * Priority (worst wins): absent > on-leave > late > half-day > present
+   *
+   * Example:
+   *  - Student has [present, present, absent] → "absent" (absent in any = absent day)
+   *  - Student has [present, late, present]   → "late"
+   *  - Student has [present, present, present]→ "present"
+   */
+  resolveStudentDailyStatus(statuses: string[]): string {
+    const priorityOrder = ['absent', 'on-leave', 'late', 'half-day', 'excused', 'present'];
+
+    for (const priority of priorityOrder) {
+      if (statuses.includes(priority)) {
+        return priority;
+      }
+    }
+    return 'present';
+  }
+
+  // Update Multi-Line Chart
+  updateLineChart(): void {
+    const weekDays = this.getWeekDays();
+    const labels = weekDays.map((date) => this.formatDateLabel(date));
+    this.weekRangeLabel = this.getWeekRangeLabel(weekDays);
+
+    const statusData = this.getWeeklyAttendanceByStatus(weekDays);
+
+    // Calculate week summary
+    this.weekSummary = {
+      present: statusData.present.reduce((a, b) => a + b, 0),
+      late: statusData.late.reduce((a, b) => a + b, 0),
+      onLeave: statusData.onLeave.reduce((a, b) => a + b, 0),
+      absent: statusData.absent.reduce((a, b) => a + b, 0),
+    };
+
+    console.log('Line chart status data (per-student):', statusData);
 
     if (this.lineChart) {
       this.lineChart.data.labels = labels;
-      this.lineChart.data.datasets[0].data = weeklyData;
+      this.lineChart.data.datasets[0].data = statusData.present;
+      this.lineChart.data.datasets[1].data = statusData.late;
+      this.lineChart.data.datasets[2].data = statusData.onLeave;
+      this.lineChart.data.datasets[3].data = statusData.absent;
+
+      // Auto-adjust Y axis max
+      const allValues = [...statusData.present, ...statusData.late, ...statusData.onLeave, ...statusData.absent];
+      const maxVal = Math.max(...allValues, 0);
+      const suggestedMax = Math.max(10, Math.ceil(maxVal * 1.2));
+      if (this.lineChart.options.scales && this.lineChart.options.scales['y']) {
+        (this.lineChart.options.scales['y'] as any).suggestedMax = suggestedMax;
+      }
+
       this.lineChart.update();
     }
   }
 
-  // Helper method to calculate attendance by date
-  getWeeklyAttendance(): number[] {
-    const attendanceByDate = this.groupAttendanceByDate();
-    const last7Days = this.getLast7Days();
+  /**
+   * Get weekly attendance grouped by status — PER STUDENT.
+   * Each student counts as ONE entry per day with their resolved daily status.
+   */
+  getWeeklyAttendanceByStatus(weekDays: string[]): {
+    present: number[];
+    late: number[];
+    onLeave: number[];
+    absent: number[];
+  } {
+    const dailyStatuses = this.getStudentDailyStatuses();
+    const leaveByDate = this.groupLeavesByDate();
 
-    console.log("Grouped attendance:", attendanceByDate);
+    const present: number[] = [];
+    const late: number[] = [];
+    const onLeave: number[] = [];
+    const absent: number[] = [];
 
-    const weekData = last7Days.map((dateStr) => {
-      return attendanceByDate[dateStr] || 0;
+    weekDays.forEach((dateStr) => {
+      const dayData = dailyStatuses[dateStr] || {};
+      let pCount = 0, lCount = 0, oCount = 0, aCount = 0;
+
+      Object.values(dayData).forEach((status) => {
+        switch (status) {
+          case 'present': pCount++; break;
+          case 'late': case 'half-day': lCount++; break;
+          case 'on-leave': oCount++; break;
+          case 'absent': aCount++; break;
+        }
+      });
+
+      // Also count approved leaves for students not already in attendance
+      const leaveCount = leaveByDate[dateStr] || 0;
+      if (leaveCount > oCount) {
+        oCount = leaveCount;
+      }
+
+      present.push(pCount);
+      late.push(lCount);
+      onLeave.push(oCount);
+      absent.push(aCount);
     });
 
-    return weekData;
+    return { present, late, onLeave, absent };
   }
 
-  // Group attendance records by date - FIXED FOR TIMEZONE
-  groupAttendanceByDate(): { [key: string]: number } {
-    const grouped: { [key: string]: number } = {};
+  /**
+   * Core function: Group attendance records by date → student → resolved daily status.
+   * Returns: { "2026-02-25": { "studentId1": "present", "studentId2": "absent" } }
+   */
+  getStudentDailyStatuses(): {
+    [date: string]: { [studentId: string]: string };
+  } {
+    // Step 1: Collect all statuses per student per day
+    const raw: { [date: string]: { [studentId: string]: string[] } } = {};
 
     this.attendance.forEach((record: any) => {
-      if (record.date) {
-        // Convert UTC date from API to local timezone date
-        // The backend stores dates as UTC (e.g., "2026-02-24T17:00:00.000Z" for Feb 25 in Asia/Phnom_Penh)
-        // We need to convert to local date to match the chart labels
-        const localDate = new Date(record.date);
-        const year = localDate.getFullYear();
-        const month = String(localDate.getMonth() + 1).padStart(2, "0");
-        const day = String(localDate.getDate()).padStart(2, "0");
-        const dateStr = `${year}-${month}-${day}`;
+      if (!record.date) return;
 
-        grouped[dateStr] = (grouped[dateStr] || 0) + 1;
+      const localDate = new Date(record.date);
+      const year = localDate.getFullYear();
+      const month = String(localDate.getMonth() + 1).padStart(2, '0');
+      const day = String(localDate.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+
+      const studentId = typeof record.student === 'object' ? record.student?._id : record.student;
+      if (!studentId) return;
+
+      const status = record.status || 'present';
+
+      if (!raw[dateStr]) raw[dateStr] = {};
+      if (!raw[dateStr][studentId]) raw[dateStr][studentId] = [];
+      raw[dateStr][studentId].push(status);
+    });
+
+    // Step 2: Resolve each student's daily status (worst wins)
+    const resolved: { [date: string]: { [studentId: string]: string } } = {};
+
+    Object.keys(raw).forEach((dateStr) => {
+      resolved[dateStr] = {};
+      Object.keys(raw[dateStr]).forEach((studentId) => {
+        resolved[dateStr][studentId] = this.resolveStudentDailyStatus(raw[dateStr][studentId]);
+      });
+    });
+
+    return resolved;
+  }
+
+  // Group approved leave requests by date (count unique students on leave per day)
+  groupLeavesByDate(): { [date: string]: number } {
+    const grouped: { [date: string]: Set<string> } = {};
+
+    this.leaveRequests.forEach((leave: any) => {
+      if (leave.status === 'approved' && leave.fromDate && leave.toDate) {
+        const studentId = typeof leave.student === 'object' ? leave.student?._id : leave.student;
+        const from = new Date(leave.fromDate);
+        const to = new Date(leave.toDate);
+        const current = new Date(from);
+
+        while (current <= to) {
+          const year = current.getFullYear();
+          const month = String(current.getMonth() + 1).padStart(2, '0');
+          const day = String(current.getDate()).padStart(2, '0');
+          const dateStr = `${year}-${month}-${day}`;
+          if (!grouped[dateStr]) grouped[dateStr] = new Set();
+          if (studentId) grouped[dateStr].add(studentId);
+          current.setDate(current.getDate() + 1);
+        }
       }
     });
 
-    return grouped;
+    // Convert Sets to counts
+    const result: { [date: string]: number } = {};
+    Object.keys(grouped).forEach((dateStr) => {
+      result[dateStr] = grouped[dateStr].size;
+    });
+    return result;
   }
 
-  // Get last 7 days as array of date strings - FIXED FOR TIMEZONE
-  getLast7Days(): string[] {
+  // Get 7 days for the current week offset (Mon-Sun)
+  getWeekDays(): string[] {
     const dates: string[] = [];
     const today = new Date();
+    // Calculate the start of the current week (Monday)
+    const dayOfWeek = today.getDay();
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
 
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(today.getDate() - i);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() + mondayOffset + this.weekOffset * 7);
 
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
       const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, "0");
-      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
       dates.push(`${year}-${month}-${day}`);
     }
 
     return dates;
   }
 
-  // Format date for chart labels (e.g., "Dec 12")
+  // Get a readable week range label
+  getWeekRangeLabel(weekDays: string[]): string {
+    if (weekDays.length === 0) return '';
+    const start = this.formatDateLabel(weekDays[0]);
+    const end = this.formatDateLabel(weekDays[weekDays.length - 1]);
+    const [yearStr] = weekDays[0].split('-');
+
+    if (this.weekOffset === 0) return `${start} - ${end}, ${yearStr} (This Week)`;
+    if (this.weekOffset === -1) return `${start} - ${end}, ${yearStr} (Last Week)`;
+    return `${start} - ${end}, ${yearStr}`;
+  }
+
+  // Navigate weeks
+  navigateWeek(direction: number): void {
+    this.weekOffset += direction;
+    // Don't allow going into the future
+    if (this.weekOffset > 0) {
+      this.weekOffset = 0;
+      return;
+    }
+    this.updateLineChart();
+  }
+
+  // Get last 7 days as array of date strings (legacy support)
+  getLast7Days(): string[] {
+    return this.getWeekDays();
+  }
+
+  // Format date for chart labels (e.g., "Mon 12")
   formatDateLabel(dateStr: string): string {
-    const [year, month, day] = dateStr.split("-").map(Number);
+    const [year, month, day] = dateStr.split('-').map(Number);
     const date = new Date(year, month - 1, day);
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
     const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
-    return `${months[date.getMonth()]} ${date.getDate()}`;
+    return `${dayNames[date.getDay()]} ${months[date.getMonth()]} ${date.getDate()}`;
   }
 
   // Review and approve leave requests (Admin only)

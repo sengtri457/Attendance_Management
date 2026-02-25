@@ -1,0 +1,316 @@
+/* ============================================
+   Weekly Attendance Chart Card - Premium Styles
+   ============================================ */
+
+.chart-card {
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  transition: box-shadow 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card-header {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid #e2e8f0;
+  padding: 20px 24px 16px;
+}
+
+.chart-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.chart-title-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.chart-main-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  display: flex;
+  align-items: center;
+}
+
+.chart-main-title i {
+  color: #6366f1;
+  font-size: 20px;
+}
+
+.chart-week-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  padding-left: 2px;
+}
+
+/* Navigation Controls */
+.chart-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e2e8f0;
+}
+
+.chart-nav-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #475569;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.chart-nav-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.chart-nav-btn:active:not(:disabled) {
+  background: #e2e8f0;
+  transform: scale(0.95);
+}
+
+.chart-nav-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.chart-nav-btn.today-btn {
+  width: auto;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  letter-spacing: 0.02em;
+  color: #6366f1;
+}
+
+.chart-nav-btn.today-btn:hover:not(:disabled) {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.chart-nav-btn.today-btn:disabled {
+  color: #94a3b8;
+}
+
+/* Summary Stats Row */
+.chart-summary-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.chart-stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.chart-stat-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Color-coded dots */
+.stat-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.present-dot {
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
+}
+
+.late-dot {
+  background: #f59e0b;
+  box-shadow: 0 0 6px rgba(245, 158, 11, 0.4);
+}
+
+.leave-dot {
+  background: #8b5cf6;
+  box-shadow: 0 0 6px rgba(139, 92, 246, 0.4);
+}
+
+.absent-dot {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
+}
+
+.stat-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #64748b;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.stat-value {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  margin-left: auto;
+}
+
+/* Badge-specific subtle backgrounds */
+.present-badge {
+  border-left: 3px solid #10b981;
+}
+
+.late-badge {
+  border-left: 3px solid #f59e0b;
+}
+
+.leave-badge {
+  border-left: 3px solid #8b5cf6;
+}
+
+.absent-badge {
+  border-left: 3px solid #ef4444;
+}
+
+/* Chart container */
+.chart-card .card-body {
+  padding: 20px 24px;
+}
+
+.chart-card .chart-container {
+  position: relative;
+  width: 100%;
+  min-height: 400px;
+}
+
+/* ============================================
+   Responsive Adjustments
+   ============================================ */
+
+@media (max-width: 768px) {
+  .chart-header-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chart-nav-controls {
+    align-self: flex-start;
+  }
+
+  .chart-summary-row {
+    gap: 8px;
+  }
+
+  .chart-stat-badge {
+    flex: 1;
+    min-width: 80px;
+    padding: 6px 10px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-value {
+    font-size: 14px;
+  }
+
+  .chart-main-title {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ============================================
+   Dark Mode Support
+   ============================================ */
+
+:host-context(.dark-mode) .chart-card,
+:host-context([data-theme="dark"]) .chart-card {
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
+}
+
+:host-context(.dark-mode) .chart-card-header,
+:host-context([data-theme="dark"]) .chart-card-header {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border-bottom-color: #334155;
+}
+
+:host-context(.dark-mode) .chart-main-title,
+:host-context([data-theme="dark"]) .chart-main-title {
+  color: #f1f5f9;
+}
+
+:host-context(.dark-mode) .chart-week-label,
+:host-context([data-theme="dark"]) .chart-week-label {
+  color: #94a3b8;
+}
+
+:host-context(.dark-mode) .chart-nav-controls,
+:host-context([data-theme="dark"]) .chart-nav-controls {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:host-context(.dark-mode) .chart-nav-btn,
+:host-context([data-theme="dark"]) .chart-nav-btn {
+  color: #94a3b8;
+}
+
+:host-context(.dark-mode) .chart-nav-btn:hover:not(:disabled),
+:host-context([data-theme="dark"]) .chart-nav-btn:hover:not(:disabled) {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+:host-context(.dark-mode) .chart-stat-badge,
+:host-context([data-theme="dark"]) .chart-stat-badge {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:host-context(.dark-mode) .stat-label,
+:host-context([data-theme="dark"]) .stat-label {
+  color: #94a3b8;
+}
+
+:host-context(.dark-mode) .stat-value,
+:host-context([data-theme="dark"]) .stat-value {
+  color: #f1f5f9;
+}
