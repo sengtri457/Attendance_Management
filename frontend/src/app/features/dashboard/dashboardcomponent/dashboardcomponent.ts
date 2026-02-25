@@ -651,8 +651,14 @@ export class Dashboardcomponent implements OnInit, AfterViewInit {
 
     this.attendance.forEach((record: any) => {
       if (record.date) {
-        // Parse the date string directly without timezone conversion
-        const dateStr = record.date.split("T")[0]; // Gets "2025-12-12" from "2025-12-12T17:00:00.000Z"
+        // Convert UTC date from API to local timezone date
+        // The backend stores dates as UTC (e.g., "2026-02-24T17:00:00.000Z" for Feb 25 in Asia/Phnom_Penh)
+        // We need to convert to local date to match the chart labels
+        const localDate = new Date(record.date);
+        const year = localDate.getFullYear();
+        const month = String(localDate.getMonth() + 1).padStart(2, "0");
+        const day = String(localDate.getDate()).padStart(2, "0");
+        const dateStr = `${year}-${month}-${day}`;
 
         grouped[dateStr] = (grouped[dateStr] || 0) + 1;
       }
