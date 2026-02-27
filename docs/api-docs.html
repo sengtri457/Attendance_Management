@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Attendance API Docs</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--sidebar:#161b27;--card:#1e2433;--border:#2a3045;
+  --accent:#6366f1;--accent2:#8b5cf6;--green:#22c55e;--red:#ef4444;
+  --yellow:#f59e0b;--blue:#3b82f6;--cyan:#06b6d4;
+  --text:#e2e8f0;--muted:#64748b;--code:#1a1f2e;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh}
+/* SIDEBAR */
+#sidebar{width:280px;min-height:100vh;background:var(--sidebar);border-right:1px solid var(--border);position:fixed;top:0;left:0;overflow-y:auto;z-index:100}
+.logo{padding:24px 20px;border-bottom:1px solid var(--border)}
+.logo h1{font-size:16px;font-weight:700;color:#fff}
+.logo p{font-size:11px;color:var(--muted);margin-top:4px}
+.badge{display:inline-block;background:var(--accent);color:#fff;font-size:10px;padding:2px 8px;border-radius:20px;margin-top:6px}
+.nav-section{padding:16px 0}
+.nav-label{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:1px;padding:0 20px 8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 20px;cursor:pointer;font-size:13px;color:var(--muted);transition:.2s;text-decoration:none}
+.nav-item:hover,.nav-item.active{color:var(--text);background:rgba(99,102,241,.1);border-right:2px solid var(--accent)}
+.nav-item .method{font-size:9px;font-weight:700;padding:2px 6px;border-radius:4px;min-width:36px;text-align:center}
+.get{background:rgba(34,197,94,.15);color:var(--green)}
+.post{background:rgba(99,102,241,.15);color:var(--accent)}
+.put{background:rgba(245,158,11,.15);color:var(--yellow)}
+.del{background:rgba(239,68,68,.15);color:var(--red)}
+.patch{background:rgba(6,182,212,.15);color:var(--cyan)}
+/* MAIN */
+#main{margin-left:280px;flex:1;padding:40px}
+.page-header{margin-bottom:40px}
+.page-header h2{font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.page-header p{color:var(--muted);margin-top:8px;font-size:14px}
+/* INFO CARDS */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:40px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px}
+.info-card h4{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.info-card p{font-size:14px;font-weight:600;margin-top:6px;color:#fff}
+/* SECTIONS */
+.section{margin-bottom:48px}
+.section-title{font-size:20px;font-weight:700;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border);color:#fff}
+/* ENDPOINT CARD */
+.endpoint{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px}
+.endpoint-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;transition:.2s}
+.endpoint-header:hover{background:rgba(255,255,255,.03)}
+.method-badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;min-width:52px;text-align:center}
+.endpoint-path{font-family:'Fira Code',monospace;font-size:14px;color:var(--text)}
+.endpoint-desc{font-size:12px;color:var(--muted);margin-left:auto}
+.role-tag{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid}
+.role-admin{color:var(--red);border-color:rgba(239,68,68,.3);background:rgba(239,68,68,.1)}
+.role-teacher{color:var(--yellow);border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.1)}
+.role-any{color:var(--green);border-color:rgba(34,197,94,.3);background:rgba(34,197,94,.1)}
+.role-public{color:var(--muted);border-color:var(--border);background:rgba(255,255,255,.05)}
+.endpoint-body{border-top:1px solid var(--border);padding:20px;display:none}
+.endpoint-body.open{display:block}
+/* CODE BLOCKS */
+pre{background:var(--code);border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'Fira Code',monospace;font-size:13px;overflow-x:auto;color:#a5f3fc;margin:10px 0}
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px;margin:12px 0}
+th{background:rgba(255,255,255,.05);color:var(--muted);font-weight:600;text-align:left;padding:10px 14px;border-bottom:1px solid var(--border)}
+td{padding:10px 14px;border-bottom:1px solid rgba(42,48,69,.5);color:var(--text)}
+td code{font-family:'Fira Code',monospace;background:var(--code);padding:2px 6px;border-radius:4px;font-size:12px;color:#a5f3fc}
+/* AUTH SECTION */
+.auth-box{background:linear-gradient(135deg,rgba(99,102,241,.1),rgba(139,92,246,.1));border:1px solid rgba(99,102,241,.3);border-radius:12px;padding:24px;margin-bottom:32px}
+.auth-box h3{color:var(--accent);margin-bottom:12px}
+.auth-step{display:flex;gap:12px;margin-bottom:12px;font-size:13px}
+.auth-step .num{background:var(--accent);color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+/* MODELS */
+.model-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.model-card h4{font-size:14px;font-weight:700;color:#fff;margin-bottom:12px;font-family:'Fira Code',monospace}
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+/* SECTION ANCHOR */
+.anchor{scroll-margin-top:20px}
+</style>
+</head>
+<body>
+<nav id="sidebar">
+  <div class="logo">
+    <h1>📋 Attendance API</h1>
+    <p>Student Management System</p>
+    <span class="badge">v1.0.0</span>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Overview</div>
+    <a class="nav-item" href="#overview">🏠 Overview</a>
+    <a class="nav-item" href="#auth-section">🔐 Authentication</a>
+    <a class="nav-item" href="#errors">⚠️ Error Handling</a>
+    <a class="nav-item" href="#roles">👤 Roles</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Endpoints</div>
+    <a class="nav-item" href="#sec-auth"><span class="method post">POST</span>Auth</a>
+    <a class="nav-item" href="#sec-users"><span class="method get">GET</span>Users</a>
+    <a class="nav-item" href="#sec-students"><span class="method get">GET</span>Students</a>
+    <a class="nav-item" href="#sec-teachers"><span class="method get">GET</span>Teachers</a>
+    <a class="nav-item" href="#sec-parents"><span class="method get">GET</span>Parents</a>
+    <a class="nav-item" href="#sec-subjects"><span class="method get">GET</span>Subjects</a>
+    <a class="nav-item" href="#sec-class"><span class="method get">GET</span>Class Groups</a>
+    <a class="nav-item" href="#sec-attendance"><span class="method get">GET</span>Attendance</a>
+    <a class="nav-item" href="#sec-leave"><span class="method get">GET</span>Leave Requests</a>
+    <a class="nav-item" href="#sec-roles"><span class="method get">GET</span>Roles</a>
+  </div>
+  <div class="nav-section">
+    <div class="nav-label">Reference</div>
+    <a class="nav-item" href="#models">🗄️ Data Models</a>
+    <a class="nav-item" href="#guidelines">📖 Dev Guidelines</a>
+  </div>
+</nav>
+
+<main id="main">
+  <!-- HEADER -->
+  <div class="page-header anchor" id="overview">
+    <h2>Attendance Management API</h2>
+    <p>Complete REST API reference for the Student Attendance Management System</p>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card"><h4>Base URL</h4><p style="font-family:'Fira Code';font-size:12px">http://localhost:4000/api</p></div>
+    <div class="info-card"><h4>Version</h4><p>1.0.0</p></div>
+    <div class="info-card"><h4>Auth Method</h4><p>JWT Bearer Token</p></div>
+    <div class="info-card"><h4>Database</h4><p>MongoDB</p></div>
+    <div class="info-card"><h4>Framework</h4><p>Express.js v5</p></div>
+    <div class="info-card"><h4>Token Expiry</h4><p>30 Days</p></div>
+  </div>
+
+  <!-- AUTH INFO -->
+  <div class="auth-box anchor" id="auth-section">
+    <h3>🔐 Authentication</h3>
+    <div class="auth-step"><div class="num">1</div><div>Call <code>POST /api/auth/login</code> with your credentials.</div></div>
+    <div class="auth-step"><div class="num">2</div><div>Extract the <code>tokens</code> field from the response.</div></div>
+    <div class="auth-step"><div class="num">3</div><div>Add it to every request header: <code>Authorization: Bearer &lt;token&gt;</code></div></div>
+    <pre>Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...</pre>
+  </div>
+
+  <!-- ERRORS -->
+  <div class="section anchor" id="errors">
+    <div class="section-title">⚠️ Error Handling</div>
+    <table>
+      <tr><th>Status</th><th>Meaning</th></tr>
+      <tr><td><code>200</code></td><td>OK – Request succeeded</td></tr>
+      <tr><td><code>201</code></td><td>Created – Resource created successfully</td></tr>
+      <tr><td><code>400</code></td><td>Bad Request – Invalid or missing data</td></tr>
+      <tr><td><code>401</code></td><td>Unauthorized – Token missing or invalid</td></tr>
+      <tr><td><code>403</code></td><td>Forbidden – Insufficient role/permission</td></tr>
+      <tr><td><code>404</code></td><td>Not Found – Resource not found</td></tr>
+      <tr><td><code>500</code></td><td>Internal Server Error</td></tr>
+    </table>
+    <pre>// Success shape
+{ "success": true, "data": { ... } }
+
+// Error shape
+{ "success": false, "message": "Descriptive error message" }</pre>
+  </div>
+
+  <!-- ROLES -->
+  <div class="section anchor" id="roles">
+    <div class="section-title">👤 Roles & Permissions</div>
+    <table>
+      <tr><th>Role</th><th>Description</th></tr>
+      <tr><td><code>Admin</code></td><td>Full access to all resources</td></tr>
+      <tr><td><code>Teacher</code></td><td>Mark attendance, review leave requests</td></tr>
+      <tr><td><code>Student</code></td><td>View own attendance, submit leave requests</td></tr>
+      <tr><td><code>Parent</code></td><td>View child's attendance records</td></tr>
+    </table>
+  </div>
+
+  <!-- AUTH ENDPOINTS -->
+  <div class="section anchor" id="sec-auth">
+    <div class="section-title">Auth Endpoints — /api/auth</div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/auth/login</span>
+        <span class="endpoint-desc">Login &amp; get JWT token</span>
+        <span class="role-tag role-public">Public</span>
+      </div>
+      <div class="endpoint-body">
+        <b>Request Body:</b>
+        <pre>{ "username": "john_doe", "password": "yourpassword" }</pre>
+        <b>Response:</b>
+        <pre>{
+  "success": true,
+  "data": {
+    "tokens": "eyJhbGci...",
+    "user": {
+      "id": "64abc...", "username": "john_doe",
+      "email": "john@example.com", "role": "Teacher",
+      "studentId": null, "teacherId": "64xyz...", "parentId": null
+    }
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/auth/register</span>
+        <span class="endpoint-desc">Register new user</span>
+        <span class="role-tag role-public">Public</span>
+      </div>
+      <div class="endpoint-body">
+        <b>Request Body:</b>
+        <pre>{ "username": "new_user", "password": "securepass", "email": "user@email.com", "roleId": "64roleId..." }</pre>
+        <b>Response (201):</b>
+        <pre>{ "success": true, "message": "User registered successfully", "data": { "userId": "64abc..." } }</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="section anchor" id="sec-users">
+    <div class="section-title">Users — /api/users</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/users</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Get all users</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/users/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get user by ID</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/users</code></td><td><span class="role-tag role-public">Public</span></td><td>Create user</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/users/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Update user</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/users/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete user</td></tr>
+      <tr><td><span class="method-badge patch">PATCH</span></td><td><code>/api/users/:id/toggle-status</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Activate/deactivate account</td></tr>
+      <tr><td><span class="method-badge patch">PATCH</span></td><td><code>/api/users/:id/change-password</code></td><td><span class="role-tag role-any">Any</span></td><td>Change password</td></tr>
+      <tr><td><span class="method-badge patch">PATCH</span></td><td><code>/api/users/:id/profile</code></td><td><span class="role-tag role-any">Any</span></td><td>Update profile</td></tr>
+    </table>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge patch">PATCH</span>
+        <span class="endpoint-path">/api/users/:id/change-password</span>
+        <span class="endpoint-desc">Example body</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>{ "currentPassword": "oldpass123", "newPassword": "newSecurePass!" }</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- STUDENTS -->
+  <div class="section anchor" id="sec-students">
+    <div class="section-title">Students — /api/students</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/students</code></td><td><span class="role-tag role-any">Any</span></td><td>Get all students</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/students/blacklisted</code></td><td><span class="role-tag role-any">Any</span></td><td>Get blacklisted students</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/students/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get student by ID</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/students/:id/parents</code></td><td><span class="role-tag role-any">Any</span></td><td>Get student's parents</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/students</code></td><td><span class="role-tag role-public">Public</span></td><td>Create student</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/students/import</code></td><td><span class="role-tag role-public">Public</span></td><td>Import from Excel (multipart)</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/students/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Update student</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/students/restore/:id</code></td><td><span class="role-tag role-public">Public</span></td><td>Restore deleted student</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/students/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete student</td></tr>
+    </table>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/students</span>
+        <span class="endpoint-desc">Create student body</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>{
+  "user": "64userId...",
+  "firstName": "Sophea", "lastName": "Chan",
+  "dob": "2005-03-15", "gender": "female",
+  "phone": "+85512345678",
+  "classGroup": "64classGroupId..."
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEACHERS -->
+  <div class="section anchor" id="sec-teachers">
+    <div class="section-title">Teachers — /api/teachers</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/teachers</code></td><td><span class="role-tag role-any">Any</span></td><td>Get all teachers</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/teachers/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get teacher by ID</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/teachers/:id/subjects</code></td><td><span class="role-tag role-any">Any</span></td><td>Get teacher's subjects</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/teachers</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Create teacher</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/teachers/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Update teacher</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/teachers/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete teacher</td></tr>
+    </table>
+  </div>
+
+  <!-- PARENTS -->
+  <div class="section anchor" id="sec-parents">
+    <div class="section-title">Parents — /api/parents</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/parents</code></td><td><span class="role-tag role-any">Any</span></td><td>Get all parents</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/parents/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get parent by ID</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/parents/:id/children</code></td><td><span class="role-tag role-any">Any</span></td><td>Get parent's children</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/parents</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Create parent</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/parents/:id/children</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Add child</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/parents/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Update parent</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/parents/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete parent</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/parents/:id/children/:studentId</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Remove child</td></tr>
+    </table>
+  </div>
+
+  <!-- SUBJECTS -->
+  <div class="section anchor" id="sec-subjects">
+    <div class="section-title">Subjects — /api/subjects</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/subjects</code></td><td><span class="role-tag role-any">Any</span></td><td>Get all subjects</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/subjects/schedule</code></td><td><span class="role-tag role-any">Any</span></td><td>Get schedule</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/subjects/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get subject by ID</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/subjects/teacher/:teacherId</code></td><td><span class="role-tag role-any">Any</span></td><td>By teacher</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/subjects</code></td><td><span class="role-tag role-teacher">Admin/Teacher</span></td><td>Create subject</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/subjects/:id</code></td><td><span class="role-tag role-teacher">Admin/Teacher</span></td><td>Update subject</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/subjects/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete subject</td></tr>
+    </table>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/subjects</span>
+        <span class="endpoint-desc">Create subject body</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>{
+  "subjectName": "Mathematics", "subjectCode": "MATH101",
+  "description": "Algebra & Calculus",
+  "teacherId": "64teacherId...", "credit": 3,
+  "classGroups": ["64classGroupId..."],
+  "sessions": [
+    { "days": ["Monday","Wednesday"], "startTime": "08:00", "endTime": "09:30", "room": "Room A1" }
+  ]
+}</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASS GROUPS -->
+  <div class="section anchor" id="sec-class">
+    <div class="section-title">Class Groups — /api/class-groups</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Auth</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/class-groups</code></td><td><span class="role-tag role-public">Public</span></td><td>Get all groups</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/class-groups/:id</code></td><td><span class="role-tag role-public">Public</span></td><td>Get group by ID</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/class-groups</code></td><td><span class="role-tag role-public">Public</span></td><td>Create group</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/class-groups/:id</code></td><td><span class="role-tag role-public">Public</span></td><td>Update group</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/class-groups/:id</code></td><td><span class="role-tag role-public">Public</span></td><td>Delete group</td></tr>
+    </table>
+  </div>
+
+  <!-- ATTENDANCE -->
+  <div class="section anchor" id="sec-attendance">
+    <div class="section-title">Attendance — /api/attendance</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance</code></td><td><span class="role-tag role-any">Any</span></td><td>Get records (filterable)</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/today</code></td><td><span class="role-tag role-any">Any</span></td><td>Today's attendance</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/stats/:studentId</code></td><td><span class="role-tag role-any">Any</span></td><td>Student stats</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/late-report</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Late report</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/absent-report</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Absent report</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/check-leave-status</code></td><td><span class="role-tag role-any">Any</span></td><td>Check leave status</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/attendance/leave-request/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Leave request by ID</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/attendance</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Mark attendance</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/attendance/bulk</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Bulk mark</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/attendance/mark-absent</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Mark absent</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/attendance/:id</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Update record</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/attendance/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete record</td></tr>
+    </table>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/attendance/bulk</span>
+        <span class="endpoint-desc">Bulk mark attendance</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>{
+  "subjectId": "64subjectId...",
+  "date": "2026-02-25",
+  "records": [
+    { "student": "64s1...", "status": "present" },
+    { "student": "64s2...", "status": "late", "lateBy": 10 },
+    { "student": "64s3...", "status": "absent" }
+  ]
+}</pre>
+        <b>Status Values:</b>
+        <table>
+          <tr><th>Value</th><th>Description</th></tr>
+          <tr><td><code>present</code></td><td>Student was present</td></tr>
+          <tr><td><code>absent</code></td><td>Student was absent</td></tr>
+          <tr><td><code>late</code></td><td>Student arrived late</td></tr>
+          <tr><td><code>half-day</code></td><td>Attended half the day</td></tr>
+          <tr><td><code>on-leave</code></td><td>Approved leave</td></tr>
+          <tr><td><code>excused</code></td><td>Excused absence</td></tr>
+        </table>
+        <b style="margin-top:12px;display:block">Query Parameters (GET /api/attendance):</b>
+        <table>
+          <tr><th>Param</th><th>Type</th><th>Description</th></tr>
+          <tr><td><code>studentId</code></td><td>string</td><td>Filter by student</td></tr>
+          <tr><td><code>subjectId</code></td><td>string</td><td>Filter by subject</td></tr>
+          <tr><td><code>date</code></td><td>date</td><td>Specific date</td></tr>
+          <tr><td><code>startDate</code></td><td>date</td><td>Range start</td></tr>
+          <tr><td><code>endDate</code></td><td>date</td><td>Range end</td></tr>
+          <tr><td><code>status</code></td><td>string</td><td>Filter by status</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEAVE REQUESTS -->
+  <div class="section anchor" id="sec-leave">
+    <div class="section-title">Leave Requests — /api/leave-requests</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/leave-requests</code></td><td><span class="role-tag role-any">Any</span></td><td>Get all leave requests</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/leave-requests/summary/:studentId</code></td><td><span class="role-tag role-any">Any</span></td><td>Student leave summary</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/leave-requests</code></td><td><span class="role-tag role-any">Any</span></td><td>Submit request (multipart)</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/leave-requests/:id/review</code></td><td><span class="role-tag role-teacher">Teacher/Admin</span></td><td>Approve/Reject</td></tr>
+    </table>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span class="method-badge post">POST</span>
+        <span class="endpoint-path">/api/leave-requests</span>
+        <span class="endpoint-desc">Submit leave (multipart/form-data)</span>
+      </div>
+      <div class="endpoint-body">
+        <table>
+          <tr><th>Field</th><th>Type</th><th>Required</th><th>Description</th></tr>
+          <tr><td><code>student</code></td><td>string</td><td>✅</td><td>Student ObjectId</td></tr>
+          <tr><td><code>fromDate</code></td><td>date</td><td>✅</td><td>Leave start date</td></tr>
+          <tr><td><code>toDate</code></td><td>date</td><td>✅</td><td>Leave end date</td></tr>
+          <tr><td><code>reason</code></td><td>string</td><td>✅</td><td>Reason for leave</td></tr>
+          <tr><td><code>evidence</code></td><td>file[]</td><td>❌</td><td>Medical/supporting files</td></tr>
+        </table>
+        <b style="margin-top:12px;display:block">Review body (PUT/:id/review):</b>
+        <pre>{ "status": "approved" }</pre>
+        <p style="color:var(--muted);font-size:12px;margin-top:6px">Status values: <code>pending</code> | <code>approved</code> | <code>rejected</code></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROLES -->
+  <div class="section anchor" id="sec-roles">
+    <div class="section-title">Roles — /api/roles</div>
+    <table>
+      <tr><th>Method</th><th>Endpoint</th><th>Role</th><th>Description</th></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/roles</code></td><td><span class="role-tag role-public">Public</span></td><td>Get all roles</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/roles/:id</code></td><td><span class="role-tag role-any">Any</span></td><td>Get role by ID</td></tr>
+      <tr><td><span class="method-badge get">GET</span></td><td><code>/api/roles/:id/users</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Get users with role</td></tr>
+      <tr><td><span class="method-badge post">POST</span></td><td><code>/api/roles</code></td><td><span class="role-tag role-public">Public</span></td><td>Create role</td></tr>
+      <tr><td><span class="method-badge put">PUT</span></td><td><code>/api/roles/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Update role</td></tr>
+      <tr><td><span class="method-badge del">DEL</span></td><td><code>/api/roles/:id</code></td><td><span class="role-tag role-admin">Admin</span></td><td>Delete role</td></tr>
+    </table>
+  </div>
+
+  <!-- MODELS -->
+  <div class="section anchor" id="models">
+    <div class="section-title">🗄️ Data Models</div>
+    <div class="model-card">
+      <h4>User</h4>
+      <pre>{ _id, username*, email*, password (hashed), role → Role, isActive, createdAt }</pre>
+    </div>
+    <div class="model-card">
+      <h4>Student</h4>
+      <pre>{ _id, user → User, classGroup → ClassGroup, firstName*, lastName*, dob, gender (male|female|other), phone, photo, isBlacklisted }</pre>
+    </div>
+    <div class="model-card">
+      <h4>Teacher</h4>
+      <pre>{ _id, user → User, subject → Subject, name*, phone }</pre>
+    </div>
+    <div class="model-card">
+      <h4>Subject</h4>
+      <pre>{ _id, subjectName*, subjectCode, description, teacherId → Teacher, credit (1-10), classGroups[] → ClassGroup, sessions[{ days[], startTime "HH:mm", endTime "HH:mm", room }] }</pre>
+    </div>
+    <div class="model-card">
+      <h4>Attendance</h4>
+      <pre>{ _id, student → Student, subject → Subject, date*, checkInTime, checkOutTime, status (present|absent|late|half-day|on-leave|excused), isLate, lateBy (minutes), workHours, markedByTeacher → Teacher, note, leaveReference → LeaveRequest }</pre>
+    </div>
+    <div class="model-card">
+      <h4>LeaveRequest</h4>
+      <pre>{ _id, student → Student, fromDate*, toDate*, reason*, status (pending|approved|rejected), reviewedBy → User, reviewedAt, requestedAt, attachments[] }</pre>
+    </div>
+    <div class="model-card">
+      <h4>ClassGroup</h4>
+      <pre>{ _id, groupName, description }</pre>
+    </div>
+    <div class="model-card">
+      <h4>Role</h4>
+      <pre>{ _id, roleName, roleDescription, createdAt }</pre>
+    </div>
+  </div>
+
+  <!-- GUIDELINES -->
+  <div class="section anchor" id="guidelines">
+    <div class="section-title">📖 Developer Guidelines</div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span style="font-size:16px">📁</span>
+        <span class="endpoint-path">Project Structure</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>backend/
+├── server.js           ← Entry point, route registration
+├── .env                ← MONGODB_URI, JWT_SECRET, PORT
+├── uploads/            ← Uploaded files (multer)
+└── src/
+    ├── config/         ← DB connection config
+    ├── controllers/    ← Business logic
+    ├── middleware/      ← auth.js, upload.js
+    ├── models/         ← Mongoose schemas
+    ├── routes/         ← Route definitions
+    └── utils/          ← seedRoles, helpers</pre>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span style="font-size:16px">🔧</span>
+        <span class="endpoint-path">Adding a New Endpoint</span>
+      </div>
+      <div class="endpoint-body">
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Follow this 4-step pattern:</p>
+        <pre>// Step 1: Model (src/models/MyModel.js)
+const schema = new mongoose.Schema({ field: String });
+module.exports = mongoose.model('MyModel', schema);
+
+// Step 2: Controller (src/controllers/my.controller.js)
+exports.getAll = async (req, res) => {
+  try {
+    const data = await MyModel.find();
+    res.json({ success: true, data });
+  } catch (e) {
+    res.status(500).json({ success: false, message: e.message });
+  }
+};
+
+// Step 3: Route (src/routes/my.routes.js)
+const { authMiddleware, roleCheck } = require('../middleware/auth');
+router.get('/', authMiddleware, roleCheck('Admin'), controller.getAll);
+
+// Step 4: Register in server.js
+app.use('/api/my-resource', require('./src/routes/my.routes'));</pre>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span style="font-size:16px">⚙️</span>
+        <span class="endpoint-path">Environment Variables (.env)</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>MONGODB_URI=mongodb://localhost:27017/attendance_db
+JWT_SECRET=your_super_secret_key_here
+PORT=4000</pre>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span style="font-size:16px">📅</span>
+        <span class="endpoint-path">Date Handling Notes</span>
+      </div>
+      <div class="endpoint-body">
+        <p style="color:var(--muted);font-size:13px">Always store dates in <strong>UTC ISO 8601</strong> format.</p>
+        <pre>// ✅ Correct
+"date": "2026-02-25T08:00:00.000Z"
+
+// ✅ Session times (Subject model)
+"startTime": "08:00"
+"endTime": "09:30"</pre>
+        <p style="color:var(--muted);font-size:13px;margin-top:8px">The system uses <code>moment</code> and <code>moment-timezone</code> for time manipulation.</p>
+      </div>
+    </div>
+    <div class="endpoint">
+      <div class="endpoint-header" onclick="toggle(this)">
+        <span style="font-size:16px">🔐</span>
+        <span class="endpoint-path">Auth Middleware Usage</span>
+      </div>
+      <div class="endpoint-body">
+        <pre>const { authMiddleware, roleCheck } = require('../middleware/auth');
+
+// 🔒 Protected – any authenticated user
+router.get('/', authMiddleware, controller.getAll);
+
+// 👑 Protected + role restricted
+router.post('/', authMiddleware, roleCheck('Admin'), controller.create);
+
+// Multi-role
+router.put('/:id', authMiddleware, roleCheck('Admin', 'Teacher'), controller.update);</pre>
+      </div>
+    </div>
+  </div>
+
+  <p style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;border-top:1px solid var(--border)">
+    Attendance Student Management System API Docs — v1.0.0 — Generated Feb 2026
+  </p>
+</main>
+
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  if(body && body.classList.contains('endpoint-body')) {
+    body.classList.toggle('open');
+  }
+}
+// Active nav highlight
+const items = document.querySelectorAll('.nav-item');
+window.addEventListener('scroll', () => {
+  const anchors = document.querySelectorAll('.anchor');
+  let current = '';
+  anchors.forEach(a => { if(window.scrollY >= a.offsetTop - 100) current = a.id; });
+  items.forEach(i => {
+    i.classList.toggle('active', i.getAttribute('href') === '#' + current);
+  });
+});
+</script>
+</body>
+</html>
