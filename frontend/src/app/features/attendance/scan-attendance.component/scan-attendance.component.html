@@ -1,15 +1,20 @@
 <div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
         <h2 class="mb-0">
             <i class="bi bi-qr-code-scan me-2 text-primary"></i>Scan Attendance
         </h2>
-        <button routerLink="/attendance/mark" class="btn btn-outline-secondary">
-            <i class="bi bi-list-check me-2"></i>Manual Marking
-        </button>
-        <button class="btn ms-2" [ngClass]="isDailyMode ? 'btn-danger' : 'btn-success'" (click)="toggleMode()">
-            <i class="bi" [ngClass]="isDailyMode ? 'bi-clock-history' : 'bi-journal-check'"></i>
-            {{ isDailyMode ? 'Switch to Subject Mode' : 'Switch to Daily Check-in/out' }}
-        </button>
+        <div class="btn-group btn-group-sm" role="group">
+            <button routerLink="/attendance/mark" class="btn btn-outline-secondary" title="Manual Marking">
+                <i class="bi bi-list-check">Manual Check</i>
+            </button>
+            <button class="btn btn-outline-secondary" routerLink="/attendance" title="Attendance Dashboard">
+                <i class="bi bi-clock-history">Dashboard</i>
+            </button>
+            <button [ngClass]="isDailyMode ? 'btn-danger' : 'btn-success'" class="btn btn-sm" (click)="toggleMode()"
+                [title]="isDailyMode ? 'Switch to Subject Mode' : 'Switch to Daily Check-in/out'">
+                <i class="bi" [ngClass]="isDailyMode ? 'bi-clock-history' : 'bi-journal-check'"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Controls -->
